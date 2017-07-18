@@ -16,11 +16,11 @@ class BoardController {
         }
     }
 
-    OnInputDown(sprite: Phaser.Sprite, pointer: Phaser.Pointer, block: Block) {
+    private OnInputDown(sprite: Phaser.Sprite, pointer: Phaser.Pointer, block: Block) {
         this.selectedBlock = block;
     }
 
-    OnInputUp(sprite: Phaser.Sprite, pointer: Phaser.Pointer, block: Block) {
+    private OnInputUp(sprite: Phaser.Sprite, pointer: Phaser.Pointer, block: Block) {
         this.selectedBlock = null;
     }
 
@@ -70,7 +70,7 @@ class BoardController {
         }
     }
 
-    SetupSlide(block: Block, direction: SlideDirection) {
+    private SetupSlide(block: Block, direction: SlideDirection) {
         // Save the state of the block that this one will swap with
         let targetBlock: Block;
         if(direction == SlideDirection.Left) {

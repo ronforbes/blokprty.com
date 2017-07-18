@@ -4,17 +4,20 @@ class Board {
     static readonly Rows: number = 11;
     private phaserGame: Phaser.Game;
     private controller: BoardController;
+    MatchDetector: MatchDetector;
 
     constructor(phaserGame: Phaser.Game) {
         this.phaserGame = phaserGame;
 
+        this.MatchDetector = new MatchDetector(this);
+        
         this.Blocks = [];
 
         for(let x = 0; x < Board.Columns; x++) {
             this.Blocks[x] = [];
 
             for(let y = 0; y < Board.Rows; y++) {
-                this.Blocks[x][y] = new Block(this.phaserGame, this.controller);
+                this.Blocks[x][y] = new Block(this.phaserGame, this);
                 this.Blocks[x][y].X = x;
                 this.Blocks[x][y].Y = y;
 
@@ -40,5 +43,7 @@ class Board {
         }
 
         this.controller.Update();
+
+        this.MatchDetector.Update();
     }
 }

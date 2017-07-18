@@ -7,6 +7,7 @@ enum SlideDirection {
 class BlockSlider {
     private block: Block;
     private phaserGame: Phaser.Game;
+    private matchDetector: MatchDetector;
     //private matchDetector: MatchDetector;
     Direction: SlideDirection;
     TargetState: BlockState;
@@ -14,10 +15,10 @@ class BlockSlider {
     Elapsed: number;
     static readonly Duration: number = 100;
 
-    constructor(block: Block, phaserGame: Phaser.Game) {
+    constructor(block: Block, phaserGame: Phaser.Game, matchDetector: MatchDetector) {
         this.block = block;
         this.phaserGame = phaserGame;
-        //matchDetector = blah blah blah
+        this.matchDetector = matchDetector;
     }
 
     Slide(direction: SlideDirection) {
@@ -40,7 +41,7 @@ class BlockSlider {
                 this.Direction = SlideDirection.None;
 
                 if(this.block.State == BlockState.Idle) {
-                    // match detector request match detection (block)
+                    this.matchDetector.RequestMatchDetection(this.block);
                 }
             }
         }

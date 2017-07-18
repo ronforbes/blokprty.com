@@ -24,8 +24,15 @@ class BlockRenderer {
         let timePercentage: number = 0;
 
         switch(this.block.State) {
+            case BlockState.Empty:
+                this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height);
+                this.block.Sprite.scale.setTo(45, 45);
+                this.block.Sprite.visible = false;
+                break;
+
             case BlockState.Idle:
                 this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height);
+                this.block.Sprite.visible = true;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             
@@ -50,6 +57,45 @@ class BlockRenderer {
                     this.block.Sprite.tint = this.colors[this.block.Type];
                 }
                 break;
+
+            case BlockState.WaitingToFall:
+                this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height);
+                this.block.Sprite.visible = true;
+                this.block.Sprite.tint = this.colors[this.block.Type];
+                break;
+            
+            case BlockState.Falling:
+                // todo: implement this
+                break;
+            
+            case BlockState.Matched:
+                this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height);
+                this.block.Sprite.visible = true;
+                this.block.Sprite.tint = 0xffffff;
+                break;
+
+            case BlockState.WaitingToClear:
+                this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height);
+                this.block.Sprite.visible = true;
+                this.block.Sprite.tint = this.colors[this.block.Type];
+                break;
+            
+            case BlockState.Clearing:
+                this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height);
+                this.block.Sprite.visible = true;
+                this.block.Sprite.tint = this.colors[this.block.Type];
+
+                let alpha: number = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
+                this.block.Sprite.alpha = alpha;
+
+                let scale: number = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
+                this.block.Sprite.scale.setTo(scale * 45, scale * 45);
+                break;
+
+            case BlockState.WaitingToEmpty:
+                this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height);
+                this.block.Sprite.scale.setTo(45, 45);
+                this.block.Sprite.visible = false;
         }
         
     }
