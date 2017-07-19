@@ -19,6 +19,7 @@ var Block = (function () {
         this.Matcher = new BlockMatcher(this, this.phaserGame);
         this.Clearer = new BlockClearer(this, this.phaserGame);
         this.Emptier = new BlockEmptier(this, this.phaserGame);
+        this.Faller = new BlockFaller(this, this.phaserGame);
     }
     Block.prototype.Update = function () {
         this.renderer.Update();
@@ -26,6 +27,7 @@ var Block = (function () {
         this.Matcher.Update();
         this.Clearer.Update();
         this.Emptier.Update();
+        this.Faller.Update();
     };
     Block.TypeCount = 6;
     return Block;
@@ -81,6 +83,45 @@ var BlockEmptier = (function () {
     BlockEmptier.DelayInterval = 250;
     return BlockEmptier;
 }());
+var BlockFaller = (function () {
+    function BlockFaller(block, phaserGame) {
+        this.delayDuration = 100;
+        this.block = block;
+        this.phaserGame = phaserGame;
+    }
+    BlockFaller.prototype.Fall = function () {
+        this.block.State = BlockState.WaitingToFall;
+        this.delayElapsed = 0;
+    };
+    BlockFaller.prototype.ContinueFalling = function () {
+        this.FinishWaitingToFall();
+    };
+    BlockFaller.prototype.FinishWaitingToFall = function () {
+        this.block.State = BlockState.Falling;
+        this.Elapsed = 0;
+    };
+    BlockFaller.prototype.Update = function () {
+        // to do: if the game isn't on, return immediately
+        if (this.block.State == BlockState.WaitingToFall) {
+            this.delayElapsed += this.phaserGame.time.elapsed;
+            if (this.delayElapsed >= this.delayDuration) {
+                this.FinishWaitingToFall();
+            }
+        }
+        if (this.block.State == BlockState.Falling) {
+            this.Elapsed += this.phaserGame.time.elapsed;
+            if (this.Elapsed >= BlockFaller.Duration) {
+                this.Target.State = BlockState.Falling;
+                this.Target.Type = this.block.Type;
+                this.Target.Faller.JustFell = true;
+                this.block.State = BlockState.Empty;
+                this.block.Type = -1;
+            }
+        }
+    };
+    BlockFaller.Duration = 100;
+    return BlockFaller;
+}());
 var BlockMatcher = (function () {
     function BlockMatcher(block, phaserGame) {
         this.duration = 1000;
@@ -130,6 +171,7 @@ var BlockRenderer = (function () {
             case BlockState.Idle:
                 this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
                 this.block.Sprite.visible = true;
+                this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             case BlockState.Sliding:
@@ -147,25 +189,33 @@ var BlockRenderer = (function () {
                 }
                 else {
                     this.block.Sprite.visible = true;
+                    this.block.Sprite.alpha = 1;
                     this.block.Sprite.tint = this.colors[this.block.Type];
                 }
                 break;
             case BlockState.WaitingToFall:
                 this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
                 this.block.Sprite.visible = true;
+                this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             case BlockState.Falling:
-                // todo: implement this
+                timePercentage = this.block.Faller.Elapsed / BlockFaller.Duration;
+                this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2 + BlockRenderer.Height * timePercentage);
+                this.block.Sprite.visible = true;
+                this.block.Sprite.alpha = 1;
+                this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             case BlockState.Matched:
                 this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
                 this.block.Sprite.visible = true;
+                this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = 0xffffff;
                 break;
             case BlockState.WaitingToClear:
                 this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
                 this.block.Sprite.visible = true;
+                this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             case BlockState.Clearing:
@@ -234,25 +284,30 @@ var Board = (function () {
                 this.Blocks[x][y] = new Block(this.phaserGame, this);
                 this.Blocks[x][y].X = x;
                 this.Blocks[x][y].Y = y;
-                var type = void 0;
-                do {
-                    type = this.phaserGame.rnd.integerInRange(0, Block.TypeCount - 1);
-                } while ((x != 0 && this.Blocks[x - 1][y].Type == type) || (y != 0 && this.Blocks[x][y - 1].Type == type));
+                var type = this.GetRandomBlockType(x, y);
                 this.Blocks[x][y].Type = type;
                 this.Blocks[x][y].State = BlockState.Idle;
             }
         }
         this.controller = new BoardController(this, this.phaserGame);
-        ;
+        this.boardGravity = new BoardGravity(this);
     }
+    Board.prototype.GetRandomBlockType = function (x, y) {
+        var type;
+        do {
+            type = this.phaserGame.rnd.integerInRange(0, Block.TypeCount - 1);
+        } while ((x != 0 && this.Blocks[x - 1][y].Type == type) || (y != 0 && this.Blocks[x][y - 1].Type == type));
+        return type;
+    };
     Board.prototype.Update = function () {
         for (var x = 0; x < Board.Columns; x++) {
-            for (var y = 0; y < Board.Rows; y++) {
+            for (var y = Board.Rows - 1; y >= 0; y--) {
                 this.Blocks[x][y].Update();
             }
         }
         this.controller.Update();
         this.MatchDetector.Update();
+        this.boardGravity.Update();
     };
     Board.Columns = 6;
     Board.Rows = 11;
@@ -328,6 +383,52 @@ var BoardController = (function () {
         block.Slider.TargetType = targetBlock.Type;
     };
     return BoardController;
+}());
+var BoardGravity = (function () {
+    function BoardGravity(board) {
+        this.board = board;
+    }
+    BoardGravity.prototype.Update = function () {
+        // todo: if the game hasn't started or has ended, return early
+        for (var x = 0; x < Board.Columns; x++) {
+            var emptyBlockDetected = false;
+            for (var y = Board.Rows - 1; y >= 0; y--) {
+                if (this.board.Blocks[x][y].State == BlockState.Empty) {
+                    emptyBlockDetected = true;
+                }
+                if (this.board.Blocks[x][y].State == BlockState.Idle && emptyBlockDetected) {
+                    this.board.Blocks[x][y].Faller.Target = this.board.Blocks[x][y + 1];
+                    this.board.Blocks[x][y].Faller.Fall();
+                }
+                if (this.board.Blocks[x][y].Faller.JustFell) {
+                    if (y < Board.Rows - 1 && (this.board.Blocks[x][y + 1].State == BlockState.Empty || this.board.Blocks[x][y + 1].State == BlockState.Falling)) {
+                        this.board.Blocks[x][y].Faller.Target = this.board.Blocks[x][y + 1];
+                        this.board.Blocks[x][y].Faller.ContinueFalling();
+                    }
+                    else {
+                        this.board.Blocks[x][y].State = BlockState.Idle;
+                        this.board.MatchDetector.RequestMatchDetection(this.board.Blocks[x][y]);
+                    }
+                    this.board.Blocks[x][y].Faller.JustFell = false;
+                }
+            }
+        }
+        // add new blocks on the top of the board
+        for (var x = 0; x < Board.Columns; x++) {
+            if (this.board.Blocks[x][0].State == BlockState.Empty) {
+                var type = this.board.GetRandomBlockType(x, 0);
+                this.board.Blocks[x][0].Type = type;
+                if (this.board.Blocks[x][1].State == BlockState.Idle) {
+                    this.board.Blocks[x][0].State = BlockState.Idle;
+                }
+                if (this.board.Blocks[x][1].State == BlockState.Empty || this.board.Blocks[x][1].State == BlockState.Falling) {
+                    this.board.Blocks[x][0].Faller.Target = this.board.Blocks[x][1];
+                    this.board.Blocks[x][0].Faller.ContinueFalling(); // Should this just be Fall?
+                }
+            }
+        }
+    };
+    return BoardGravity;
 }());
 var Game = (function () {
     function Game() {

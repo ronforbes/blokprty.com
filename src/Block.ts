@@ -23,6 +23,7 @@ class Block {
     Matcher: BlockMatcher;
     Clearer: BlockClearer;
     Emptier: BlockEmptier;
+    Faller: BlockFaller;
 
     constructor(phaserGame: Phaser.Game, board: Board) {
         this.phaserGame = phaserGame;
@@ -34,6 +35,7 @@ class Block {
         this.Matcher = new BlockMatcher(this, this.phaserGame);
         this.Clearer = new BlockClearer(this, this.phaserGame);
         this.Emptier = new BlockEmptier(this, this.phaserGame);
+        this.Faller = new BlockFaller(this, this.phaserGame);
     }
 
     Update() {
@@ -42,5 +44,6 @@ class Block {
         this.Matcher.Update();
         this.Clearer.Update();
         this.Emptier.Update();
+        this.Faller.Update();
     }
 }
