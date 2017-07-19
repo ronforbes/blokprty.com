@@ -11,10 +11,6 @@ app.get('/',function(req,res){
     res.sendFile(__dirname+'/bin/index.html');
 });
 
-//server.listen(process.env.PORT || 8081,function(){
-//    console.log('Listening on '+server.address().port);
-//});
-
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!')
-})
+server.listen(process.env.PORT || 3000, function() {
+    console.log('Listening on ' + server.address().port);
+});
