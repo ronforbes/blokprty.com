@@ -158,13 +158,14 @@ var BlockRenderer = (function () {
         this.block = block;
         this.phaserGame = phaserGame;
         this.block.Sprite.anchor.setTo(0.5, 0.5);
+        this.screenScale = BlockRenderer.Height * 11 / this.phaserGame.height;
     }
     BlockRenderer.prototype.Update = function () {
         var timePercentage = 0;
         switch (this.block.State) {
             case BlockState.Empty:
                 this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
-                this.block.Sprite.scale.setTo(1, 1);
+                this.block.Sprite.scale.setTo(this.screenScale, this.screenScale);
                 this.block.Sprite.visible = false;
                 break;
             case BlockState.Idle:
@@ -224,11 +225,11 @@ var BlockRenderer = (function () {
                 var alpha = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
                 this.block.Sprite.alpha = alpha;
                 var scale = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
-                this.block.Sprite.scale.setTo(scale, scale);
+                this.block.Sprite.scale.setTo(this.screenScale * scale, this.screenScale * scale);
                 break;
             case BlockState.WaitingToEmpty:
                 this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
-                this.block.Sprite.scale.setTo(1, 1);
+                this.block.Sprite.scale.setTo(this.screenScale, this.screenScale);
                 this.block.Sprite.visible = false;
         }
     };
