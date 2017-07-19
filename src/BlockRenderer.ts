@@ -13,12 +13,18 @@ class BlockRenderer {
         0xff00ff,
         0x00ffff
     ];
+    private mask: Phaser.Graphics;
 
     constructor(block: Block, phaserGame: Phaser.Game) {
         this.block = block;
         this.phaserGame = phaserGame;
         this.block.Sprite.anchor.setTo(0.5, 0.5);
         this.block.Sprite.scale.setTo(45, 45);
+
+        this.mask = this.phaserGame.add.graphics(0, 0);
+        this.mask.beginFill(0xffffff);
+        this.mask.drawRect(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + BlockRenderer.Height, Board.Columns * BlockRenderer.Width, Board.Rows * BlockRenderer.Height - BlockRenderer.Height);
+        this.block.Sprite.mask = this.mask;
     }
 
     Update() {
