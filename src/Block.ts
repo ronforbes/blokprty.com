@@ -25,10 +25,10 @@ class Block {
     Emptier: BlockEmptier;
     Faller: BlockFaller;
 
-    constructor(phaserGame: Phaser.Game, board: Board) {
+    constructor(phaserGame: Phaser.Game, board: Board, group: Phaser.Group) {
         this.phaserGame = phaserGame;
 
-        this.Sprite = this.phaserGame.add.sprite(0, 0, BlockRenderer.Key);
+        this.Sprite = group.create(0, 0, BlockRenderer.Key);
 
         this.renderer = new BlockRenderer(this, this.phaserGame);
         this.Slider = new BlockSlider(this, this.phaserGame, board.MatchDetector);

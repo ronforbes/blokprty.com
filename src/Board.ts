@@ -6,19 +6,28 @@ class Board {
     private controller: BoardController;
     MatchDetector: MatchDetector;
     private boardGravity: BoardGravity;
+    private blockGroup: Phaser.Group;
+    private mask: Phaser.Graphics;
 
     constructor(phaserGame: Phaser.Game) {
         this.phaserGame = phaserGame;
 
         this.MatchDetector = new MatchDetector(this);
         
+        this.blockGroup = this.phaserGame.add.group();
+
+        this.mask = this.phaserGame.add.graphics(0, 0);
+        this.mask.beginFill(0xffffff);
+        this.mask.drawRect(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + BlockRenderer.Height, Board.Columns * BlockRenderer.Width, Board.Rows * BlockRenderer.Height - BlockRenderer.Height);
+        this.blockGroup.mask = this.mask;
+
         this.Blocks = [];
 
         for(let x = 0; x < Board.Columns; x++) {
             this.Blocks[x] = [];
 
             for(let y = 0; y < Board.Rows; y++) {
-                this.Blocks[x][y] = new Block(this.phaserGame, this);
+                this.Blocks[x][y] = new Block(this.phaserGame, this, this.blockGroup);
                 this.Blocks[x][y].X = x;
                 this.Blocks[x][y].Y = y;
 

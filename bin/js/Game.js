@@ -11,9 +11,9 @@ var BlockState;
     BlockState[BlockState["WaitingToEmpty"] = 8] = "WaitingToEmpty";
 })(BlockState || (BlockState = {}));
 var Block = (function () {
-    function Block(phaserGame, board) {
+    function Block(phaserGame, board, group) {
         this.phaserGame = phaserGame;
-        this.Sprite = this.phaserGame.add.sprite(0, 0, BlockRenderer.Key);
+        this.Sprite = group.create(0, 0, BlockRenderer.Key);
         this.renderer = new BlockRenderer(this, this.phaserGame);
         this.Slider = new BlockSlider(this, this.phaserGame, board.MatchDetector);
         this.Matcher = new BlockMatcher(this, this.phaserGame);
@@ -158,18 +158,13 @@ var BlockRenderer = (function () {
         this.block = block;
         this.phaserGame = phaserGame;
         this.block.Sprite.anchor.setTo(0.5, 0.5);
-        this.block.Sprite.scale.setTo(45, 45);
-        this.mask = this.phaserGame.add.graphics(0, 0);
-        this.mask.beginFill(0xffffff);
-        this.mask.drawRect(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + BlockRenderer.Height, Board.Columns * BlockRenderer.Width, Board.Rows * BlockRenderer.Height - BlockRenderer.Height);
-        this.block.Sprite.mask = this.mask;
     }
     BlockRenderer.prototype.Update = function () {
         var timePercentage = 0;
         switch (this.block.State) {
             case BlockState.Empty:
-                this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height);
-                this.block.Sprite.scale.setTo(45, 45);
+                this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = false;
                 break;
             case BlockState.Idle:
@@ -229,18 +224,18 @@ var BlockRenderer = (function () {
                 var alpha = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
                 this.block.Sprite.alpha = alpha;
                 var scale = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
-                this.block.Sprite.scale.setTo(scale * 45, scale * 45);
+                this.block.Sprite.scale.setTo(scale, scale);
                 break;
             case BlockState.WaitingToEmpty:
                 this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
-                this.block.Sprite.scale.setTo(45, 45);
+                this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = false;
         }
     };
     BlockRenderer.Key = "block";
-    BlockRenderer.Url = "assets/sprites/pixel.png";
-    BlockRenderer.Width = 50;
-    BlockRenderer.Height = 50;
+    BlockRenderer.Url = "assets/sprites/block.png";
+    BlockRenderer.Width = 130;
+    BlockRenderer.Height = 130;
     return BlockRenderer;
 }());
 var SlideDirection;
@@ -281,11 +276,16 @@ var Board = (function () {
     function Board(phaserGame) {
         this.phaserGame = phaserGame;
         this.MatchDetector = new MatchDetector(this);
+        this.blockGroup = this.phaserGame.add.group();
+        this.mask = this.phaserGame.add.graphics(0, 0);
+        this.mask.beginFill(0xffffff);
+        this.mask.drawRect(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + BlockRenderer.Height, Board.Columns * BlockRenderer.Width, Board.Rows * BlockRenderer.Height - BlockRenderer.Height);
+        this.blockGroup.mask = this.mask;
         this.Blocks = [];
         for (var x = 0; x < Board.Columns; x++) {
             this.Blocks[x] = [];
             for (var y = 0; y < Board.Rows; y++) {
-                this.Blocks[x][y] = new Block(this.phaserGame, this);
+                this.Blocks[x][y] = new Block(this.phaserGame, this, this.blockGroup);
                 this.Blocks[x][y].X = x;
                 this.Blocks[x][y].Y = y;
                 var type = this.GetRandomBlockType(x, y);
@@ -436,17 +436,22 @@ var BoardGravity = (function () {
 }());
 var Game = (function () {
     function Game() {
-        this.game = new Phaser.Game("100%", "100%", Phaser.AUTO, 'game', { preload: this.preload, create: this.create, update: this.update });
+        this.game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'game', { preload: this.preload, create: this.create, update: this.update, render: this.render });
     }
     Game.prototype.preload = function () {
-        this.game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
+        this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+        this.game.scale.pageAlignHorizontally = this.game.scale.pageAlignVertically = true;
         this.game.load.image(BlockRenderer.Key, BlockRenderer.Url);
     };
     Game.prototype.create = function () {
+        this.game.time.advancedTiming = true;
         this.board = new Board(this.game);
     };
     Game.prototype.update = function () {
         this.board.Update();
+    };
+    Game.prototype.render = function () {
+        this.game.debug.text(this.game.time.fps.toString(), 2, 14, "#00ff00");
     };
     return Game;
 }());

@@ -2,9 +2,9 @@ class BlockRenderer {
     private block: Block;
     private phaserGame: Phaser.Game;
     static readonly Key: string = "block";
-    static readonly Url: string = "assets/sprites/pixel.png";
-    static readonly Width: number = 50;
-    static readonly Height: number = 50;
+    static readonly Url: string = "assets/sprites/block.png";
+    static readonly Width: number = 130;
+    static readonly Height: number = 130;
     private readonly colors: number[] = [
         0xff0000,
         0x00ff00,
@@ -13,18 +13,11 @@ class BlockRenderer {
         0xff00ff,
         0x00ffff
     ];
-    private mask: Phaser.Graphics;
 
     constructor(block: Block, phaserGame: Phaser.Game) {
         this.block = block;
         this.phaserGame = phaserGame;
         this.block.Sprite.anchor.setTo(0.5, 0.5);
-        this.block.Sprite.scale.setTo(45, 45);
-
-        this.mask = this.phaserGame.add.graphics(0, 0);
-        this.mask.beginFill(0xffffff);
-        this.mask.drawRect(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + BlockRenderer.Height, Board.Columns * BlockRenderer.Width, Board.Rows * BlockRenderer.Height - BlockRenderer.Height);
-        this.block.Sprite.mask = this.mask;
     }
 
     Update() {
@@ -32,8 +25,8 @@ class BlockRenderer {
 
         switch(this.block.State) {
             case BlockState.Empty:
-                this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height);
-                this.block.Sprite.scale.setTo(45, 45);
+                this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = false;
                 break;
 
@@ -105,12 +98,12 @@ class BlockRenderer {
                 this.block.Sprite.alpha = alpha;
 
                 let scale: number = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
-                this.block.Sprite.scale.setTo(scale * 45, scale * 45);
+                this.block.Sprite.scale.setTo(scale, scale);
                 break;
 
             case BlockState.WaitingToEmpty:
                 this.block.Sprite.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
-                this.block.Sprite.scale.setTo(45, 45);
+                this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = false;
         }
         
