@@ -1,6 +1,5 @@
 class Game {
     private game: Phaser.Game;
-    private testBlock: Block;
     private board: Board;
 
     constructor() {

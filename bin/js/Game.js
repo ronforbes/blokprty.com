@@ -287,9 +287,9 @@ var BoardController = (function () {
                 this.selectedBlock.X - 1 >= 0 &&
                 (this.board.Blocks[this.selectedBlock.X - 1][this.selectedBlock.Y].State == BlockState.Idle ||
                     this.board.Blocks[this.selectedBlock.X - 1][this.selectedBlock.Y].State == BlockState.Empty) &&
-                (this.selectedBlock.Y + 1 == Board.Rows || (this.selectedBlock.Y + 1 < Board.Rows &&
-                    this.board.Blocks[this.selectedBlock.X - 1][this.selectedBlock.Y + 1].State != BlockState.Falling &&
-                    this.board.Blocks[this.selectedBlock.X - 1][this.selectedBlock.Y + 1].State != BlockState.WaitingToFall))) {
+                (this.selectedBlock.Y - 1 == 0 || (this.selectedBlock.Y - 1 > 0 &&
+                    this.board.Blocks[this.selectedBlock.X - 1][this.selectedBlock.Y - 1].State != BlockState.Falling &&
+                    this.board.Blocks[this.selectedBlock.X - 1][this.selectedBlock.Y - 1].State != BlockState.WaitingToFall))) {
                 leftBlock = this.board.Blocks[this.selectedBlock.X - 1][this.selectedBlock.Y];
                 rightBlock = this.selectedBlock;
                 this.selectedBlock = leftBlock;
@@ -299,9 +299,9 @@ var BoardController = (function () {
                 this.selectedBlock.X + 1 < Board.Columns &&
                 (this.board.Blocks[this.selectedBlock.X + 1][this.selectedBlock.Y].State == BlockState.Idle ||
                     this.board.Blocks[this.selectedBlock.X + 1][this.selectedBlock.Y].State == BlockState.Empty) &&
-                (this.selectedBlock.Y + 1 == Board.Rows || (this.selectedBlock.Y + 1 < Board.Rows &&
-                    this.board.Blocks[this.selectedBlock.X + 1][this.selectedBlock.Y + 1].State != BlockState.Falling &&
-                    this.board.Blocks[this.selectedBlock.X + 1][this.selectedBlock.Y + 1].State != BlockState.WaitingToFall))) {
+                (this.selectedBlock.Y - 1 == 0 || (this.selectedBlock.Y - 1 > 0 &&
+                    this.board.Blocks[this.selectedBlock.X + 1][this.selectedBlock.Y - 1].State != BlockState.Falling &&
+                    this.board.Blocks[this.selectedBlock.X + 1][this.selectedBlock.Y - 1].State != BlockState.WaitingToFall))) {
                 leftBlock = this.selectedBlock;
                 rightBlock = this.board.Blocks[this.selectedBlock.X + 1][this.selectedBlock.Y];
                 this.selectedBlock = rightBlock;
@@ -380,12 +380,12 @@ var MatchDetector = (function () {
         while (right < Board.Columns && this.board.Blocks[right][block.Y].State == BlockState.Idle && this.board.Blocks[right][block.Y].Type == block.Type) {
             right++;
         }
-        var bottom = block.Y;
-        while (bottom > 0 && this.board.Blocks[block.X][bottom - 1].State == BlockState.Idle && this.board.Blocks[block.X][bottom - 1].Type == block.Type) {
+        var bottom = block.Y; // exclude the top row since it's for new incoming blocks
+        while (bottom > 1 && this.board.Blocks[block.X][bottom - 1].State == BlockState.Idle && this.board.Blocks[block.X][bottom - 1].Type == block.Type) {
             bottom--;
         }
-        var top = block.Y + 1; // exclude the top row since it's for new incoming blocks
-        while (top < Board.Rows - 1 && this.board.Blocks[block.X][top].State == BlockState.Idle && this.board.Blocks[block.X][top].Type == block.Type) {
+        var top = block.Y + 1;
+        while (top < Board.Rows && this.board.Blocks[block.X][top].State == BlockState.Idle && this.board.Blocks[block.X][top].Type == block.Type) {
             top++;
         }
         var width = right - left;

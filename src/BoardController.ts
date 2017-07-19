@@ -39,9 +39,9 @@ class BoardController {
                 this.selectedBlock.X - 1 >= 0 &&
                 (this.board.Blocks[this.selectedBlock.X - 1][this.selectedBlock.Y].State == BlockState.Idle ||
                 this.board.Blocks[this.selectedBlock.X - 1][this.selectedBlock.Y].State == BlockState.Empty) &&
-                (this.selectedBlock.Y + 1 == Board.Rows || (this.selectedBlock.Y + 1 < Board.Rows &&
-                this.board.Blocks[this.selectedBlock.X - 1][this.selectedBlock.Y + 1].State != BlockState.Falling &&
-                this.board.Blocks[this.selectedBlock.X - 1][this.selectedBlock.Y + 1].State != BlockState.WaitingToFall))) {
+                (this.selectedBlock.Y - 1 == 0 || (this.selectedBlock.Y - 1 > 0 &&
+                this.board.Blocks[this.selectedBlock.X - 1][this.selectedBlock.Y - 1].State != BlockState.Falling &&
+                this.board.Blocks[this.selectedBlock.X - 1][this.selectedBlock.Y - 1].State != BlockState.WaitingToFall))) {
                     leftBlock = this.board.Blocks[this.selectedBlock.X - 1][this.selectedBlock.Y];
                     rightBlock = this.selectedBlock;
                     this.selectedBlock = leftBlock;
@@ -52,9 +52,9 @@ class BoardController {
                 this.selectedBlock.X + 1 < Board.Columns &&
                 (this.board.Blocks[this.selectedBlock.X + 1][this.selectedBlock.Y].State == BlockState.Idle ||
                 this.board.Blocks[this.selectedBlock.X + 1][this.selectedBlock.Y].State == BlockState.Empty) &&
-                (this.selectedBlock.Y + 1 == Board.Rows || (this.selectedBlock.Y + 1 < Board.Rows &&
-                this.board.Blocks[this.selectedBlock.X + 1][this.selectedBlock.Y + 1].State != BlockState.Falling &&
-                this.board.Blocks[this.selectedBlock.X + 1][this.selectedBlock.Y + 1].State != BlockState.WaitingToFall))) {
+                (this.selectedBlock.Y - 1 == 0 || (this.selectedBlock.Y - 1 > 0 &&
+                this.board.Blocks[this.selectedBlock.X + 1][this.selectedBlock.Y - 1].State != BlockState.Falling &&
+                this.board.Blocks[this.selectedBlock.X + 1][this.selectedBlock.Y - 1].State != BlockState.WaitingToFall))) {
                     leftBlock = this.selectedBlock;
                     rightBlock = this.board.Blocks[this.selectedBlock.X + 1][this.selectedBlock.Y];
                     this.selectedBlock = rightBlock;

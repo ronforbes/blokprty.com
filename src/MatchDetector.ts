@@ -43,13 +43,13 @@ class MatchDetector {
             right++;
         }
 
-        let bottom = block.Y;
-        while(bottom > 0 && this.board.Blocks[block.X][bottom - 1].State == BlockState.Idle && this.board.Blocks[block.X][bottom - 1].Type == block.Type) {
+        let bottom = block.Y; // exclude the top row since it's for new incoming blocks
+        while(bottom > 1 && this.board.Blocks[block.X][bottom - 1].State == BlockState.Idle && this.board.Blocks[block.X][bottom - 1].Type == block.Type) {
             bottom--;
         }
 
-        let top = block.Y + 1; // exclude the top row since it's for new incoming blocks
-        while(top < Board.Rows - 1 && this.board.Blocks[block.X][top].State == BlockState.Idle && this.board.Blocks[block.X][top].Type == block.Type) {
+        let top = block.Y + 1; 
+        while(top < Board.Rows && this.board.Blocks[block.X][top].State == BlockState.Idle && this.board.Blocks[block.X][top].Type == block.Type) {
             top++;
         }
 
