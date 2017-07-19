@@ -43,18 +43,18 @@ class MatchDetector {
             right++;
         }
 
-        let bottom = block.Y; // exclude the top row since it's for new incoming blocks
-        while(bottom > 1 && this.board.Blocks[block.X][bottom - 1].State == BlockState.Idle && this.board.Blocks[block.X][bottom - 1].Type == block.Type) {
-            bottom--;
+        let top = block.Y; // exclude the top row since it's for new incoming blocks
+        while(top > 1 && this.board.Blocks[block.X][top - 1].State == BlockState.Idle && this.board.Blocks[block.X][top - 1].Type == block.Type) {
+            top--;
         }
 
-        let top = block.Y + 1; 
-        while(top < Board.Rows && this.board.Blocks[block.X][top].State == BlockState.Idle && this.board.Blocks[block.X][top].Type == block.Type) {
-            top++;
+        let bottom = block.Y + 1; 
+        while(bottom < Board.Rows && this.board.Blocks[block.X][bottom].State == BlockState.Idle && this.board.Blocks[block.X][bottom].Type == block.Type) {
+            bottom++;
         }
 
         let width: number = right - left;
-        let height: number = top - bottom;
+        let height: number = bottom - top;
         let matchedBlockCount: number = 0;
         let horizontalMatch: boolean = false;
         let verticalMatch: boolean = false;
@@ -89,7 +89,7 @@ class MatchDetector {
         }
 
         if(verticalMatch) {
-            for(let y: number = top - 1; y >= bottom; y--) {
+            for(let y: number = top; y < bottom; y++) {
                 this.board.Blocks[block.X][y].Matcher.Match(matchedBlockCount, delayCounter);
                 delayCounter--;
             }
