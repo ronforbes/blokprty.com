@@ -8,6 +8,7 @@ class Game {
     }
 
     preload() {
+        this.game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
         this.game.load.image(BlockRenderer.Key, BlockRenderer.Url);
     }
 

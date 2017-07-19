@@ -333,6 +333,7 @@ var Game = (function () {
         this.game = new Phaser.Game("100%", "100%", Phaser.AUTO, 'game', { preload: this.preload, create: this.create, update: this.update });
     }
     Game.prototype.preload = function () {
+        this.game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
         this.game.load.image(BlockRenderer.Key, BlockRenderer.Url);
     };
     Game.prototype.create = function () {
