@@ -1,32 +1,17 @@
-class Game {
+class Game extends Phaser.Game {
     private game: Phaser.Game;
-    private board: Board;
-    private scoreboard: Scoreboard;
 
     constructor() {
-        this.game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'game', { preload: this.preload, create: this.create, update: this.update, render: this.render });
-    }
+        super(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'game', null);// { preload: this.preload, create: this.create, update: this.update, render: this.render })
 
-    preload() {
-        this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        this.game.scale.pageAlignHorizontally = this.game.scale.pageAlignVertically = true;
-        this.game.load.image(BlockRenderer.Key, BlockRenderer.Url);
-    }
+        this.state.add("Boot", BootState);
+        this.state.add("Preload", PreloadState);
+        this.state.add("Menu", MenuState);
+        this.state.add("Gameplay", GameplayState);
+        this.state.add("Results", ResultsState);
+        this.state.add("Leaderboard", LeaderboardState);
 
-    create() {
-        this.game.time.advancedTiming = true;
-        this.scoreboard = new Scoreboard(this.game);
-        this.board = new Board(this.game, this.scoreboard);
-    }
-
-    update() {
-        this.board.Update();
-        this.scoreboard.Update();
-    }
-
-    render() {
-        this.game.debug.text(this.game.time.fps.toString(), 2, 100, "#00ff00", "48px Arial");
-        this.board.Render();
+        this.state.start("Boot");
     }
 }
 

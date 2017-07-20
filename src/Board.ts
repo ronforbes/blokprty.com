@@ -63,8 +63,4 @@ class Board {
 
         this.boardGravity.Update();
     }
-
-    Render() {
-        this.renderer.Render(this.phaserGame);
-    }
 }

@@ -1,3 +1,13 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var BlockState;
 (function (BlockState) {
     BlockState[BlockState["Empty"] = 0] = "Empty";
@@ -314,9 +324,6 @@ var Board = (function () {
         this.MatchDetector.Update();
         this.boardGravity.Update();
     };
-    Board.prototype.Render = function () {
-        this.renderer.Render(this.phaserGame);
-    };
     Board.Columns = 6;
     Board.Rows = 11;
     return Board;
@@ -454,39 +461,150 @@ var BoardRenderer = (function () {
         this.mask.drawRect(-10, BlockRenderer.Height, Board.Columns * BlockRenderer.Width + 20, Board.Rows * BlockRenderer.Height - BlockRenderer.Height + 10);
         group.mask = this.mask;
     }
-    BoardRenderer.prototype.Render = function (phaserGame) {
-        phaserGame.debug.text("Game Width= " + phaserGame.width + ", Game Height=" + phaserGame.height, 0, 150, "#00ff00", "48px Arial");
-        phaserGame.debug.text("Board Position=" + this.position.toString(), 0, 200, "#00ff00", "48px Arial");
-    };
     return BoardRenderer;
 }());
-var Game = (function () {
-    function Game() {
-        this.game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'game', { preload: this.preload, create: this.create, update: this.update, render: this.render });
+var BootState = (function (_super) {
+    __extends(BootState, _super);
+    function BootState() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    Game.prototype.preload = function () {
+    BootState.prototype.preload = function () {
+        this.load.image("PreloadBar", "assets/sprites/preloadbar.png");
+    };
+    BootState.prototype.create = function () {
+        // Disable multi-touch
+        this.input.maxPointers = 1;
+        // Disable pausing when page loses focus
+        this.stage.disableVisibilityChange = true;
+        // Enable advanced timing to track fps
+        this.game.time.advancedTiming = true;
         this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         this.game.scale.pageAlignHorizontally = this.game.scale.pageAlignVertically = true;
-        this.game.load.image(BlockRenderer.Key, BlockRenderer.Url);
+        if (this.game.device.desktop) {
+            // desktop specific settings
+        }
+        else {
+            // mobile specific settings
+        }
+        this.game.state.start("Preload");
     };
-    Game.prototype.create = function () {
-        this.game.time.advancedTiming = true;
-        this.scoreboard = new Scoreboard(this.game);
-        this.board = new Board(this.game, this.scoreboard);
+    return BootState;
+}(Phaser.State));
+var ClockState;
+(function (ClockState) {
+    ClockState[ClockState["Gameplay"] = 0] = "Gameplay";
+    ClockState[ClockState["Results"] = 1] = "Results";
+    ClockState[ClockState["Leaderboard"] = 2] = "Leaderboard";
+})(ClockState || (ClockState = {}));
+var Clock = (function () {
+    function Clock(phaserGame) {
+        this.gameplayDuration = 10000;
+        this.resultsDuration = 10000;
+        this.leaderboardDuration = 10000;
+        this.State = ClockState.Gameplay;
+        this.TimeRemaining = 10000;
+        this.phaserGame = phaserGame;
+        this.renderer = new ClockRenderer(this, this.phaserGame);
+    }
+    Clock.prototype.Update = function (state) {
+        this.TimeRemaining -= this.phaserGame.time.elapsed;
+        this.renderer.Update();
+        if (this.TimeRemaining <= 0) {
+            switch (this.State) {
+                case ClockState.Gameplay:
+                    this.State = ClockState.Results;
+                    this.TimeRemaining = this.resultsDuration;
+                    if (this.IsControllingGameState) {
+                        state.StartResults();
+                    }
+                    break;
+                case ClockState.Results:
+                    this.State = ClockState.Leaderboard;
+                    this.TimeRemaining = this.leaderboardDuration;
+                    if (this.IsControllingGameState) {
+                        //state.StartLeaderboard();
+                    }
+                    break;
+                case ClockState.Leaderboard:
+                    this.State = ClockState.Gameplay;
+                    this.TimeRemaining = this.gameplayDuration;
+                    if (this.IsControllingGameState) {
+                        //state.StartGameplay();
+                    }
+                    break;
+            }
+        }
     };
-    Game.prototype.update = function () {
-        this.board.Update();
-        this.scoreboard.Update();
-    };
-    Game.prototype.render = function () {
-        this.game.debug.text(this.game.time.fps.toString(), 2, 100, "#00ff00", "48px Arial");
-        this.board.Render();
-    };
-    return Game;
+    return Clock;
 }());
+var ClockRenderer = (function () {
+    function ClockRenderer(clock, phaserGame) {
+        this.clock = clock;
+        var style = { font: "48px Arial", fill: "#ffffff", align: "right" };
+        this.clockText = phaserGame.add.text(phaserGame.width - 10, 10, "Time: 10", style);
+        this.clockText.anchor.setTo(1, 0);
+    }
+    ClockRenderer.prototype.Update = function () {
+        this.clockText.text = "Time: " + (this.clock.TimeRemaining / 1000).toFixed(0);
+    };
+    return ClockRenderer;
+}());
+var Game = (function (_super) {
+    __extends(Game, _super);
+    function Game() {
+        var _this = _super.call(this, window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'game', null) || this;
+        _this.state.add("Boot", BootState);
+        _this.state.add("Preload", PreloadState);
+        _this.state.add("Menu", MenuState);
+        _this.state.add("Gameplay", GameplayState);
+        _this.state.add("Results", ResultsState);
+        _this.state.add("Leaderboard", LeaderboardState);
+        _this.state.start("Boot");
+        return _this;
+    }
+    return Game;
+}(Phaser.Game));
 window.onload = function () {
     var game = new Game();
 };
+var GameplayState = (function (_super) {
+    __extends(GameplayState, _super);
+    function GameplayState() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    GameplayState.prototype.create = function () {
+        this.background = this.add.image(0, 0, "Background");
+        this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
+        this.scoreboard = new Scoreboard(this.game);
+        this.board = new Board(this.game, this.scoreboard);
+        this.clock = new Clock(this.game);
+    };
+    GameplayState.prototype.update = function () {
+        this.board.Update();
+        this.scoreboard.Update();
+        this.clock.Update(this);
+    };
+    GameplayState.prototype.StartMenu = function () {
+        this.game.state.start("Menu");
+    };
+    GameplayState.prototype.StartResults = function () {
+        this.game.state.start("Results", true, false, this.scoreboard);
+    };
+    return GameplayState;
+}(Phaser.State));
+var LeaderboardState = (function (_super) {
+    __extends(LeaderboardState, _super);
+    function LeaderboardState() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    LeaderboardState.prototype.StartMenu = function () {
+        this.game.state.start("Menu");
+    };
+    LeaderboardState.prototype.StartGameplay = function () {
+        this.game.state.start("Gameplay");
+    };
+    return LeaderboardState;
+}(Phaser.State));
 var MatchDetection = (function () {
     function MatchDetection(block) {
         this.Block = block;
@@ -566,6 +684,79 @@ var MatchDetector = (function () {
     MatchDetector.MinimumMatchLength = 3;
     return MatchDetector;
 }());
+var MenuState = (function (_super) {
+    __extends(MenuState, _super);
+    function MenuState() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    MenuState.prototype.create = function () {
+        this.background = this.add.image(0, 0, "Background");
+        this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
+        this.background.alpha = 0;
+        this.logo = this.add.image(0, -600, "Logo");
+        this.logo.scale.setTo(this.game.width / this.logo.width, this.game.height / this.logo.height);
+        this.add.tween(this.background).to({ alpha: 1 }, 2000, Phaser.Easing.Bounce.InOut, true);
+        this.add.tween(this.logo).to({ y: 0 }, 2000, Phaser.Easing.Elastic.Out, true, 2000);
+        this.input.onDown.addOnce(this.FadeOut, this);
+    };
+    MenuState.prototype.FadeOut = function () {
+        this.add.tween(this.background).to({ alpha: 0 }, 2000, Phaser.Easing.Linear.None, true);
+        var tween = this.add.tween(this.logo).to({ y: this.game.height }, 2000, Phaser.Easing.Linear.None, true);
+        tween.onComplete.add(this.StartGameplay, this);
+    };
+    MenuState.prototype.StartGameplay = function () {
+        this.game.state.start("Gameplay");
+    };
+    return MenuState;
+}(Phaser.State));
+var PreloadState = (function (_super) {
+    __extends(PreloadState, _super);
+    function PreloadState() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    PreloadState.prototype.preload = function () {
+        // Setup the preload bar
+        this.preloadBar = this.add.sprite(0, 0, "PreloadBar");
+        this.preloadBar.anchor.setTo(0.5, 0.5);
+        this.preloadBar.position.setTo(this.world.centerX, this.world.centerY);
+        this.load.setPreloadSprite(this.preloadBar);
+        // Load game assets
+        this.load.image("Background", "assets/sprites/background.png");
+        this.load.image("Logo", "assets/sprites/logo.png");
+        this.load.image(BlockRenderer.Key, BlockRenderer.Url);
+    };
+    PreloadState.prototype.create = function () {
+        var alphaTween = this.add.tween(this.preloadBar).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
+        alphaTween.onComplete.add(this.StartMenu, this);
+    };
+    PreloadState.prototype.StartMenu = function () {
+        this.game.state.start("Menu");
+    };
+    return PreloadState;
+}(Phaser.State));
+var ResultsState = (function (_super) {
+    __extends(ResultsState, _super);
+    function ResultsState() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ResultsState.prototype.init = function (scoreboard) {
+        this.scoreboard = scoreboard;
+    };
+    ResultsState.prototype.create = function () {
+        this.background = this.add.image(0, 0, "Background");
+        this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
+        var style = { font: "48px Arial", fill: "#ffffff" };
+        this.scoreText = this.add.text(this.world.centerX, this.world.centerY, "Score: " + this.scoreboard.Score, style);
+        this.scoreText.anchor.setTo(0.5, 0.5);
+    };
+    ResultsState.prototype.StartMenu = function () {
+        this.game.state.start("Menu");
+    };
+    ResultsState.prototype.StartLeaderboard = function () {
+        this.game.state.start("Leaderboard");
+    };
+    return ResultsState;
+}(Phaser.State));
 var Scoreboard = (function () {
     function Scoreboard(phaserGame) {
         this.matchValue = 10;

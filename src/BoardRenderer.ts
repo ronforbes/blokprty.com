@@ -23,9 +23,4 @@ class BoardRenderer {
         this.mask.drawRect(-10, BlockRenderer.Height, Board.Columns * BlockRenderer.Width + 20, Board.Rows * BlockRenderer.Height - BlockRenderer.Height + 10);
         group.mask = this.mask;
     }
-
-    Render(phaserGame: Phaser.Game) {
-        phaserGame.debug.text("Game Width= " + phaserGame.width + ", Game Height=" + phaserGame.height, 0, 150, "#00ff00", "48px Arial");
-        phaserGame.debug.text("Board Position=" + this.position.toString(), 0, 200, "#00ff00", "48px Arial");
-    }
 }
