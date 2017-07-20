@@ -25,7 +25,7 @@ class Block {
     Emptier: BlockEmptier;
     Faller: BlockFaller;
 
-    constructor(phaserGame: Phaser.Game, board: Board, group: Phaser.Group) {
+    constructor(phaserGame: Phaser.Game, board: Board, group: Phaser.Group, scoreboard: Scoreboard) {
         this.phaserGame = phaserGame;
 
         this.Sprite = group.create(0, 0, BlockRenderer.Key);
@@ -33,7 +33,7 @@ class Block {
         this.renderer = new BlockRenderer(this, this.phaserGame);
         this.Slider = new BlockSlider(this, this.phaserGame, board.MatchDetector);
         this.Matcher = new BlockMatcher(this, this.phaserGame);
-        this.Clearer = new BlockClearer(this, this.phaserGame);
+        this.Clearer = new BlockClearer(this, this.phaserGame, scoreboard);
         this.Emptier = new BlockEmptier(this, this.phaserGame);
         this.Faller = new BlockFaller(this, this.phaserGame);
     }

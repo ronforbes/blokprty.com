@@ -6,10 +6,12 @@ class BlockClearer {
     DelayDuration: number;
     Elapsed: number;
     static readonly Duration: number = 250;
+    private scoreboard: Scoreboard;
 
-    constructor(block: Block, phaserGame: Phaser.Game) {
+    constructor(block: Block, phaserGame: Phaser.Game, scoreboard: Scoreboard) {
         this.block = block;
         this.phaserGame = phaserGame;
+        this.scoreboard = scoreboard;
     }
 
     Clear() {
@@ -28,6 +30,8 @@ class BlockClearer {
                 this.block.State = BlockState.Clearing;
 
                 this.Elapsed = 0;
+
+                this.scoreboard.ScoreMatch();
             }
         }
 

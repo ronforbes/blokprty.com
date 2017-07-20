@@ -17,7 +17,6 @@ class BlockRenderer {
     constructor(block: Block, phaserGame: Phaser.Game) {
         this.block = block;
         this.phaserGame = phaserGame;
-        this.block.Sprite.anchor.setTo(0.5, 0.5);
     }
 
     Update() {
@@ -25,13 +24,13 @@ class BlockRenderer {
 
         switch(this.block.State) {
             case BlockState.Empty:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
                 this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = false;
                 break;
 
             case BlockState.Idle:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
                 this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
@@ -49,7 +48,7 @@ class BlockRenderer {
                 }
 
                 timePercentage = this.block.Slider.Elapsed / BlockSlider.Duration;
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2 + destination * timePercentage, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + destination * timePercentage, this.block.Y * BlockRenderer.Height);
 
                 if(this.block.Type == -1) {
                     this.block.Sprite.visible = false;
@@ -62,7 +61,7 @@ class BlockRenderer {
                 break;
 
             case BlockState.WaitingToFall:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
@@ -70,21 +69,21 @@ class BlockRenderer {
             
             case BlockState.Falling:
                 timePercentage = this.block.Faller.Elapsed / BlockFaller.Duration;
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2 + BlockRenderer.Height * timePercentage);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height + BlockRenderer.Height * timePercentage);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             
             case BlockState.Matched:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = 0xffffff;
                 break;
 
             case BlockState.WaitingToClear:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
@@ -98,12 +97,15 @@ class BlockRenderer {
                 let alpha: number = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
                 this.block.Sprite.alpha = alpha;
 
+                this.block.Sprite.anchor.setTo(0.5, 0.5);
                 let scale: number = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
                 this.block.Sprite.scale.setTo(scale, scale);
+                
                 break;
 
             case BlockState.WaitingToEmpty:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
+                this.block.Sprite.anchor.setTo(0, 0);
                 this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = false;
         }

@@ -11,13 +11,13 @@ var BlockState;
     BlockState[BlockState["WaitingToEmpty"] = 8] = "WaitingToEmpty";
 })(BlockState || (BlockState = {}));
 var Block = (function () {
-    function Block(phaserGame, board, group) {
+    function Block(phaserGame, board, group, scoreboard) {
         this.phaserGame = phaserGame;
         this.Sprite = group.create(0, 0, BlockRenderer.Key);
         this.renderer = new BlockRenderer(this, this.phaserGame);
         this.Slider = new BlockSlider(this, this.phaserGame, board.MatchDetector);
         this.Matcher = new BlockMatcher(this, this.phaserGame);
-        this.Clearer = new BlockClearer(this, this.phaserGame);
+        this.Clearer = new BlockClearer(this, this.phaserGame, scoreboard);
         this.Emptier = new BlockEmptier(this, this.phaserGame);
         this.Faller = new BlockFaller(this, this.phaserGame);
     }
@@ -33,9 +33,10 @@ var Block = (function () {
     return Block;
 }());
 var BlockClearer = (function () {
-    function BlockClearer(block, phaserGame) {
+    function BlockClearer(block, phaserGame, scoreboard) {
         this.block = block;
         this.phaserGame = phaserGame;
+        this.scoreboard = scoreboard;
     }
     BlockClearer.prototype.Clear = function () {
         this.block.State = BlockState.WaitingToClear;
@@ -48,6 +49,7 @@ var BlockClearer = (function () {
             if (this.delayElapsed >= this.DelayDuration) {
                 this.block.State = BlockState.Clearing;
                 this.Elapsed = 0;
+                this.scoreboard.ScoreMatch();
             }
         }
         if (this.block.State == BlockState.Clearing) {
@@ -157,18 +159,17 @@ var BlockRenderer = (function () {
         ];
         this.block = block;
         this.phaserGame = phaserGame;
-        this.block.Sprite.anchor.setTo(0.5, 0.5);
     }
     BlockRenderer.prototype.Update = function () {
         var timePercentage = 0;
         switch (this.block.State) {
             case BlockState.Empty:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
                 this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = false;
                 break;
             case BlockState.Idle:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
                 this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
@@ -183,7 +184,7 @@ var BlockRenderer = (function () {
                     destination = BlockRenderer.Width;
                 }
                 timePercentage = this.block.Slider.Elapsed / BlockSlider.Duration;
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2 + destination * timePercentage, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + destination * timePercentage, this.block.Y * BlockRenderer.Height);
                 if (this.block.Type == -1) {
                     this.block.Sprite.visible = false;
                 }
@@ -194,26 +195,26 @@ var BlockRenderer = (function () {
                 }
                 break;
             case BlockState.WaitingToFall:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             case BlockState.Falling:
                 timePercentage = this.block.Faller.Elapsed / BlockFaller.Duration;
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2 + BlockRenderer.Height * timePercentage);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height + BlockRenderer.Height * timePercentage);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             case BlockState.Matched:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = 0xffffff;
                 break;
             case BlockState.WaitingToClear:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
@@ -224,11 +225,13 @@ var BlockRenderer = (function () {
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 var alpha = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
                 this.block.Sprite.alpha = alpha;
+                this.block.Sprite.anchor.setTo(0.5, 0.5);
                 var scale = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
                 this.block.Sprite.scale.setTo(scale, scale);
                 break;
             case BlockState.WaitingToEmpty:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
+                this.block.Sprite.anchor.setTo(0, 0);
                 this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = false;
         }
@@ -274,23 +277,16 @@ var BlockSlider = (function () {
     return BlockSlider;
 }());
 var Board = (function () {
-    function Board(phaserGame) {
+    function Board(phaserGame, scoreboard) {
         this.phaserGame = phaserGame;
         this.MatchDetector = new MatchDetector(this);
         this.boardGroup = this.phaserGame.add.group();
-        var boardScale = this.phaserGame.height / (BlockRenderer.Height * 11);
-        console.log("Game height=" + this.phaserGame.height + ", Block Height=" + BlockRenderer.Height + ", Board Scale=" + boardScale);
-        this.boardGroup.scale.setTo(boardScale, boardScale);
-        this.boardGroup.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2, (this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 - BlockRenderer.Height / 2) * boardScale);
-        this.mask = this.phaserGame.add.graphics(0, 0);
-        this.mask.beginFill(0xffffff);
-        this.mask.drawRect(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + BlockRenderer.Height / 2, Board.Columns * BlockRenderer.Width, Board.Rows * BlockRenderer.Height - BlockRenderer.Height);
-        this.boardGroup.mask = this.mask;
+        this.renderer = new BoardRenderer(this, this.phaserGame, this.boardGroup);
         this.Blocks = [];
         for (var x = 0; x < Board.Columns; x++) {
             this.Blocks[x] = [];
             for (var y = 0; y < Board.Rows; y++) {
-                this.Blocks[x][y] = new Block(this.phaserGame, this, this.boardGroup);
+                this.Blocks[x][y] = new Block(this.phaserGame, this, this.boardGroup, scoreboard);
                 this.Blocks[x][y].X = x;
                 this.Blocks[x][y].Y = y;
                 var type = this.GetRandomBlockType(x, y);
@@ -439,6 +435,20 @@ var BoardGravity = (function () {
     };
     return BoardGravity;
 }());
+var BoardRenderer = (function () {
+    function BoardRenderer(board, phaserGame, group) {
+        var position = new Phaser.Point(phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2, phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 - BlockRenderer.Height / 2);
+        group.position = position;
+        var scale = phaserGame.height / (BlockRenderer.Height * 11);
+        group.scale.setTo(scale, scale);
+        this.mask = phaserGame.add.graphics(0, 0);
+        group.addChild(this.mask);
+        this.mask.beginFill(0xffffff);
+        this.mask.drawRect(0, BlockRenderer.Height, Board.Columns * BlockRenderer.Width, Board.Rows * BlockRenderer.Height - BlockRenderer.Height);
+        group.mask = this.mask;
+    }
+    return BoardRenderer;
+}());
 var Game = (function () {
     function Game() {
         this.game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'game', { preload: this.preload, create: this.create, update: this.update, render: this.render });
@@ -450,10 +460,12 @@ var Game = (function () {
     };
     Game.prototype.create = function () {
         this.game.time.advancedTiming = true;
-        this.board = new Board(this.game);
+        this.scoreboard = new Scoreboard(this.game);
+        this.board = new Board(this.game, this.scoreboard);
     };
     Game.prototype.update = function () {
         this.board.Update();
+        this.scoreboard.Update();
     };
     Game.prototype.render = function () {
         this.game.debug.text(this.game.time.fps.toString(), 2, 14, "#00ff00");
@@ -541,4 +553,32 @@ var MatchDetector = (function () {
     };
     MatchDetector.MinimumMatchLength = 3;
     return MatchDetector;
+}());
+var Scoreboard = (function () {
+    function Scoreboard(phaserGame) {
+        this.matchValue = 10;
+        this.scoreboardRenderer = new ScoreboardRenderer(this, phaserGame);
+        this.Reset();
+    }
+    Scoreboard.prototype.Reset = function () {
+        this.Score = 0;
+    };
+    Scoreboard.prototype.ScoreMatch = function () {
+        this.Score += this.matchValue;
+    };
+    Scoreboard.prototype.Update = function () {
+        this.scoreboardRenderer.Update();
+    };
+    return Scoreboard;
+}());
+var ScoreboardRenderer = (function () {
+    function ScoreboardRenderer(scoreboard, phaserGame) {
+        this.scoreboard = scoreboard;
+        var style = { font: "48px Arial", fill: "#ffffff" };
+        this.scoreText = phaserGame.add.text(10, 10, "Score: 0", style);
+    }
+    ScoreboardRenderer.prototype.Update = function () {
+        this.scoreText.text = "Score: " + this.scoreboard.Score;
+    };
+    return ScoreboardRenderer;
 }());

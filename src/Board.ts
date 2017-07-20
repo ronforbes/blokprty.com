@@ -7,25 +7,16 @@ class Board {
     MatchDetector: MatchDetector;
     private boardGravity: BoardGravity;
     private boardGroup: Phaser.Group;
-    private mask: Phaser.Graphics;
+    private renderer: BoardRenderer;
 
-    constructor(phaserGame: Phaser.Game) {
+    constructor(phaserGame: Phaser.Game, scoreboard: Scoreboard) {
         this.phaserGame = phaserGame;
 
         this.MatchDetector = new MatchDetector(this);
         
         this.boardGroup = this.phaserGame.add.group();
-        
 
-        let boardScale = this.phaserGame.height / (BlockRenderer.Height * 11);
-        console.log("Game height=" + this.phaserGame.height + ", Block Height=" + BlockRenderer.Height + ", Board Scale=" + boardScale);
-        this.boardGroup.scale.setTo(boardScale, boardScale);
-        this.boardGroup.position.setTo(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 - BlockRenderer.Height / 2);
-
-        this.mask = this.phaserGame.add.graphics(0, 0);
-        this.mask.beginFill(0xffffff);
-        this.mask.drawRect(this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2, this.phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 + BlockRenderer.Height / 2, Board.Columns * BlockRenderer.Width, Board.Rows * BlockRenderer.Height - BlockRenderer.Height);
-        this.boardGroup.mask = this.mask;
+        this.renderer = new BoardRenderer(this, this.phaserGame, this.boardGroup);        
 
         this.Blocks = [];
 
@@ -33,7 +24,7 @@ class Board {
             this.Blocks[x] = [];
 
             for(let y = 0; y < Board.Rows; y++) {
-                this.Blocks[x][y] = new Block(this.phaserGame, this, this.boardGroup);
+                this.Blocks[x][y] = new Block(this.phaserGame, this, this.boardGroup, scoreboard);
                 this.Blocks[x][y].X = x;
                 this.Blocks[x][y].Y = y;
 

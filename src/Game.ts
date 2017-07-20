@@ -1,6 +1,7 @@
 class Game {
     private game: Phaser.Game;
     private board: Board;
+    private scoreboard: Scoreboard;
 
     constructor() {
         this.game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'game', { preload: this.preload, create: this.create, update: this.update, render: this.render });
@@ -14,11 +15,13 @@ class Game {
 
     create() {
         this.game.time.advancedTiming = true;
-        this.board = new Board(this.game);
+        this.scoreboard = new Scoreboard(this.game);
+        this.board = new Board(this.game, this.scoreboard);
     }
 
     update() {
         this.board.Update();
+        this.scoreboard.Update();
     }
 
     render() {
