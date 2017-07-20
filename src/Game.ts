@@ -25,7 +25,8 @@ class Game {
     }
 
     render() {
-        this.game.debug.text(this.game.time.fps.toString(), 2, 14, "#00ff00");
+        this.game.debug.text(this.game.time.fps.toString(), 2, 100, "#00ff00", "48px Arial");
+        this.board.Render();
     }
 }
 
