@@ -443,7 +443,7 @@ var BoardRenderer = (function () {
         this.position = new Phaser.Point(phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2, phaserGame.height / 2 - Board.Rows * BlockRenderer.Height / 2 - BlockRenderer.Height / 2);
         group.position = this.position;
         var scale = phaserGame.height / (BlockRenderer.Height * 11);
-        group.scale.setTo(scale, scale);
+        //group.scale.setTo(scale, scale);
         this.background = phaserGame.add.graphics(0, 0);
         group.addChild(this.background);
         this.background.beginFill(0x333333);

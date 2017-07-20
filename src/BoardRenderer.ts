@@ -8,7 +8,7 @@ class BoardRenderer {
         group.position = this.position;
 
         let scale = phaserGame.height / (BlockRenderer.Height * 11);
-        group.scale.setTo(scale, scale);
+        //group.scale.setTo(scale, scale);
 
         this.background = phaserGame.add.graphics(0, 0);
         group.addChild(this.background);
