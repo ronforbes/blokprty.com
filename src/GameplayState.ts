@@ -19,12 +19,19 @@ class GameplayState extends Phaser.State {
         this.board = new Board(this.game, this.scoreboard);
 
         this.scoreboard.Reset();
-        
+
         this.scoreboardRenderer = new ScoreboardRenderer(this.scoreboard, this.game);
 
         this.clockRenderer = new ClockRenderer(this.clock, this.game);
 
         this.backButton = this.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
+
+        this.scale.onSizeChange.add(this.OnSizeChange, this);
+    }
+
+    private OnSizeChange() {
+        console.log("OnSizeChange: GameplayState");
+        this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
     }
 
     private OnBackButtonClick() {

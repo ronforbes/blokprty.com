@@ -16,11 +16,15 @@ class MenuState extends Phaser.State {
 
     create() {
         this.background = this.add.image(0, 0, "Background");
-        this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
+        this.background.scale.setTo(this.game.width / this.background.width / window.devicePixelRatio, this.game.height / this.background.height / window.devicePixelRatio);
         this.background.alpha = 0;
 
         this.logo = this.add.image(0, -600, "Logo");
-        this.logo.scale.setTo(this.game.width / this.logo.width, this.game.height / this.logo.height);
+        //console.log("Logo: Game Width=" + this.game.width + ", Logo Width=" + this.logo.width);
+        this.logo.scale.setTo(this.game.width / this.logo.width / window.devicePixelRatio, this.game.height / this.logo.height / window.devicePixelRatio);
+
+        //let block = this.add.image(0, 0, "block");
+        //block.scale.setTo(this.game.width / block.width / window.devicePixelRatio, this.game.height / block.height / window.devicePixelRatio);
 
         this.add.tween(this.background).to({ alpha: 1 }, 2000, Phaser.Easing.Bounce.InOut, true);
         this.add.tween(this.logo).to({ y: 0}, 2000, Phaser.Easing.Elastic.Out, true, 2000);
@@ -34,6 +38,12 @@ class MenuState extends Phaser.State {
         if(this.scoreboard == undefined) {
             this.scoreboard = new Scoreboard(this.game);
         }
+
+        this.scale.onSizeChange.add(this.OnSizeChange, this);
+    }
+
+    private OnSizeChange() {
+        this.logo.scale.setTo(this.game.width / this.logo.width / window.devicePixelRatio, this.game.height / this.logo.height / window.devicePixelRatio);
     }
 
     FadeOut() {

@@ -12,9 +12,9 @@ class BootState extends Phaser.State {
 
         // Enable advanced timing to track fps
         this.game.time.advancedTiming = true;
-        
-        this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        this.game.scale.pageAlignHorizontally = this.game.scale.pageAlignVertically = true;
+
+        this.game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
+        this.game.scale.onSizeChange.add(this.OnSizeChange, this);
 
         if(this.game.device.desktop) {
             // desktop specific settings
@@ -26,5 +26,11 @@ class BootState extends Phaser.State {
         }
 
         this.game.state.start("Preload");
+    }
+
+    private OnSizeChange() {
+        this.game.width = window.innerWidth * window.devicePixelRatio;
+        this.game.height = window.innerHeight * window.devicePixelRatio;
+        console.log("GameWidth=" + this.game.width + ", GameHeight=" + this.game.height);
     }
 }

@@ -18,7 +18,7 @@ class Board {
 
         this.renderer = new BoardRenderer(this, this.phaserGame, this.boardGroup);        
 
-        this.Blocks = [];
+        /*this.Blocks = [];
 
         for(let x = 0; x < Board.Columns; x++) {
             this.Blocks[x] = [];
@@ -37,7 +37,7 @@ class Board {
 
         this.controller = new BoardController(this, this.phaserGame);
 
-        this.boardGravity = new BoardGravity(this);
+        this.boardGravity = new BoardGravity(this);*/
     }
 
     GetRandomBlockType(x: number, y: number): number {
@@ -51,7 +51,7 @@ class Board {
     }
 
     Update() {
-        for(let x = 0; x < Board.Columns; x++) {
+        /*for(let x = 0; x < Board.Columns; x++) {
             for(let y = Board.Rows - 1; y >= 0; y--) {
                 this.Blocks[x][y].Update();
             }
@@ -61,6 +61,6 @@ class Board {
 
         this.MatchDetector.Update();
 
-        this.boardGravity.Update();
+        this.boardGravity.Update();*/
     }
 }
