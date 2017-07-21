@@ -12,6 +12,7 @@ class PreloadState extends Phaser.State {
         this.load.image("Background", "assets/sprites/background.png");
         this.load.image("Logo", "assets/sprites/logo.png");
         this.load.image(BlockRenderer.Key, BlockRenderer.Url);
+        this.load.image("BackButton", "assets/sprites/backbutton.png");
     }
 
     create() {

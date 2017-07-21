@@ -2,28 +2,52 @@ class GameplayState extends Phaser.State {
     private background: Phaser.Image;
     private board: Board;
     private scoreboard: Scoreboard;
+    private scoreboardRenderer: ScoreboardRenderer;
     private clock: Clock;
+    private clockRenderer: ClockRenderer;
+    private backButton: Phaser.Button;
+
+    init(clock: Clock, scoreboard: Scoreboard) {
+        this.clock = clock;
+        this.scoreboard = scoreboard;
+    }
 
     create() {
         this.background = this.add.image(0, 0, "Background");
         this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
 
-        this.scoreboard = new Scoreboard(this.game);
         this.board = new Board(this.game, this.scoreboard);
-        this.clock = new Clock(this.game);
+
+        this.scoreboard.Reset();
+        
+        this.scoreboardRenderer = new ScoreboardRenderer(this.scoreboard, this.game);
+
+        this.clockRenderer = new ClockRenderer(this.clock, this.game);
+
+        this.backButton = this.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
+    }
+
+    private OnBackButtonClick() {
+        this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
     }
 
     update() {
         this.board.Update();
-        this.scoreboard.Update();
-        this.clock.Update(this);
-    }
+        
+        this.clock.Update();
 
-    private StartMenu() {
-        this.game.state.start("Menu");
-    }
+        switch(this.clock.State) {
+            case ClockState.Results:
+                this.game.state.start("Results", true, false, this.clock, this.scoreboard);
+                break;
+            case ClockState.Leaderboard:
+                this.game.state.start("Leaderboard", true, false, this.clock, this.scoreboard);
+                break;
+            default:
+                break;
+        }
 
-    StartResults() {
-        this.game.state.start("Results", true, false, this.scoreboard);
+        this.scoreboardRenderer.Update();
+        this.clockRenderer.Update();
     }
 }

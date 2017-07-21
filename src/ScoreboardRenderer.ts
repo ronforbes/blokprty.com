@@ -6,7 +6,7 @@ class ScoreboardRenderer {
         this.scoreboard = scoreboard;
 
         let style = { font: "48px Arial", fill: "#ffffff" };
-        this.scoreText = phaserGame.add.text(10, 10, "Score: 0", style);
+        this.scoreText = phaserGame.add.text(10, 150, "Score: 0", style);
     }
 
     Update() {

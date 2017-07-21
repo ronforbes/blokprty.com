@@ -2,9 +2,13 @@ class ResultsState extends Phaser.State {
     private background: Phaser.Image;
     private scoreboard: Scoreboard;
     private scoreText: Phaser.Text;
+    private clock: Clock;
+    private clockRenderer: ClockRenderer;
+    private backButton: Phaser.Button;
 
-    init(scoreboard: Scoreboard) {
+    init(clock: Clock, scoreboard: Scoreboard) {
         this.scoreboard = scoreboard;
+        this.clock = clock;
     }
 
     create() {
@@ -14,13 +18,30 @@ class ResultsState extends Phaser.State {
         let style = { font: "48px Arial", fill: "#ffffff" };
         this.scoreText = this.add.text(this.world.centerX, this.world.centerY, "Score: " + this.scoreboard.Score, style);
         this.scoreText.anchor.setTo(0.5, 0.5);
+
+        this.clockRenderer = new ClockRenderer(this.clock, this.game);
+
+        this.backButton = this.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
     }
 
-    private StartMenu() {
-        this.game.state.start("Menu");
+    private OnBackButtonClick() {
+        this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
     }
 
-    StartLeaderboard() {
-        this.game.state.start("Leaderboard");
+    update() {
+        this.clock.Update();
+
+        switch(this.clock.State) {
+            case ClockState.Leaderboard:
+                this.game.state.start("Leaderboard", true, false, this.clock, this.scoreboard);
+                break;
+            case ClockState.Gameplay:
+                this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard);
+                break;
+            default:
+                break;
+        }
+
+        this.clockRenderer.Update();
     }
 }
