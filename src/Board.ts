@@ -1,13 +1,13 @@
 class Board {
     Blocks: Block[][];
     static readonly Columns: number = 6;
-    static readonly Rows: number = 11;
+    static readonly Rows: number = 10;
     private phaserGame: Phaser.Game;
     private controller: BoardController;
     MatchDetector: MatchDetector;
     private boardGravity: BoardGravity;
     private boardGroup: Phaser.Group;
-    private renderer: BoardRenderer;
+    Renderer: BoardRenderer;
 
     constructor(phaserGame: Phaser.Game, scoreboard: Scoreboard) {
         this.phaserGame = phaserGame;
@@ -16,9 +16,9 @@ class Board {
         
         this.boardGroup = this.phaserGame.add.group();
 
-        this.renderer = new BoardRenderer(this, this.phaserGame, this.boardGroup);        
+        this.Renderer = new BoardRenderer(this, this.phaserGame, this.boardGroup);        
 
-        /*this.Blocks = [];
+        this.Blocks = [];
 
         for(let x = 0; x < Board.Columns; x++) {
             this.Blocks[x] = [];
@@ -37,7 +37,7 @@ class Board {
 
         this.controller = new BoardController(this, this.phaserGame);
 
-        this.boardGravity = new BoardGravity(this);*/
+        this.boardGravity = new BoardGravity(this);
     }
 
     GetRandomBlockType(x: number, y: number): number {
@@ -51,7 +51,7 @@ class Board {
     }
 
     Update() {
-        /*for(let x = 0; x < Board.Columns; x++) {
+        for(let x = 0; x < Board.Columns; x++) {
             for(let y = Board.Rows - 1; y >= 0; y--) {
                 this.Blocks[x][y].Update();
             }
@@ -61,6 +61,6 @@ class Board {
 
         this.MatchDetector.Update();
 
-        this.boardGravity.Update();*/
+        this.boardGravity.Update();
     }
 }

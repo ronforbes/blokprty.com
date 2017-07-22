@@ -1,6 +1,7 @@
 class MenuState extends Phaser.State {
     private background: Phaser.Image;
     private logo: Phaser.Image;
+    private playButton: Phaser.Button;
     private clock: Clock;
     private scoreboard: Scoreboard;
 
@@ -16,20 +17,16 @@ class MenuState extends Phaser.State {
 
     create() {
         this.background = this.add.image(0, 0, "Background");
-        this.background.scale.setTo(this.game.width / this.background.width / window.devicePixelRatio, this.game.height / this.background.height / window.devicePixelRatio);
-        this.background.alpha = 0;
+        this.background.width = this.game.width;
+        this.background.height = this.game.height;
 
-        this.logo = this.add.image(0, -600, "Logo");
-        //console.log("Logo: Game Width=" + this.game.width + ", Logo Width=" + this.logo.width);
-        this.logo.scale.setTo(this.game.width / this.logo.width / window.devicePixelRatio, this.game.height / this.logo.height / window.devicePixelRatio);
+        this.logo = this.add.image(this.world.centerX, this.world.centerY - this.game.height / 3, "Logo");
+        this.logo.anchor.setTo(0.5);
+        this.ScaleSprite(this.logo, this.game.width, this.game.height / 3, 50, 1);
 
-        //let block = this.add.image(0, 0, "block");
-        //block.scale.setTo(this.game.width / block.width / window.devicePixelRatio, this.game.height / block.height / window.devicePixelRatio);
-
-        this.add.tween(this.background).to({ alpha: 1 }, 2000, Phaser.Easing.Bounce.InOut, true);
-        this.add.tween(this.logo).to({ y: 0}, 2000, Phaser.Easing.Elastic.Out, true, 2000);
-
-        this.input.onDown.addOnce(this.FadeOut, this);
+        this.playButton = this.add.button(this.world.centerX, this.world.centerY, "PlayButton", this.StartPlay, this);
+        this.playButton.anchor.setTo(0.5);
+        this.ScaleSprite(this.playButton, this.game.width, this.game.height / 3, 50, 1);
 
         if(this.clock == undefined) {
             this.clock = new Clock(this.game);
@@ -38,22 +35,45 @@ class MenuState extends Phaser.State {
         if(this.scoreboard == undefined) {
             this.scoreboard = new Scoreboard(this.game);
         }
-
-        this.scale.onSizeChange.add(this.OnSizeChange, this);
+        //this.scale.setResizeCallback(this.OnSizeChange, this);
+        //this.scale.onSizeChange.add(this.OnSizeChange, this);
     }
 
-    private OnSizeChange() {
-        this.logo.scale.setTo(this.game.width / this.logo.width / window.devicePixelRatio, this.game.height / this.logo.height / window.devicePixelRatio);
+    ScaleSprite(sprite, availableSpaceWidth: number, availableSpaceHeight: number, padding: number, scaleMultiplier: number) {
+        let scale: number = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
+        sprite.scale.x = scale * scaleMultiplier;
+        sprite.scale.y = scale * scaleMultiplier;
     }
 
-    FadeOut() {
-        this.add.tween(this.background).to({ alpha: 0 }, 2000, Phaser.Easing.Linear.None, true);
-        let tween = this.add.tween(this.logo).to({ y: this.game.height }, 2000, Phaser.Easing.Linear.None, true);
+    GetSpriteScale(spriteWidth: number, spriteHeight: number, availableSpaceWidth: number, availableSpaceHeight: number, minimumPadding: number): number {
+        let ratio: number = 1;
+        let devicePixelRatio = window.devicePixelRatio;
 
-        tween.onComplete.add(this.StartPlay, this);
+        // sprite needs to fit in either width or height
+        let widthRatio = (spriteWidth * devicePixelRatio + 2 * minimumPadding) / availableSpaceWidth;
+        let heightRatio = (spriteHeight * devicePixelRatio + 2 * minimumPadding) / availableSpaceHeight;
+
+        if(widthRatio > 1 || heightRatio > 1) {
+            ratio = 1 / Math.max(widthRatio, heightRatio);
+        }
+
+        return ratio * devicePixelRatio;
     }
 
-    StartPlay() {
+    resize() {
+        this.background.width = this.game.width;
+        this.background.height = this.game.height;
+
+        this.ScaleSprite(this.logo, this.game.width, this.game.height / 3, 50, 1);
+        this.logo.x = this.world.centerX;
+        this.logo.y = this.world.centerY - this.game.height / 3;
+
+        this.ScaleSprite(this.playButton, this.game.width, this.game.height / 3, 50, 1);
+        this.playButton.x = this.world.centerX;
+        this.playButton.y = this.world.centerY;
+    }
+
+    private StartPlay() {
         switch(this.clock.State) {
             case ClockState.Gameplay:
                 this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard);

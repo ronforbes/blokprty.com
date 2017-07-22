@@ -26,8 +26,8 @@ class BoardController {
 
     Update() {
         if(this.selectedBlock != null) {
-            let leftEdge: number = this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.selectedBlock.X * BlockRenderer.Width;
-            let rightEdge: number = this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.selectedBlock.X * BlockRenderer.Width + BlockRenderer.Width;
+            let leftEdge: number = this.phaserGame.width / 2 - Board.Columns * BlockRenderer.CalculatedSize / 2 + this.selectedBlock.X * BlockRenderer.CalculatedSize;
+            let rightEdge: number = this.phaserGame.width / 2 - Board.Columns * BlockRenderer.CalculatedSize / 2 + this.selectedBlock.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize;
 
             let leftBlock: Block;
             let rightBlock: Block;

@@ -169,18 +169,19 @@ var BlockRenderer = (function () {
         ];
         this.block = block;
         this.phaserGame = phaserGame;
+        this.block.Sprite.anchor.setTo(0.5);
     }
     BlockRenderer.prototype.Update = function () {
         var timePercentage = 0;
         switch (this.block.State) {
             case BlockState.Empty:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
-                this.block.Sprite.scale.setTo(1, 1);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
+                //this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = false;
                 break;
             case BlockState.Idle:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
-                this.block.Sprite.scale.setTo(1, 1);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
+                //this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
@@ -188,13 +189,13 @@ var BlockRenderer = (function () {
             case BlockState.Sliding:
                 var destination = 0;
                 if (this.block.Slider.Direction == SlideDirection.Left) {
-                    destination = -BlockRenderer.Width;
+                    destination = -BlockRenderer.CalculatedSize;
                 }
                 if (this.block.Slider.Direction == SlideDirection.Right) {
-                    destination = BlockRenderer.Width;
+                    destination = BlockRenderer.CalculatedSize;
                 }
                 timePercentage = this.block.Slider.Elapsed / BlockSlider.Duration;
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + destination * timePercentage, this.block.Y * BlockRenderer.Height);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + destination * timePercentage, this.block.Y * BlockRenderer.CalculatedSize);
                 if (this.block.Type == -1) {
                     this.block.Sprite.visible = false;
                 }
@@ -205,32 +206,32 @@ var BlockRenderer = (function () {
                 }
                 break;
             case BlockState.WaitingToFall:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize, this.block.Y * BlockRenderer.CalculatedSize);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             case BlockState.Falling:
                 timePercentage = this.block.Faller.Elapsed / BlockFaller.Duration;
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height + BlockRenderer.Height * timePercentage);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize * timePercentage);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             case BlockState.Matched:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize, this.block.Y * BlockRenderer.CalculatedSize);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = 0xffffff;
                 break;
             case BlockState.WaitingToClear:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize, this.block.Y * BlockRenderer.CalculatedSize);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             case BlockState.Clearing:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width + BlockRenderer.Width / 2, this.block.Y * BlockRenderer.Height + BlockRenderer.Height / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 var alpha = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
@@ -240,7 +241,7 @@ var BlockRenderer = (function () {
                 this.block.Sprite.scale.setTo(scale, scale);
                 break;
             case BlockState.WaitingToEmpty:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Width, this.block.Y * BlockRenderer.Height);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize, this.block.Y * BlockRenderer.CalculatedSize);
                 this.block.Sprite.anchor.setTo(0, 0);
                 this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = false;
@@ -248,8 +249,7 @@ var BlockRenderer = (function () {
     };
     BlockRenderer.Key = "block";
     BlockRenderer.Url = "assets/sprites/block.png";
-    BlockRenderer.Width = 130;
-    BlockRenderer.Height = 130;
+    BlockRenderer.CalculatedSize = 0;
     return BlockRenderer;
 }());
 var SlideDirection;
@@ -291,27 +291,21 @@ var Board = (function () {
         this.phaserGame = phaserGame;
         this.MatchDetector = new MatchDetector(this);
         this.boardGroup = this.phaserGame.add.group();
-        this.renderer = new BoardRenderer(this, this.phaserGame, this.boardGroup);
-        /*this.Blocks = [];
-
-        for(let x = 0; x < Board.Columns; x++) {
+        this.Renderer = new BoardRenderer(this, this.phaserGame, this.boardGroup);
+        this.Blocks = [];
+        for (var x = 0; x < Board.Columns; x++) {
             this.Blocks[x] = [];
-
-            for(let y = 0; y < Board.Rows; y++) {
+            for (var y = 0; y < Board.Rows; y++) {
                 this.Blocks[x][y] = new Block(this.phaserGame, this, this.boardGroup, scoreboard);
                 this.Blocks[x][y].X = x;
                 this.Blocks[x][y].Y = y;
-
-                let type = this.GetRandomBlockType(x, y);
-
+                var type = this.GetRandomBlockType(x, y);
                 this.Blocks[x][y].Type = type;
                 this.Blocks[x][y].State = BlockState.Idle;
             }
         }
-
         this.controller = new BoardController(this, this.phaserGame);
-
-        this.boardGravity = new BoardGravity(this);*/
+        this.boardGravity = new BoardGravity(this);
     }
     Board.prototype.GetRandomBlockType = function (x, y) {
         var type;
@@ -321,20 +315,17 @@ var Board = (function () {
         return type;
     };
     Board.prototype.Update = function () {
-        /*for(let x = 0; x < Board.Columns; x++) {
-            for(let y = Board.Rows - 1; y >= 0; y--) {
+        for (var x = 0; x < Board.Columns; x++) {
+            for (var y = Board.Rows - 1; y >= 0; y--) {
                 this.Blocks[x][y].Update();
             }
         }
-
         this.controller.Update();
-
         this.MatchDetector.Update();
-
-        this.boardGravity.Update();*/
+        this.boardGravity.Update();
     };
     Board.Columns = 6;
-    Board.Rows = 11;
+    Board.Rows = 10;
     return Board;
 }());
 var BoardController = (function () {
@@ -357,8 +348,8 @@ var BoardController = (function () {
     };
     BoardController.prototype.Update = function () {
         if (this.selectedBlock != null) {
-            var leftEdge = this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.selectedBlock.X * BlockRenderer.Width;
-            var rightEdge = this.phaserGame.width / 2 - Board.Columns * BlockRenderer.Width / 2 + this.selectedBlock.X * BlockRenderer.Width + BlockRenderer.Width;
+            var leftEdge = this.phaserGame.width / 2 - Board.Columns * BlockRenderer.CalculatedSize / 2 + this.selectedBlock.X * BlockRenderer.CalculatedSize;
+            var rightEdge = this.phaserGame.width / 2 - Board.Columns * BlockRenderer.CalculatedSize / 2 + this.selectedBlock.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize;
             var leftBlock = void 0;
             var rightBlock = void 0;
             var pointerPosition = this.phaserGame.input.activePointer.position;
@@ -457,29 +448,23 @@ var BoardGravity = (function () {
 var BoardRenderer = (function () {
     function BoardRenderer(board, phaserGame, group) {
         this.phaserGame = phaserGame;
-        this.group = group;
+        this.Group = group;
         //console.log("World centerX=" + this.phaserGame.world.centerX)
         //this.position = new Phaser.Point(this.phaserGame.world.centerX - Board.Columns * BlockRenderer.Width / 2, this.phaserGame.world.centerY - (Board.Rows - 1) * BlockRenderer.Height / 2);
-        this.position = new Phaser.Point(0 /*this.phaserGame.world.centerX - Board.Columns * BlockRenderer.Width / 2*/, 0);
-        this.group.position = this.position;
+        //this.position = new Phaser.Point(this.phaserGame.world.centerX - Board.Columns * BlockRenderer.Width / 2, this.p);
+        //this.Group.position = this.position;
         //let scale = this.phaserGame.height / (BlockRenderer.Height * 10) / window.devicePixelRatio;
-        this.group.scale.setTo(this.phaserGame.width / (BlockRenderer.Width * Board.Columns) / window.devicePixelRatio, 10 / (BlockRenderer.Height * 10) / window.devicePixelRatio);
-        this.background = this.phaserGame.add.graphics(0, 0);
-        this.group.addChild(this.background);
-        this.background.beginFill(0x333333);
-        this.background.drawRect(0, 0, Board.Columns * BlockRenderer.Width, Board.Rows * BlockRenderer.Height);
+        //this.group.scale.setTo(this.phaserGame.width / (BlockRenderer.Width * Board.Columns) / window.devicePixelRatio, 10 / (BlockRenderer.Height * 10) / window.devicePixelRatio);
+        //this.background = this.phaserGame.add.graphics(0, 0);
+        //this.Group.addChild(this.background);
+        //this.background.beginFill(0x333333);
+        //this.background.drawRect(0, 0, Board.Columns * BlockRenderer.Width, Board.Rows * BlockRenderer.Height);
         //this.mask = this.phaserGame.add.graphics(0, 0);
         //this.group.addChild(this.mask);
         //this.mask.beginFill(0xffffff);
         //this.mask.drawRect(-10, BlockRenderer.Height, Board.Columns * BlockRenderer.Width + 20, Board.Rows * BlockRenderer.Height - BlockRenderer.Height + 10);
         //this.group.mask = this.mask;
-        this.phaserGame.scale.onSizeChange.add(this.OnSizeChange, this);
     }
-    BoardRenderer.prototype.OnSizeChange = function () {
-        console.log("Game width=" + this.phaserGame.width + ", Game height=" + this.phaserGame.height);
-        var scale = this.phaserGame.height / (BlockRenderer.Height * 11);
-        this.group.scale.setTo(scale, scale);
-    };
     return BoardRenderer;
 }());
 var BootState = (function (_super) {
@@ -488,7 +473,7 @@ var BootState = (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     BootState.prototype.preload = function () {
-        this.load.image("PreloadBar", "assets/sprites/preloadbar.png");
+        this.load.image("LoadingBar", "assets/sprites/loadingbar.png");
     };
     BootState.prototype.create = function () {
         // Disable multi-touch
@@ -498,19 +483,13 @@ var BootState = (function (_super) {
         // Enable advanced timing to track fps
         this.game.time.advancedTiming = true;
         this.game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
-        this.game.scale.onSizeChange.add(this.OnSizeChange, this);
         if (this.game.device.desktop) {
             // desktop specific settings
         }
         else {
             // mobile specific settings
         }
-        this.game.state.start("Preload");
-    };
-    BootState.prototype.OnSizeChange = function () {
-        this.game.width = window.innerWidth * window.devicePixelRatio;
-        this.game.height = window.innerHeight * window.devicePixelRatio;
-        console.log("GameWidth=" + this.game.width + ", GameHeight=" + this.game.height);
+        this.game.state.start("Loading");
     };
     return BootState;
 }(Phaser.State));
@@ -566,8 +545,10 @@ var Game = (function (_super) {
     __extends(Game, _super);
     function Game() {
         var _this = _super.call(this, window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'game', null) || this;
+        _this.logicalWidth = 1920;
+        _this.logicalHeight = 1080;
         _this.state.add("Boot", BootState);
-        _this.state.add("Preload", PreloadState);
+        _this.state.add("Loading", LoadingState);
         _this.state.add("Menu", MenuState);
         _this.state.add("Gameplay", GameplayState);
         _this.state.add("Results", ResultsState);
@@ -591,25 +572,68 @@ var GameplayState = (function (_super) {
     };
     GameplayState.prototype.create = function () {
         this.background = this.add.image(0, 0, "Background");
-        this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
+        this.background.width = this.game.width;
+        this.background.height = this.game.height;
         this.board = new Board(this.game, this.scoreboard);
-        this.scoreboard.Reset();
-        this.scoreboardRenderer = new ScoreboardRenderer(this.scoreboard, this.game);
-        this.clockRenderer = new ClockRenderer(this.clock, this.game);
-        this.backButton = this.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
-        this.scale.onSizeChange.add(this.OnSizeChange, this);
+        //this.scoreboard.Reset();
+        //this.scoreboardRenderer = new ScoreboardRenderer(this.scoreboard, this.game);
+        //this.clockRenderer = new ClockRenderer(this.clock, this.game);
+        //this.backButton = this.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
+        // Position the UI
+        this.PositionUI();
     };
-    GameplayState.prototype.OnSizeChange = function () {
-        console.log("OnSizeChange: GameplayState");
-        this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
+    GameplayState.prototype.PositionUI = function () {
+        var isLandscape = this.game.height / this.game.width < 1.3 ? true : false;
+        if (isLandscape) {
+            var availableGridSpace = Math.min(this.game.width * 2 / 3, this.game.height);
+            BlockRenderer.CalculatedSize = (availableGridSpace * 0.9) / Board.Rows;
+            this.horizontalMargin = (this.game.width * 2 / 3 - Board.Columns * BlockRenderer.CalculatedSize) / 2;
+            this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.CalculatedSize) / 2;
+            this.board.Renderer.Group.x = this.horizontalMargin;
+            this.board.Renderer.Group.y = this.verticalMargin;
+        }
+        else {
+            var availableGridSpace = this.game.width;
+            BlockRenderer.CalculatedSize = (availableGridSpace * 0.9) / Board.Columns;
+            this.horizontalMargin = (this.game.width - Board.Columns * BlockRenderer.CalculatedSize) / 2;
+            this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.CalculatedSize) / 2;
+            this.board.Renderer.Group.x = this.horizontalMargin;
+            this.board.Renderer.Group.y = this.verticalMargin;
+        }
+        for (var x = 0; x < Board.Columns; x++) {
+            for (var y = 0; y < Board.Rows; y++) {
+                this.ScaleSprite(this.board.Blocks[x][y].Sprite, BlockRenderer.CalculatedSize, BlockRenderer.CalculatedSize, 0, 1, true);
+            }
+        }
+    };
+    GameplayState.prototype.ScaleSprite = function (sprite, availableSpaceWidth, availableSpaceHeight, padding, scaleMultiplier, isFullScale) {
+        var scale = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding, isFullScale);
+        sprite.scale.x = scale * scaleMultiplier;
+        sprite.scale.y = scale * scaleMultiplier;
+    };
+    GameplayState.prototype.GetSpriteScale = function (spriteWidth, spriteHeight, availableSpaceWidth, availableSpaceHeight, minimumPadding, isFullScale) {
+        var ratio = 1;
+        var devicePixelRatio = window.devicePixelRatio;
+        // Sprite needs to fit in either width or height
+        var widthRatio = (spriteWidth * devicePixelRatio + 2 * minimumPadding) / availableSpaceWidth;
+        var heightRatio = (spriteHeight * devicePixelRatio + 2 * minimumPadding) / availableSpaceHeight;
+        if (widthRatio > 1 || heightRatio > 1 || isFullScale) {
+            ratio = 1 / Math.max(widthRatio, heightRatio);
+        }
+        return ratio * devicePixelRatio;
     };
     GameplayState.prototype.OnBackButtonClick = function () {
         this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
     };
+    GameplayState.prototype.resize = function () {
+        this.background.width = this.game.width;
+        this.background.height = this.game.height;
+        this.PositionUI();
+    };
     GameplayState.prototype.update = function () {
         this.board.Update();
-        this.clock.Update();
-        switch (this.clock.State) {
+        //this.clock.Update();
+        /*switch(this.clock.State) {
             case ClockState.Results:
                 this.game.state.start("Results", true, false, this.clock, this.scoreboard);
                 break;
@@ -618,9 +642,9 @@ var GameplayState = (function (_super) {
                 break;
             default:
                 break;
-        }
-        this.scoreboardRenderer.Update();
-        this.clockRenderer.Update();
+        }*/
+        //this.scoreboardRenderer.Update();
+        //this.clockRenderer.Update();
     };
     return GameplayState;
 }(Phaser.State));
@@ -660,6 +684,33 @@ var LeaderboardState = (function (_super) {
         this.clockRenderer.Update();
     };
     return LeaderboardState;
+}(Phaser.State));
+var LoadingState = (function (_super) {
+    __extends(LoadingState, _super);
+    function LoadingState() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    LoadingState.prototype.preload = function () {
+        // Setup the preload bar
+        this.loadingBar = this.add.sprite(0, 0, "LoadingBar");
+        this.loadingBar.anchor.setTo(0.5);
+        this.loadingBar.position.setTo(this.world.centerX, this.world.centerY);
+        this.load.setPreloadSprite(this.loadingBar);
+        // Load game assets
+        this.load.image("Background", "assets/sprites/background.png");
+        this.load.image("Logo", "assets/sprites/logo.png");
+        this.load.image("PlayButton", "assets/sprites/playbutton.png");
+        this.load.image(BlockRenderer.Key, BlockRenderer.Url);
+        this.load.image("BackButton", "assets/sprites/backbutton.png");
+    };
+    LoadingState.prototype.create = function () {
+        var alphaTween = this.add.tween(this.loadingBar).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
+        alphaTween.onComplete.add(this.StartMenu, this);
+    };
+    LoadingState.prototype.StartMenu = function () {
+        this.game.state.start("Gameplay");
+    };
+    return LoadingState;
 }(Phaser.State));
 var MatchDetection = (function () {
     function MatchDetection(block) {
@@ -755,31 +806,48 @@ var MenuState = (function (_super) {
     };
     MenuState.prototype.create = function () {
         this.background = this.add.image(0, 0, "Background");
-        this.background.scale.setTo(this.game.width / this.background.width / window.devicePixelRatio, this.game.height / this.background.height / window.devicePixelRatio);
-        this.background.alpha = 0;
-        this.logo = this.add.image(0, -600, "Logo");
-        //console.log("Logo: Game Width=" + this.game.width + ", Logo Width=" + this.logo.width);
-        this.logo.scale.setTo(this.game.width / this.logo.width / window.devicePixelRatio, this.game.height / this.logo.height / window.devicePixelRatio);
-        //let block = this.add.image(0, 0, "block");
-        //block.scale.setTo(this.game.width / block.width / window.devicePixelRatio, this.game.height / block.height / window.devicePixelRatio);
-        this.add.tween(this.background).to({ alpha: 1 }, 2000, Phaser.Easing.Bounce.InOut, true);
-        this.add.tween(this.logo).to({ y: 0 }, 2000, Phaser.Easing.Elastic.Out, true, 2000);
-        this.input.onDown.addOnce(this.FadeOut, this);
+        this.background.width = this.game.width;
+        this.background.height = this.game.height;
+        this.logo = this.add.image(this.world.centerX, this.world.centerY - this.game.height / 3, "Logo");
+        this.logo.anchor.setTo(0.5);
+        this.ScaleSprite(this.logo, this.game.width, this.game.height / 3, 50, 1);
+        this.playButton = this.add.button(this.world.centerX, this.world.centerY, "PlayButton", this.StartPlay, this);
+        this.playButton.anchor.setTo(0.5);
+        this.ScaleSprite(this.playButton, this.game.width, this.game.height / 3, 50, 1);
         if (this.clock == undefined) {
             this.clock = new Clock(this.game);
         }
         if (this.scoreboard == undefined) {
             this.scoreboard = new Scoreboard(this.game);
         }
-        this.scale.onSizeChange.add(this.OnSizeChange, this);
+        //this.scale.setResizeCallback(this.OnSizeChange, this);
+        //this.scale.onSizeChange.add(this.OnSizeChange, this);
     };
-    MenuState.prototype.OnSizeChange = function () {
-        this.logo.scale.setTo(this.game.width / this.logo.width / window.devicePixelRatio, this.game.height / this.logo.height / window.devicePixelRatio);
+    MenuState.prototype.ScaleSprite = function (sprite, availableSpaceWidth, availableSpaceHeight, padding, scaleMultiplier) {
+        var scale = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
+        sprite.scale.x = scale * scaleMultiplier;
+        sprite.scale.y = scale * scaleMultiplier;
     };
-    MenuState.prototype.FadeOut = function () {
-        this.add.tween(this.background).to({ alpha: 0 }, 2000, Phaser.Easing.Linear.None, true);
-        var tween = this.add.tween(this.logo).to({ y: this.game.height }, 2000, Phaser.Easing.Linear.None, true);
-        tween.onComplete.add(this.StartPlay, this);
+    MenuState.prototype.GetSpriteScale = function (spriteWidth, spriteHeight, availableSpaceWidth, availableSpaceHeight, minimumPadding) {
+        var ratio = 1;
+        var devicePixelRatio = window.devicePixelRatio;
+        // sprite needs to fit in either width or height
+        var widthRatio = (spriteWidth * devicePixelRatio + 2 * minimumPadding) / availableSpaceWidth;
+        var heightRatio = (spriteHeight * devicePixelRatio + 2 * minimumPadding) / availableSpaceHeight;
+        if (widthRatio > 1 || heightRatio > 1) {
+            ratio = 1 / Math.max(widthRatio, heightRatio);
+        }
+        return ratio * devicePixelRatio;
+    };
+    MenuState.prototype.resize = function () {
+        this.background.width = this.game.width;
+        this.background.height = this.game.height;
+        this.ScaleSprite(this.logo, this.game.width, this.game.height / 3, 50, 1);
+        this.logo.x = this.world.centerX;
+        this.logo.y = this.world.centerY - this.game.height / 3;
+        this.ScaleSprite(this.playButton, this.game.width, this.game.height / 3, 50, 1);
+        this.playButton.x = this.world.centerX;
+        this.playButton.y = this.world.centerY;
     };
     MenuState.prototype.StartPlay = function () {
         switch (this.clock.State) {
@@ -798,32 +866,6 @@ var MenuState = (function (_super) {
         this.clock.Update();
     };
     return MenuState;
-}(Phaser.State));
-var PreloadState = (function (_super) {
-    __extends(PreloadState, _super);
-    function PreloadState() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    PreloadState.prototype.preload = function () {
-        // Setup the preload bar
-        this.preloadBar = this.add.sprite(0, 0, "PreloadBar");
-        this.preloadBar.anchor.setTo(0.5, 0.5);
-        this.preloadBar.position.setTo(this.world.centerX, this.world.centerY);
-        this.load.setPreloadSprite(this.preloadBar);
-        // Load game assets
-        this.load.image("Background", "assets/sprites/background.png");
-        this.load.image("Logo", "assets/sprites/logo.png");
-        this.load.image(BlockRenderer.Key, BlockRenderer.Url);
-        this.load.image("BackButton", "assets/sprites/backbutton.png");
-    };
-    PreloadState.prototype.create = function () {
-        var alphaTween = this.add.tween(this.preloadBar).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
-        alphaTween.onComplete.add(this.StartMenu, this);
-    };
-    PreloadState.prototype.StartMenu = function () {
-        this.game.state.start("Menu");
-    };
-    return PreloadState;
 }(Phaser.State));
 var ResultsState = (function (_super) {
     __extends(ResultsState, _super);
