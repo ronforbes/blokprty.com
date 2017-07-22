@@ -1,6 +1,5 @@
 class BlockRenderer {
     private block: Block;
-    private phaserGame: Phaser.Game;
     static readonly Key: string = "block";
     static readonly Url: string = "assets/sprites/block.png";
     static CalculatedSize: number = 0;
@@ -13,9 +12,8 @@ class BlockRenderer {
         0x00ffff
     ];
 
-    constructor(block: Block, phaserGame: Phaser.Game) {
+    constructor(block: Block) {
         this.block = block;
-        this.phaserGame = phaserGame;
         this.block.Sprite.anchor.setTo(0.5);
     }
 
@@ -48,7 +46,7 @@ class BlockRenderer {
                 }
 
                 timePercentage = this.block.Slider.Elapsed / BlockSlider.Duration;
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + destination * timePercentage, this.block.Y * BlockRenderer.CalculatedSize);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2 + destination * timePercentage, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
 
                 if(this.block.Type == -1) {
                     this.block.Sprite.visible = false;
@@ -61,7 +59,7 @@ class BlockRenderer {
                 break;
 
             case BlockState.WaitingToFall:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize, this.block.Y * BlockRenderer.CalculatedSize);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
@@ -69,21 +67,21 @@ class BlockRenderer {
             
             case BlockState.Falling:
                 timePercentage = this.block.Faller.Elapsed / BlockFaller.Duration;
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize * timePercentage);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2 + BlockRenderer.CalculatedSize * timePercentage);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             
             case BlockState.Matched:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize, this.block.Y * BlockRenderer.CalculatedSize);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = 0xffffff;
                 break;
 
             case BlockState.WaitingToClear:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize, this.block.Y * BlockRenderer.CalculatedSize);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
@@ -104,7 +102,7 @@ class BlockRenderer {
                 break;
 
             case BlockState.WaitingToEmpty:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize, this.block.Y * BlockRenderer.CalculatedSize);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
                 this.block.Sprite.anchor.setTo(0, 0);
                 this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = false;

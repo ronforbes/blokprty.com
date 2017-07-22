@@ -17,7 +17,9 @@ class BoardController {
     }
 
     private OnInputDown(sprite: Phaser.Sprite, pointer: Phaser.Pointer, block: Block) {
-        this.selectedBlock = block;
+        if(block.State == BlockState.Idle) {
+            this.selectedBlock = block;
+        }
     }
 
     private OnInputUp(sprite: Phaser.Sprite, pointer: Phaser.Pointer, block: Block) {
@@ -26,14 +28,18 @@ class BoardController {
 
     Update() {
         if(this.selectedBlock != null) {
-            let leftEdge: number = this.phaserGame.width / 2 - Board.Columns * BlockRenderer.CalculatedSize / 2 + this.selectedBlock.X * BlockRenderer.CalculatedSize;
-            let rightEdge: number = this.phaserGame.width / 2 - Board.Columns * BlockRenderer.CalculatedSize / 2 + this.selectedBlock.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize;
+            let bounds: PIXI.Rectangle = this.selectedBlock.Sprite.getBounds();
+            
+            //let leftEdge: number = this.phaserGame.width / 2 - Board.Columns * BlockRenderer.CalculatedSize / 2 + this.selectedBlock.X * BlockRenderer.CalculatedSize;
+            let leftEdge: number = bounds.x;
+            //let rightEdge: number = this.phaserGame.width / 2 - Board.Columns * BlockRenderer.CalculatedSize / 2 + this.selectedBlock.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize;
+            let rightEdge: number = bounds.x + bounds.width;
 
             let leftBlock: Block;
             let rightBlock: Block;
 
             let pointerPosition: Phaser.Point = this.phaserGame.input.activePointer.position;
-
+            console.log("Bounds=" + bounds + ", Pointer=" + pointerPosition);
             if(pointerPosition.x < leftEdge &&
                 this.selectedBlock.State == BlockState.Idle &&
                 this.selectedBlock.X - 1 >= 0 &&

@@ -6,18 +6,15 @@ enum SlideDirection {
 
 class BlockSlider {
     private block: Block;
-    private phaserGame: Phaser.Game;
     private matchDetector: MatchDetector;
-    //private matchDetector: MatchDetector;
     Direction: SlideDirection;
     TargetState: BlockState;
     TargetType: number;
     Elapsed: number;
-    static readonly Duration: number = 100;
+    static readonly Duration: number = 1000;
 
-    constructor(block: Block, phaserGame: Phaser.Game, matchDetector: MatchDetector) {
+    constructor(block: Block, matchDetector: MatchDetector) {
         this.block = block;
-        this.phaserGame = phaserGame;
         this.matchDetector = matchDetector;
     }
 
@@ -30,9 +27,9 @@ class BlockSlider {
         this.Direction = direction;
     }
 
-    Update() {
+    Update(elapsedGameTime: number) {
         if(this.block.State == BlockState.Sliding) {
-            this.Elapsed += this.phaserGame.time.elapsed;
+            this.Elapsed += elapsedGameTime;
 
             if(this.Elapsed >= BlockSlider.Duration) {
                 this.block.State = this.TargetState;

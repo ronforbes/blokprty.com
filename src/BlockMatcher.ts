@@ -2,11 +2,9 @@ class BlockMatcher {
     private block: Block;
     private elapsed: number;
     private readonly duration: number = 1000;
-    private phaserGame: Phaser.Game;
 
-    constructor(block: Block, phaserGame: Phaser.Game) {
+    constructor(block: Block) {
         this.block = block;
-        this.phaserGame = phaserGame;
     }
 
     Match(matchedBlockCount: number, delayCounter: number) {
@@ -18,11 +16,11 @@ class BlockMatcher {
         this.block.Emptier.DelayDuration = delayCounter * BlockEmptier.DelayInterval;
     }
 
-    Update() {
+    Update(elapsedGameTime: number) {
         // to do: return immediately if the game hasn't started or is over
 
         if(this.block.State == BlockState.Matched) {
-            this.elapsed += this.phaserGame.time.elapsed;
+            this.elapsed += elapsedGameTime;
 
             if(this.elapsed >= this.duration) {
                 this.block.Clearer.Clear();

@@ -1,16 +1,14 @@
 class BlockClearer {
     private block: Block;
-    private phaserGame: Phaser.Game;
     private delayElapsed: number;
-    static readonly DelayInterval: number = 250;
     DelayDuration: number;
+    static readonly DelayInterval: number = 250;
     Elapsed: number;
     static readonly Duration: number = 250;
     private scoreboard: Scoreboard;
 
-    constructor(block: Block, phaserGame: Phaser.Game, scoreboard: Scoreboard) {
+    constructor(block: Block, scoreboard: Scoreboard) {
         this.block = block;
-        this.phaserGame = phaserGame;
         this.scoreboard = scoreboard;
     }
 
@@ -20,11 +18,11 @@ class BlockClearer {
         this.delayElapsed = 0;
     }
 
-    Update() {
+    Update(elapsedGameTime: number) {
         // if the game hasn't started or has finished, return immediately
 
         if(this.block.State == BlockState.WaitingToClear) {
-            this.delayElapsed += this.phaserGame.time.elapsed;
+            this.delayElapsed += elapsedGameTime;
 
             if(this.delayElapsed >= this.DelayDuration) {
                 this.block.State = BlockState.Clearing;
@@ -36,7 +34,7 @@ class BlockClearer {
         }
 
         if(this.block.State == BlockState.Clearing) {
-            this.Elapsed += this.phaserGame.time.elapsed;
+            this.Elapsed += elapsedGameTime;
 
             if(this.Elapsed >= BlockClearer.Duration) {
                 this.block.Emptier.Empty();

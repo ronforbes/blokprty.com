@@ -24,7 +24,7 @@ class Board {
             this.Blocks[x] = [];
 
             for(let y = 0; y < Board.Rows; y++) {
-                this.Blocks[x][y] = new Block(this.phaserGame, this, this.boardGroup, scoreboard);
+                this.Blocks[x][y] = new Block(this, this.boardGroup, scoreboard);
                 this.Blocks[x][y].X = x;
                 this.Blocks[x][y].Y = y;
 
@@ -53,7 +53,7 @@ class Board {
     Update() {
         for(let x = 0; x < Board.Columns; x++) {
             for(let y = Board.Rows - 1; y >= 0; y--) {
-                this.Blocks[x][y].Update();
+                this.Blocks[x][y].Update(this.phaserGame.time.elapsed);
             }
         }
 

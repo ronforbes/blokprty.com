@@ -16,7 +16,6 @@ class Block {
     Type: number;
     static readonly TypeCount: number = 6;
     State: BlockState;
-    private phaserGame: Phaser.Game;
     Sprite: Phaser.Sprite;
     private renderer: BlockRenderer;
     Slider: BlockSlider;
@@ -25,25 +24,23 @@ class Block {
     Emptier: BlockEmptier;
     Faller: BlockFaller;
 
-    constructor(phaserGame: Phaser.Game, board: Board, group: Phaser.Group, scoreboard: Scoreboard) {
-        this.phaserGame = phaserGame;
-
+    constructor(board: Board, group: Phaser.Group, scoreboard: Scoreboard) {
         this.Sprite = group.create(0, 0, BlockRenderer.Key);
 
-        this.renderer = new BlockRenderer(this, this.phaserGame);
-        this.Slider = new BlockSlider(this, this.phaserGame, board.MatchDetector);
-        this.Matcher = new BlockMatcher(this, this.phaserGame);
-        this.Clearer = new BlockClearer(this, this.phaserGame, scoreboard);
-        this.Emptier = new BlockEmptier(this, this.phaserGame);
-        this.Faller = new BlockFaller(this, this.phaserGame);
+        this.renderer = new BlockRenderer(this);
+        this.Slider = new BlockSlider(this, board.MatchDetector);
+        this.Matcher = new BlockMatcher(this);
+        this.Clearer = new BlockClearer(this, scoreboard);
+        this.Emptier = new BlockEmptier(this);
+        this.Faller = new BlockFaller(this);
     }
 
-    Update() {
+    Update(elapsedGameTime) {
         this.renderer.Update();
-        this.Slider.Update();
-        this.Matcher.Update();
-        this.Clearer.Update();
-        this.Emptier.Update();
-        this.Faller.Update();
+        this.Slider.Update(elapsedGameTime);
+        this.Matcher.Update(elapsedGameTime);
+        this.Clearer.Update(elapsedGameTime);
+        this.Emptier.Update(elapsedGameTime);
+        this.Faller.Update(elapsedGameTime);
     }
 }

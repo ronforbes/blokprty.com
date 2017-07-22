@@ -1,6 +1,5 @@
 class BlockFaller {
     private block: Block;
-    private phaserGame: Phaser.Game;
     private delayElapsed: number;
     readonly delayDuration: number = 100;
     Elapsed: number;
@@ -8,9 +7,8 @@ class BlockFaller {
     Target: Block;
     JustFell: boolean;
 
-    constructor(block: Block, phaserGame: Phaser.Game) {
+    constructor(block: Block) {
         this.block = block;
-        this.phaserGame = phaserGame;
     }
 
     Fall() {
@@ -29,11 +27,11 @@ class BlockFaller {
         this.Elapsed = 0;
     }
 
-    Update() {
+    Update(elapsedGameTime: number) {
         // to do: if the game isn't on, return immediately
 
         if(this.block.State == BlockState.WaitingToFall) {
-            this.delayElapsed += this.phaserGame.time.elapsed;
+            this.delayElapsed += elapsedGameTime;
 
             if(this.delayElapsed >= this.delayDuration) {
                 this.FinishWaitingToFall();
@@ -41,7 +39,7 @@ class BlockFaller {
         }
 
         if(this.block.State == BlockState.Falling) {
-            this.Elapsed += this.phaserGame.time.elapsed;
+            this.Elapsed += elapsedGameTime;
 
             if(this.Elapsed >= BlockFaller.Duration) {
                 this.Target.State = BlockState.Falling;
