@@ -11,7 +11,7 @@ class BlockSlider {
     TargetState: BlockState;
     TargetType: number;
     Elapsed: number;
-    static readonly Duration: number = 1000;
+    static readonly Duration: number = 100;
 
     constructor(block: Block, matchDetector: MatchDetector) {
         this.block = block;

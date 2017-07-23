@@ -1,15 +1,16 @@
 class ScoreboardRenderer {
     private scoreboard: Scoreboard;
-    private scoreText: Phaser.Text;
+    ScoreText: Phaser.Text;
 
     constructor(scoreboard: Scoreboard, phaserGame: Phaser.Game) {
         this.scoreboard = scoreboard;
 
         let style = { font: "48px Arial", fill: "#ffffff" };
-        this.scoreText = phaserGame.add.text(10, 150, "Score: 0", style);
+        this.ScoreText = phaserGame.add.text(0, 0, "Score: 0", style);
+        this.ScoreText.anchor.setTo(0.5);
     }
 
     Update() {
-        this.scoreText.text = "Score: " + this.scoreboard.Score;
+        this.ScoreText.text = "Score: " + this.scoreboard.Score;
     }
 }

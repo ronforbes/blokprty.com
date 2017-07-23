@@ -12,8 +12,13 @@ class GameplayState extends Phaser.State {
     
 
     init(clock: Clock, scoreboard: Scoreboard) {
-        this.clock = clock;
-        this.scoreboard = scoreboard;
+        if(clock != undefined) {
+            this.clock = clock;
+        }
+
+        if(scoreboard != undefined) {
+            this.scoreboard = scoreboard;
+        }
     }
 
     create() {
@@ -21,15 +26,23 @@ class GameplayState extends Phaser.State {
         this.background.width = this.game.width;
         this.background.height = this.game.height;
 
+        if(this.clock == undefined) {
+            this.clock = new Clock(this.game);
+        }
+
+        if(this.scoreboard == undefined) {
+            this.scoreboard = new Scoreboard(this.game);
+        }
+
         this.board = new Board(this.game, this.scoreboard);
 
-        //this.scoreboard.Reset();
+        this.scoreboard.Reset();
 
-        //this.scoreboardRenderer = new ScoreboardRenderer(this.scoreboard, this.game);
+        this.scoreboardRenderer = new ScoreboardRenderer(this.scoreboard, this.game);
 
-        //this.clockRenderer = new ClockRenderer(this.clock, this.game);
+        this.clockRenderer = new ClockRenderer(this.clock, this.game);
 
-        //this.backButton = this.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
+        this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButtonClick, this);
 
         // Position the UI
         this.PositionUI();
@@ -41,11 +54,23 @@ class GameplayState extends Phaser.State {
         if(isLandscape) {
             let availableGridSpace: number = Math.min(this.game.width * 2 / 3, this.game.height);
             BlockRenderer.CalculatedSize = (availableGridSpace * 0.9) / Board.Rows;
-            this.horizontalMargin = (this.game.width * 2 / 3 - Board.Columns * BlockRenderer.CalculatedSize) / 2;
+            this.horizontalMargin = this.game.width * 0.95 - Board.Columns * BlockRenderer.CalculatedSize
             this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.CalculatedSize) / 2;
 
             this.board.Renderer.Group.x = this.horizontalMargin;
             this.board.Renderer.Group.y = this.verticalMargin;
+
+            this.ScaleSprite(this.backButton, this.game.width / 3, this.game.height / 3, 50, 1, false);
+            this.backButton.x = 0;
+            this.backButton.y = this.verticalMargin;
+
+            this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1, false);
+            this.clockRenderer.ClockText.x = this.game.width / 6;
+            this.clockRenderer.ClockText.y = this.verticalMargin + 200;
+            
+            this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.game.height / 3, 50, 1, false);
+            this.scoreboardRenderer.ScoreText.x = this.game.width / 6;
+            this.scoreboardRenderer.ScoreText.y = this.verticalMargin + 400;
         } else {
             let availableGridSpace: number = this.game.width;
             BlockRenderer.CalculatedSize = (availableGridSpace * 0.9) / Board.Columns;
@@ -54,6 +79,18 @@ class GameplayState extends Phaser.State {
 
             this.board.Renderer.Group.x = this.horizontalMargin;
             this.board.Renderer.Group.y = this.verticalMargin;
+
+            this.ScaleSprite(this.backButton, this.game.width / 3, this.verticalMargin, 10, 1, false);
+            this.backButton.x = 0;
+            this.backButton.y = 0;
+
+            this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.verticalMargin, 10, 1, false);
+            this.clockRenderer.ClockText.x = this.game.world.centerX;
+            this.clockRenderer.ClockText.y = this.verticalMargin / 2;
+            
+            this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.verticalMargin, 10, 1, false);
+            this.scoreboardRenderer.ScoreText.x = this.game.width - this.scoreboardRenderer.ScoreText.width / 2;
+            this.scoreboardRenderer.ScoreText.y = this.verticalMargin / 2;
         }
 
         for(let x = 0; x < Board.Columns; x++) {
@@ -98,9 +135,9 @@ class GameplayState extends Phaser.State {
     update() {
         this.board.Update();
         
-        //this.clock.Update();
+        this.clock.Update();
 
-        /*switch(this.clock.State) {
+        switch(this.clock.State) {
             case ClockState.Results:
                 this.game.state.start("Results", true, false, this.clock, this.scoreboard);
                 break;
@@ -109,9 +146,9 @@ class GameplayState extends Phaser.State {
                 break;
             default:
                 break;
-        }*/
+        }
 
-        //this.scoreboardRenderer.Update();
-        //this.clockRenderer.Update();
+        this.scoreboardRenderer.Update();
+        this.clockRenderer.Update();
     }
 }

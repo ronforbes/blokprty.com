@@ -11,6 +11,7 @@ class BlockRenderer {
         0xff00ff,
         0x00ffff
     ];
+    private localScale: Phaser.Point;
 
     constructor(block: Block) {
         this.block = block;
@@ -78,6 +79,7 @@ class BlockRenderer {
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = 0xffffff;
+                this.localScale = new Phaser.Point(this.block.Sprite.scale.x, this.block.Sprite.scale.y);
                 break;
 
             case BlockState.WaitingToClear:
@@ -95,16 +97,14 @@ class BlockRenderer {
                 let alpha: number = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
                 this.block.Sprite.alpha = alpha;
 
-                this.block.Sprite.anchor.setTo(0.5, 0.5);
                 let scale: number = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
-                this.block.Sprite.scale.setTo(scale, scale);
+                this.block.Sprite.scale.setTo(scale * this.localScale.x, scale * this.localScale.y);
                 
                 break;
 
             case BlockState.WaitingToEmpty:
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
-                this.block.Sprite.anchor.setTo(0, 0);
-                this.block.Sprite.scale.setTo(1, 1);
+                this.block.Sprite.scale = this.localScale;
                 this.block.Sprite.visible = false;
         }
         

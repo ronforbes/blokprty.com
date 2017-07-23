@@ -9,16 +9,6 @@ class BoardRenderer {
         this.phaserGame = phaserGame;
         this.Group = group;
 
-        //console.log("World centerX=" + this.phaserGame.world.centerX)
-        //this.position = new Phaser.Point(this.phaserGame.world.centerX - Board.Columns * BlockRenderer.Width / 2, this.phaserGame.world.centerY - (Board.Rows - 1) * BlockRenderer.Height / 2);
-        //this.position = new Phaser.Point(this.phaserGame.world.centerX - Board.Columns * BlockRenderer.Width / 2, this.p);
-        //this.Group.position = this.position;
-
-        //let scale = this.phaserGame.height / (BlockRenderer.Height * 10) / window.devicePixelRatio;
-    
-        
-        //this.group.scale.setTo(this.phaserGame.width / (BlockRenderer.Width * Board.Columns) / window.devicePixelRatio, 10 / (BlockRenderer.Height * 10) / window.devicePixelRatio);
-
         //this.background = this.phaserGame.add.graphics(0, 0);
         //this.Group.addChild(this.background);
 

@@ -9,13 +9,13 @@ class Clock {
     TimeRemaining: number;
     IsControllingGameState: boolean;
     phaserGame: Phaser.Game;
-    private readonly gameplayDuration = 10000;
-    private readonly resultsDuration = 10000;
-    private readonly leaderboardDuration = 10000;
+    private readonly gameplayDuration = 120000;
+    private readonly resultsDuration = 15000;
+    private readonly leaderboardDuration = 15000;
 
     constructor(phaserGame: Phaser.Game) {
         this.State = ClockState.Gameplay;
-        this.TimeRemaining = 10000;
+        this.TimeRemaining = this.gameplayDuration;
         this.phaserGame = phaserGame;
     }
 

@@ -217,6 +217,7 @@ var BlockRenderer = (function () {
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = 0xffffff;
+                this.localScale = new Phaser.Point(this.block.Sprite.scale.x, this.block.Sprite.scale.y);
                 break;
             case BlockState.WaitingToClear:
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
@@ -230,14 +231,12 @@ var BlockRenderer = (function () {
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 var alpha = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
                 this.block.Sprite.alpha = alpha;
-                this.block.Sprite.anchor.setTo(0.5, 0.5);
                 var scale = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
-                this.block.Sprite.scale.setTo(scale, scale);
+                this.block.Sprite.scale.setTo(scale * this.localScale.x, scale * this.localScale.y);
                 break;
             case BlockState.WaitingToEmpty:
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
-                this.block.Sprite.anchor.setTo(0, 0);
-                this.block.Sprite.scale.setTo(1, 1);
+                this.block.Sprite.scale = this.localScale;
                 this.block.Sprite.visible = false;
         }
     };
@@ -276,7 +275,7 @@ var BlockSlider = (function () {
             }
         }
     };
-    BlockSlider.Duration = 1000;
+    BlockSlider.Duration = 100;
     return BlockSlider;
 }());
 var Board = (function () {
@@ -317,7 +316,7 @@ var Board = (function () {
         this.MatchDetector.Update();
         this.boardGravity.Update();
     };
-    Board.Columns = 6;
+    Board.Columns = 10;
     Board.Rows = 10;
     return Board;
 }());
@@ -334,9 +333,7 @@ var BoardController = (function () {
         }
     }
     BoardController.prototype.OnInputDown = function (sprite, pointer, block) {
-        if (block.State == BlockState.Idle) {
-            this.selectedBlock = block;
-        }
+        this.selectedBlock = block;
     };
     BoardController.prototype.OnInputUp = function (sprite, pointer, block) {
         this.selectedBlock = null;
@@ -344,14 +341,11 @@ var BoardController = (function () {
     BoardController.prototype.Update = function () {
         if (this.selectedBlock != null) {
             var bounds = this.selectedBlock.Sprite.getBounds();
-            //let leftEdge: number = this.phaserGame.width / 2 - Board.Columns * BlockRenderer.CalculatedSize / 2 + this.selectedBlock.X * BlockRenderer.CalculatedSize;
-            var leftEdge = bounds.x;
-            //let rightEdge: number = this.phaserGame.width / 2 - Board.Columns * BlockRenderer.CalculatedSize / 2 + this.selectedBlock.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize;
-            var rightEdge = bounds.x + bounds.width;
+            var leftEdge = this.board.Renderer.Group.position.x + this.selectedBlock.X * BlockRenderer.CalculatedSize;
+            var rightEdge = this.board.Renderer.Group.position.x + this.selectedBlock.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize;
             var leftBlock = void 0;
             var rightBlock = void 0;
             var pointerPosition = this.phaserGame.input.activePointer.position;
-            console.log("Bounds=" + bounds + ", Pointer=" + pointerPosition);
             if (pointerPosition.x < leftEdge &&
                 this.selectedBlock.State == BlockState.Idle &&
                 this.selectedBlock.X - 1 >= 0 &&
@@ -448,12 +442,6 @@ var BoardRenderer = (function () {
     function BoardRenderer(board, phaserGame, group) {
         this.phaserGame = phaserGame;
         this.Group = group;
-        //console.log("World centerX=" + this.phaserGame.world.centerX)
-        //this.position = new Phaser.Point(this.phaserGame.world.centerX - Board.Columns * BlockRenderer.Width / 2, this.phaserGame.world.centerY - (Board.Rows - 1) * BlockRenderer.Height / 2);
-        //this.position = new Phaser.Point(this.phaserGame.world.centerX - Board.Columns * BlockRenderer.Width / 2, this.p);
-        //this.Group.position = this.position;
-        //let scale = this.phaserGame.height / (BlockRenderer.Height * 10) / window.devicePixelRatio;
-        //this.group.scale.setTo(this.phaserGame.width / (BlockRenderer.Width * Board.Columns) / window.devicePixelRatio, 10 / (BlockRenderer.Height * 10) / window.devicePixelRatio);
         //this.background = this.phaserGame.add.graphics(0, 0);
         //this.Group.addChild(this.background);
         //this.background.beginFill(0x333333);
@@ -500,11 +488,11 @@ var ClockState;
 })(ClockState || (ClockState = {}));
 var Clock = (function () {
     function Clock(phaserGame) {
-        this.gameplayDuration = 10000;
-        this.resultsDuration = 10000;
-        this.leaderboardDuration = 10000;
+        this.gameplayDuration = 120000;
+        this.resultsDuration = 15000;
+        this.leaderboardDuration = 15000;
         this.State = ClockState.Gameplay;
-        this.TimeRemaining = 10000;
+        this.TimeRemaining = this.gameplayDuration;
         this.phaserGame = phaserGame;
     }
     Clock.prototype.Update = function () {
@@ -532,11 +520,11 @@ var ClockRenderer = (function () {
     function ClockRenderer(clock, phaserGame) {
         this.clock = clock;
         var style = { font: "48px Arial", fill: "#ffffff", align: "right" };
-        this.clockText = phaserGame.add.text(phaserGame.width - 10, 10, "Time: 10", style);
-        this.clockText.anchor.setTo(1, 0);
+        this.ClockText = phaserGame.add.text(0, 0, "Time: 10", style);
+        this.ClockText.anchor.setTo(0.5);
     }
     ClockRenderer.prototype.Update = function () {
-        this.clockText.text = "Time: " + (this.clock.TimeRemaining / 1000).toFixed(0);
+        this.ClockText.text = "Time: " + (this.clock.TimeRemaining / 1000).toFixed(0);
     };
     return ClockRenderer;
 }());
@@ -566,18 +554,28 @@ var GameplayState = (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     GameplayState.prototype.init = function (clock, scoreboard) {
-        this.clock = clock;
-        this.scoreboard = scoreboard;
+        if (clock != undefined) {
+            this.clock = clock;
+        }
+        if (scoreboard != undefined) {
+            this.scoreboard = scoreboard;
+        }
     };
     GameplayState.prototype.create = function () {
         this.background = this.add.image(0, 0, "Background");
         this.background.width = this.game.width;
         this.background.height = this.game.height;
+        if (this.clock == undefined) {
+            this.clock = new Clock(this.game);
+        }
+        if (this.scoreboard == undefined) {
+            this.scoreboard = new Scoreboard(this.game);
+        }
         this.board = new Board(this.game, this.scoreboard);
-        //this.scoreboard.Reset();
-        //this.scoreboardRenderer = new ScoreboardRenderer(this.scoreboard, this.game);
-        //this.clockRenderer = new ClockRenderer(this.clock, this.game);
-        //this.backButton = this.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
+        this.scoreboard.Reset();
+        this.scoreboardRenderer = new ScoreboardRenderer(this.scoreboard, this.game);
+        this.clockRenderer = new ClockRenderer(this.clock, this.game);
+        this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButtonClick, this);
         // Position the UI
         this.PositionUI();
     };
@@ -586,10 +584,19 @@ var GameplayState = (function (_super) {
         if (isLandscape) {
             var availableGridSpace = Math.min(this.game.width * 2 / 3, this.game.height);
             BlockRenderer.CalculatedSize = (availableGridSpace * 0.9) / Board.Rows;
-            this.horizontalMargin = (this.game.width * 2 / 3 - Board.Columns * BlockRenderer.CalculatedSize) / 2;
+            this.horizontalMargin = this.game.width * 0.95 - Board.Columns * BlockRenderer.CalculatedSize;
             this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.CalculatedSize) / 2;
             this.board.Renderer.Group.x = this.horizontalMargin;
             this.board.Renderer.Group.y = this.verticalMargin;
+            this.ScaleSprite(this.backButton, this.game.width / 3, this.game.height / 3, 50, 1, false);
+            this.backButton.x = 0;
+            this.backButton.y = this.verticalMargin;
+            this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1, false);
+            this.clockRenderer.ClockText.x = this.game.width / 6;
+            this.clockRenderer.ClockText.y = this.verticalMargin + 200;
+            this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.game.height / 3, 50, 1, false);
+            this.scoreboardRenderer.ScoreText.x = this.game.width / 6;
+            this.scoreboardRenderer.ScoreText.y = this.verticalMargin + 400;
         }
         else {
             var availableGridSpace = this.game.width;
@@ -598,6 +605,15 @@ var GameplayState = (function (_super) {
             this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.CalculatedSize) / 2;
             this.board.Renderer.Group.x = this.horizontalMargin;
             this.board.Renderer.Group.y = this.verticalMargin;
+            this.ScaleSprite(this.backButton, this.game.width / 3, this.verticalMargin, 10, 1, false);
+            this.backButton.x = 0;
+            this.backButton.y = 0;
+            this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.verticalMargin, 10, 1, false);
+            this.clockRenderer.ClockText.x = this.game.world.centerX;
+            this.clockRenderer.ClockText.y = this.verticalMargin / 2;
+            this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.verticalMargin, 10, 1, false);
+            this.scoreboardRenderer.ScoreText.x = this.game.width - this.scoreboardRenderer.ScoreText.width / 2;
+            this.scoreboardRenderer.ScoreText.y = this.verticalMargin / 2;
         }
         for (var x = 0; x < Board.Columns; x++) {
             for (var y = 0; y < Board.Rows; y++) {
@@ -631,8 +647,8 @@ var GameplayState = (function (_super) {
     };
     GameplayState.prototype.update = function () {
         this.board.Update();
-        //this.clock.Update();
-        /*switch(this.clock.State) {
+        this.clock.Update();
+        switch (this.clock.State) {
             case ClockState.Results:
                 this.game.state.start("Results", true, false, this.clock, this.scoreboard);
                 break;
@@ -641,9 +657,9 @@ var GameplayState = (function (_super) {
                 break;
             default:
                 break;
-        }*/
-        //this.scoreboardRenderer.Update();
-        //this.clockRenderer.Update();
+        }
+        this.scoreboardRenderer.Update();
+        this.clockRenderer.Update();
     };
     return GameplayState;
 }(Phaser.State));
@@ -920,10 +936,11 @@ var ScoreboardRenderer = (function () {
     function ScoreboardRenderer(scoreboard, phaserGame) {
         this.scoreboard = scoreboard;
         var style = { font: "48px Arial", fill: "#ffffff" };
-        this.scoreText = phaserGame.add.text(10, 150, "Score: 0", style);
+        this.ScoreText = phaserGame.add.text(0, 0, "Score: 0", style);
+        this.ScoreText.anchor.setTo(0.5);
     }
     ScoreboardRenderer.prototype.Update = function () {
-        this.scoreText.text = "Score: " + this.scoreboard.Score;
+        this.ScoreText.text = "Score: " + this.scoreboard.Score;
     };
     return ScoreboardRenderer;
 }());
