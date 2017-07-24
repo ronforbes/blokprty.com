@@ -5,6 +5,7 @@ class ResultsState extends Phaser.State {
     private clock: Clock;
     private clockRenderer: ClockRenderer;
     private backButton: Phaser.Button;
+    private request: XMLHttpRequest;
 
     init(clock: Clock, scoreboard: Scoreboard) {
         this.scoreboard = scoreboard;
@@ -12,6 +13,13 @@ class ResultsState extends Phaser.State {
     }
 
     create() {
+        if(this.scoreboard == undefined) {
+            this.scoreboard = new Scoreboard(this.game);
+        }
+        if(this.clock == undefined) {
+            this.clock = new Clock(this.game);
+        }
+
         this.background = this.add.image(0, 0, "Background");
         this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
 
@@ -22,6 +30,11 @@ class ResultsState extends Phaser.State {
         this.clockRenderer = new ClockRenderer(this.clock, this.game);
 
         this.backButton = this.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
+
+        this.request = new XMLHttpRequest();
+        this.request.open("POST", "http://localhost:5000/api/gameresults", true);
+        this.request.setRequestHeader("Content-type", "application/json");
+        this.request.send(JSON.stringify({name: "Guest", score: this.scoreboard.Score}));
     }
 
     private OnBackButtonClick() {

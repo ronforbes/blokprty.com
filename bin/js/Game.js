@@ -8,6 +8,23 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+/*import * as express from "express"
+import * as http from "http"
+
+let app = express();
+let server = require('http').Server(app);
+
+app.use('/',express.static(__dirname + '/bin'));
+app.use('/js',express.static(__dirname + '/bin/js'));
+app.use('/assets',express.static(__dirname + '/bin/assets'));
+
+app.get('/',function(req,res){
+    res.sendFile(__dirname+'/bin/index.html');
+});
+
+server.listen(process.env.PORT || 3000, function() {
+    console.log('Listening on ' + server.address().port);
+});*/ 
 var BlockState;
 (function (BlockState) {
     BlockState[BlockState["Empty"] = 0] = "Empty";
@@ -494,9 +511,29 @@ var Clock = (function () {
         this.State = ClockState.Gameplay;
         this.TimeRemaining = this.gameplayDuration;
         this.phaserGame = phaserGame;
+        this.request = new XMLHttpRequest();
+        this.request.onreadystatechange = this.OnServerClockReceived;
+        this.request.open("GET", "http://localhost:5000/api/gameroom", true);
+        this.request.send();
     }
+    Clock.prototype.OnServerClockReceived = function (ev) {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log(JSON.parse(this.responseText));
+            var state = JSON.parse(this.responseText).state;
+            var time = JSON.parse(this.responseText).timeRemaining;
+            Clock.ServerState = state;
+            Clock.ServerTimeRemaining = time;
+            Clock.CheckServerState = true;
+        }
+    };
     Clock.prototype.Update = function () {
         this.TimeRemaining -= this.phaserGame.time.elapsed;
+        if (Clock.CheckServerState) {
+            this.State = Clock.ServerState;
+            this.TimeRemaining = Clock.ServerTimeRemaining;
+            console.log("Synced to server state=" + this.State + ", time=" + this.TimeRemaining);
+            Clock.CheckServerState = false;
+        }
         if (this.TimeRemaining <= 0) {
             switch (this.State) {
                 case ClockState.Gameplay:
@@ -663,6 +700,11 @@ var GameplayState = (function (_super) {
     };
     return GameplayState;
 }(Phaser.State));
+var LeaderboardResult = (function () {
+    function LeaderboardResult() {
+    }
+    return LeaderboardResult;
+}());
 var LeaderboardState = (function (_super) {
     __extends(LeaderboardState, _super);
     function LeaderboardState() {
@@ -673,6 +715,12 @@ var LeaderboardState = (function (_super) {
         this.clock = clock;
     };
     LeaderboardState.prototype.create = function () {
+        if (this.scoreboard == undefined) {
+            this.scoreboard = new Scoreboard(this.game);
+        }
+        if (this.clock == undefined) {
+            this.clock = new Clock(this.game);
+        }
         this.background = this.add.image(0, 0, "Background");
         this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
         var style = { font: "48px Arial", fill: "#ffffff" };
@@ -680,12 +728,28 @@ var LeaderboardState = (function (_super) {
         this.leaderboardText.anchor.setTo(0.5, 0.5);
         this.clockRenderer = new ClockRenderer(this.clock, this.game);
         this.backButton = this.game.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
+        this.request = new XMLHttpRequest();
+        this.request.onreadystatechange = this.OnServerLeaderboardReceived;
+        this.request.open("GET", "http://localhost:5000/api/leaderboard", true);
+        this.request.send();
     };
     LeaderboardState.prototype.OnBackButtonClick = function () {
         this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
     };
+    LeaderboardState.prototype.OnServerLeaderboardReceived = function (ev) {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log(JSON.parse(this.responseText));
+            LeaderboardState.LeaderboardResults = JSON.parse(this.responseText);
+        }
+    };
     LeaderboardState.prototype.update = function () {
         this.clock.Update();
+        if (LeaderboardState.LeaderboardResults != undefined) {
+            this.leaderboardText.text = "";
+            for (var n = 0; n < LeaderboardState.LeaderboardResults.length; n++) {
+                this.leaderboardText.text += (n + 1).toString() + ". " + LeaderboardState.LeaderboardResults[n].name + ": " + LeaderboardState.LeaderboardResults[n].score + "\n";
+            }
+        }
         switch (this.clock.State) {
             case ClockState.Gameplay:
                 this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard);
@@ -723,7 +787,7 @@ var LoadingState = (function (_super) {
         alphaTween.onComplete.add(this.StartMenu, this);
     };
     LoadingState.prototype.StartMenu = function () {
-        this.game.state.start("Gameplay");
+        this.game.state.start("Menu");
     };
     return LoadingState;
 }(Phaser.State));
@@ -892,6 +956,12 @@ var ResultsState = (function (_super) {
         this.clock = clock;
     };
     ResultsState.prototype.create = function () {
+        if (this.scoreboard == undefined) {
+            this.scoreboard = new Scoreboard(this.game);
+        }
+        if (this.clock == undefined) {
+            this.clock = new Clock(this.game);
+        }
         this.background = this.add.image(0, 0, "Background");
         this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
         var style = { font: "48px Arial", fill: "#ffffff" };
@@ -899,6 +969,10 @@ var ResultsState = (function (_super) {
         this.scoreText.anchor.setTo(0.5, 0.5);
         this.clockRenderer = new ClockRenderer(this.clock, this.game);
         this.backButton = this.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
+        this.request = new XMLHttpRequest();
+        this.request.open("POST", "http://localhost:5000/api/gameresults", true);
+        this.request.setRequestHeader("Content-type", "application/json");
+        this.request.send(JSON.stringify({ name: "Guest", score: this.scoreboard.Score }));
     };
     ResultsState.prototype.OnBackButtonClick = function () {
         this.game.state.start("Menu", true, false, this.clock, this.scoreboard);

@@ -22,6 +22,6 @@ class LoadingState extends Phaser.State {
     }
 
     private StartMenu() {
-        this.game.state.start("Gameplay");
+        this.game.state.start("Menu");
     }
 }
