@@ -40,7 +40,7 @@ class LeaderboardState extends Phaser.State {
         this.request = new XMLHttpRequest();
         this.request.onreadystatechange = this.OnServerLeaderboardReceived;
             
-        this.request.open("GET", "http://localhost:5001/api/leaderboard", true);
+        this.request.open("GET", "/api/leaderboard", true);
         this.request.send();
     }
 

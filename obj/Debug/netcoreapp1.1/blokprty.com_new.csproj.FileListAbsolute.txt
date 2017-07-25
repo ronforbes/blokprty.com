@@ -6,3 +6,11 @@
 /Users/ronforbes/Projects/blokprty.com_new/bin/Debug/netcoreapp1.1/blokprty.com_new.pdb
 /Users/ronforbes/Projects/blokprty.com_new/obj/Debug/netcoreapp1.1/blokprty.com_new.dll
 /Users/ronforbes/Projects/blokprty.com_new/obj/Debug/netcoreapp1.1/blokprty.com_new.pdb
+/Users/ronforbes/Projects/blokprty.com/bin/Debug/netcoreapp1.1/blokprty.com_new.deps.json
+/Users/ronforbes/Projects/blokprty.com/bin/Debug/netcoreapp1.1/blokprty.com_new.runtimeconfig.json
+/Users/ronforbes/Projects/blokprty.com/bin/Debug/netcoreapp1.1/blokprty.com_new.runtimeconfig.dev.json
+/Users/ronforbes/Projects/blokprty.com/bin/Debug/netcoreapp1.1/blokprty.com_new.dll
+/Users/ronforbes/Projects/blokprty.com/bin/Debug/netcoreapp1.1/blokprty.com_new.pdb
+/Users/ronforbes/Projects/blokprty.com/obj/Debug/netcoreapp1.1/blokprty.com_new.AssemblyInfo.cs
+/Users/ronforbes/Projects/blokprty.com/obj/Debug/netcoreapp1.1/blokprty.com_new.dll
+/Users/ronforbes/Projects/blokprty.com/obj/Debug/netcoreapp1.1/blokprty.com_new.pdb

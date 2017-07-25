@@ -496,7 +496,7 @@ var Clock = (function () {
         this.phaserGame = phaserGame;
         this.request = new XMLHttpRequest();
         this.request.onreadystatechange = this.OnServerClockReceived;
-        this.request.open("GET", "http://localhost:5001/api/gameroom", true);
+        this.request.open("GET", "/api/gameroom", true);
         this.request.send();
     }
     Clock.prototype.OnServerClockReceived = function (ev) {
@@ -713,7 +713,7 @@ var LeaderboardState = (function (_super) {
         this.backButton = this.game.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
         this.request = new XMLHttpRequest();
         this.request.onreadystatechange = this.OnServerLeaderboardReceived;
-        this.request.open("GET", "http://localhost:5001/api/leaderboard", true);
+        this.request.open("GET", "/api/leaderboard", true);
         this.request.send();
     };
     LeaderboardState.prototype.OnBackButtonClick = function () {
@@ -953,7 +953,7 @@ var ResultsState = (function (_super) {
         this.clockRenderer = new ClockRenderer(this.clock, this.game);
         this.backButton = this.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
         this.request = new XMLHttpRequest();
-        this.request.open("POST", "http://localhost:5001/api/gameresults", true);
+        this.request.open("POST", "/api/gameresults", true);
         this.request.setRequestHeader("Content-type", "application/json");
         this.request.send(JSON.stringify({ name: "Guest", score: this.scoreboard.Score }));
     };

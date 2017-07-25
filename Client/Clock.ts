@@ -25,7 +25,7 @@ class Clock {
         this.request = new XMLHttpRequest();
         this.request.onreadystatechange = this.OnServerClockReceived;
             
-        this.request.open("GET", "http://localhost:5001/api/gameroom", true);
+        this.request.open("GET", "/api/gameroom", true);
         this.request.send();
     }
 
