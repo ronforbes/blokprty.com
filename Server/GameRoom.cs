@@ -63,9 +63,9 @@ namespace blokprty.com_new {
 
         public List<GameResults> GetLeaderboard() {
             gameResults.Sort((x, y) => {
-                if(x.Score > y.Score) 
+                if(x.Score < y.Score) 
                     return 1;
-                if(x.Score < y.Score)
+                if(x.Score > y.Score)
                     return -1;
                 else
                     return 0;});
