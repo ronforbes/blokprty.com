@@ -8,23 +8,6 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-/*import * as express from "express"
-import * as http from "http"
-
-let app = express();
-let server = require('http').Server(app);
-
-app.use('/',express.static(__dirname + '/bin'));
-app.use('/js',express.static(__dirname + '/bin/js'));
-app.use('/assets',express.static(__dirname + '/bin/assets'));
-
-app.get('/',function(req,res){
-    res.sendFile(__dirname+'/bin/index.html');
-});
-
-server.listen(process.env.PORT || 3000, function() {
-    console.log('Listening on ' + server.address().port);
-});*/ 
 var BlockState;
 (function (BlockState) {
     BlockState[BlockState["Empty"] = 0] = "Empty";
@@ -513,7 +496,7 @@ var Clock = (function () {
         this.phaserGame = phaserGame;
         this.request = new XMLHttpRequest();
         this.request.onreadystatechange = this.OnServerClockReceived;
-        this.request.open("GET", "http://localhost:5000/api/gameroom", true);
+        this.request.open("GET", "http://localhost:5001/api/gameroom", true);
         this.request.send();
     }
     Clock.prototype.OnServerClockReceived = function (ev) {
@@ -730,7 +713,7 @@ var LeaderboardState = (function (_super) {
         this.backButton = this.game.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
         this.request = new XMLHttpRequest();
         this.request.onreadystatechange = this.OnServerLeaderboardReceived;
-        this.request.open("GET", "http://localhost:5000/api/leaderboard", true);
+        this.request.open("GET", "http://localhost:5001/api/leaderboard", true);
         this.request.send();
     };
     LeaderboardState.prototype.OnBackButtonClick = function () {
@@ -970,7 +953,7 @@ var ResultsState = (function (_super) {
         this.clockRenderer = new ClockRenderer(this.clock, this.game);
         this.backButton = this.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
         this.request = new XMLHttpRequest();
-        this.request.open("POST", "http://localhost:5000/api/gameresults", true);
+        this.request.open("POST", "http://localhost:5001/api/gameresults", true);
         this.request.setRequestHeader("Content-type", "application/json");
         this.request.send(JSON.stringify({ name: "Guest", score: this.scoreboard.Score }));
     };

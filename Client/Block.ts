@@ -35,7 +35,7 @@ class Block {
         this.Faller = new BlockFaller(this);
     }
 
-    Update(elapsedGameTime) {
+    Update(elapsedGameTime: number) {
         this.renderer.Update();
         this.Slider.Update(elapsedGameTime);
         this.Matcher.Update(elapsedGameTime);

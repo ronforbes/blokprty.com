@@ -32,7 +32,7 @@ class ResultsState extends Phaser.State {
         this.backButton = this.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
 
         this.request = new XMLHttpRequest();
-        this.request.open("POST", "http://localhost:5000/api/gameresults", true);
+        this.request.open("POST", "http://localhost:5001/api/gameresults", true);
         this.request.setRequestHeader("Content-type", "application/json");
         this.request.send(JSON.stringify({name: "Guest", score: this.scoreboard.Score}));
     }

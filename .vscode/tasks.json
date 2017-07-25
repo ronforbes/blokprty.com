@@ -1,10 +1,23 @@
 {
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
-    "version": "0.1.0",
-    "command": "tsc",
-    "isShellCommand": true,
-    "args": ["--out", "bin/js/Game.js"],
-    "showOutput": "silent",
-    "problemMatcher": "$tsc"
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "taskName": "Build Server",
+            "command": "dotnet",
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "taskName": "Build Client",
+            "command": "tsc",
+            "type": "shell",
+            "group": "build"
+        }
+    ]
 }
