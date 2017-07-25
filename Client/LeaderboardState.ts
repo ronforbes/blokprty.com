@@ -30,7 +30,7 @@ class LeaderboardState extends Phaser.State {
         this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
 
         let style = { font: "48px Arial", fill: "#ffffff" };
-        this.leaderboardText = this.add.text(this.world.centerX, this.world.centerY, "Leaderboards coming soon!", style);
+        this.leaderboardText = this.add.text(this.world.centerX, this.world.centerY, "Loading...", style);
         this.leaderboardText.anchor.setTo(0.5, 0.5);
 
         this.clockRenderer = new ClockRenderer(this.clock, this.game);
