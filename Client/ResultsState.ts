@@ -21,7 +21,8 @@ class ResultsState extends Phaser.State {
         }
 
         this.background = this.add.image(0, 0, "Background");
-        this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
+        this.background.width = this.game.width;
+        this.background.height = this.game.height;
 
         let style = { font: "48px Arial", fill: "#ffffff" };
         this.scoreText = this.add.text(this.world.centerX, this.world.centerY, "Score: " + this.scoreboard.Score, style);
@@ -29,7 +30,9 @@ class ResultsState extends Phaser.State {
 
         this.clockRenderer = new ClockRenderer(this.clock, this.game);
 
-        this.backButton = this.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
+        this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButtonClick, this);
+
+        this.PositionUI();
 
         this.request = new XMLHttpRequest();
         this.request.open("POST", "/api/gameresults", true);
@@ -39,6 +42,44 @@ class ResultsState extends Phaser.State {
 
     private OnBackButtonClick() {
         this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
+    }
+
+    PositionUI() {
+        this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1);
+        this.clockRenderer.ClockText.x = this.game.width - this.clockRenderer.ClockText.width / 2;
+        this.clockRenderer.ClockText.y = this.clockRenderer.ClockText.height / 2;
+
+        this.ScaleSprite(this.backButton, this.game.width / 3, this.game.height / 6, 50, 1);
+        this.backButton.x = 0;
+        this.backButton.y = 0;
+    }
+
+    ScaleSprite(sprite, availableSpaceWidth: number, availableSpaceHeight: number, padding: number, scaleMultiplier: number) {
+        let scale: number = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
+        sprite.scale.x = scale * scaleMultiplier;
+        sprite.scale.y = scale * scaleMultiplier;
+    }
+
+    GetSpriteScale(spriteWidth: number, spriteHeight: number, availableSpaceWidth: number, availableSpaceHeight: number, minimumPadding: number): number {
+        let ratio: number = 1;
+        let devicePixelRatio = window.devicePixelRatio;
+
+        // sprite needs to fit in either width or height
+        let widthRatio = (spriteWidth * devicePixelRatio + 2 * minimumPadding) / availableSpaceWidth;
+        let heightRatio = (spriteHeight * devicePixelRatio + 2 * minimumPadding) / availableSpaceHeight;
+
+        if(widthRatio > 1 || heightRatio > 1) {
+            ratio = 1 / Math.max(widthRatio, heightRatio);
+        }
+
+        return ratio * devicePixelRatio;
+    }
+
+    resize() {
+        this.background.width = this.game.width;
+        this.background.height = this.game.height;
+
+        this.PositionUI();
     }
 
     update() {
@@ -54,7 +95,7 @@ class ResultsState extends Phaser.State {
             default:
                 break;
         }
-
+        
         this.clockRenderer.Update();
     }
 }

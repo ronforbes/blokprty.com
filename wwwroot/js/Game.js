@@ -608,7 +608,7 @@ var GameplayState = (function (_super) {
             this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.CalculatedSize) / 2;
             this.board.Renderer.Group.x = this.horizontalMargin;
             this.board.Renderer.Group.y = this.verticalMargin;
-            this.ScaleSprite(this.backButton, this.game.width / 3, this.game.height / 3, 50, 1, false);
+            this.ScaleSprite(this.backButton, this.game.width / 3, this.game.height / 6, 50, 1, false);
             this.backButton.x = 0;
             this.backButton.y = this.verticalMargin;
             this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1, false);
@@ -707,10 +707,11 @@ var LeaderboardState = (function (_super) {
         this.background = this.add.image(0, 0, "Background");
         this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
         var style = { font: "48px Arial", fill: "#ffffff" };
-        this.leaderboardText = this.add.text(this.world.centerX, this.world.centerY, "Leaderboards coming soon!", style);
+        this.leaderboardText = this.add.text(this.world.centerX, this.world.centerY, "Loading...", style);
         this.leaderboardText.anchor.setTo(0.5, 0.5);
         this.clockRenderer = new ClockRenderer(this.clock, this.game);
-        this.backButton = this.game.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
+        this.backButton = this.game.add.button(0, 0, "BackButton", this.OnBackButtonClick, this);
+        this.PositionUI();
         this.request = new XMLHttpRequest();
         this.request.onreadystatechange = this.OnServerLeaderboardReceived;
         this.request.open("GET", "/api/leaderboard", true);
@@ -724,6 +725,30 @@ var LeaderboardState = (function (_super) {
             console.log(JSON.parse(this.responseText));
             LeaderboardState.LeaderboardResults = JSON.parse(this.responseText);
         }
+    };
+    LeaderboardState.prototype.PositionUI = function () {
+        this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1);
+        this.clockRenderer.ClockText.x = this.game.width - this.clockRenderer.ClockText.width / 2;
+        this.clockRenderer.ClockText.y = this.clockRenderer.ClockText.height / 2;
+        this.ScaleSprite(this.backButton, this.game.width / 3, this.game.height / 6, 50, 1);
+        this.backButton.x = 0;
+        this.backButton.y = 0;
+    };
+    LeaderboardState.prototype.ScaleSprite = function (sprite, availableSpaceWidth, availableSpaceHeight, padding, scaleMultiplier) {
+        var scale = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
+        sprite.scale.x = scale * scaleMultiplier;
+        sprite.scale.y = scale * scaleMultiplier;
+    };
+    LeaderboardState.prototype.GetSpriteScale = function (spriteWidth, spriteHeight, availableSpaceWidth, availableSpaceHeight, minimumPadding) {
+        var ratio = 1;
+        var devicePixelRatio = window.devicePixelRatio;
+        // sprite needs to fit in either width or height
+        var widthRatio = (spriteWidth * devicePixelRatio + 2 * minimumPadding) / availableSpaceWidth;
+        var heightRatio = (spriteHeight * devicePixelRatio + 2 * minimumPadding) / availableSpaceHeight;
+        if (widthRatio > 1 || heightRatio > 1) {
+            ratio = 1 / Math.max(widthRatio, heightRatio);
+        }
+        return ratio * devicePixelRatio;
     };
     LeaderboardState.prototype.update = function () {
         this.clock.Update();
@@ -882,8 +907,6 @@ var MenuState = (function (_super) {
         if (this.scoreboard == undefined) {
             this.scoreboard = new Scoreboard(this.game);
         }
-        //this.scale.setResizeCallback(this.OnSizeChange, this);
-        //this.scale.onSizeChange.add(this.OnSizeChange, this);
     };
     MenuState.prototype.ScaleSprite = function (sprite, availableSpaceWidth, availableSpaceHeight, padding, scaleMultiplier) {
         var scale = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
@@ -946,12 +969,14 @@ var ResultsState = (function (_super) {
             this.clock = new Clock(this.game);
         }
         this.background = this.add.image(0, 0, "Background");
-        this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
+        this.background.width = this.game.width;
+        this.background.height = this.game.height;
         var style = { font: "48px Arial", fill: "#ffffff" };
         this.scoreText = this.add.text(this.world.centerX, this.world.centerY, "Score: " + this.scoreboard.Score, style);
         this.scoreText.anchor.setTo(0.5, 0.5);
         this.clockRenderer = new ClockRenderer(this.clock, this.game);
-        this.backButton = this.add.button(10, 10, "BackButton", this.OnBackButtonClick, this);
+        this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButtonClick, this);
+        this.PositionUI();
         this.request = new XMLHttpRequest();
         this.request.open("POST", "/api/gameresults", true);
         this.request.setRequestHeader("Content-type", "application/json");
@@ -959,6 +984,35 @@ var ResultsState = (function (_super) {
     };
     ResultsState.prototype.OnBackButtonClick = function () {
         this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
+    };
+    ResultsState.prototype.PositionUI = function () {
+        this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1);
+        this.clockRenderer.ClockText.x = this.game.width - this.clockRenderer.ClockText.width / 2;
+        this.clockRenderer.ClockText.y = this.clockRenderer.ClockText.height / 2;
+        this.ScaleSprite(this.backButton, this.game.width / 3, this.game.height / 6, 50, 1);
+        this.backButton.x = 0;
+        this.backButton.y = 0;
+    };
+    ResultsState.prototype.ScaleSprite = function (sprite, availableSpaceWidth, availableSpaceHeight, padding, scaleMultiplier) {
+        var scale = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
+        sprite.scale.x = scale * scaleMultiplier;
+        sprite.scale.y = scale * scaleMultiplier;
+    };
+    ResultsState.prototype.GetSpriteScale = function (spriteWidth, spriteHeight, availableSpaceWidth, availableSpaceHeight, minimumPadding) {
+        var ratio = 1;
+        var devicePixelRatio = window.devicePixelRatio;
+        // sprite needs to fit in either width or height
+        var widthRatio = (spriteWidth * devicePixelRatio + 2 * minimumPadding) / availableSpaceWidth;
+        var heightRatio = (spriteHeight * devicePixelRatio + 2 * minimumPadding) / availableSpaceHeight;
+        if (widthRatio > 1 || heightRatio > 1) {
+            ratio = 1 / Math.max(widthRatio, heightRatio);
+        }
+        return ratio * devicePixelRatio;
+    };
+    ResultsState.prototype.resize = function () {
+        this.background.width = this.game.width;
+        this.background.height = this.game.height;
+        this.PositionUI();
     };
     ResultsState.prototype.update = function () {
         this.clock.Update();

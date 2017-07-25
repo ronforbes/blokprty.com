@@ -60,7 +60,7 @@ class GameplayState extends Phaser.State {
             this.board.Renderer.Group.x = this.horizontalMargin;
             this.board.Renderer.Group.y = this.verticalMargin;
 
-            this.ScaleSprite(this.backButton, this.game.width / 3, this.game.height / 3, 50, 1, false);
+            this.ScaleSprite(this.backButton, this.game.width / 3, this.game.height / 6, 50, 1, false);
             this.backButton.x = 0;
             this.backButton.y = this.verticalMargin;
 

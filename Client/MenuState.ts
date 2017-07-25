@@ -35,8 +35,6 @@ class MenuState extends Phaser.State {
         if(this.scoreboard == undefined) {
             this.scoreboard = new Scoreboard(this.game);
         }
-        //this.scale.setResizeCallback(this.OnSizeChange, this);
-        //this.scale.onSizeChange.add(this.OnSizeChange, this);
     }
 
     ScaleSprite(sprite, availableSpaceWidth: number, availableSpaceHeight: number, padding: number, scaleMultiplier: number) {
