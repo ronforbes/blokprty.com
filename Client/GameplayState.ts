@@ -1,10 +1,12 @@
 class GameplayState extends Phaser.State {
-    private background: Phaser.Image;
+    private backgroundImage: Phaser.Image;
     private board: Board;
     private scoreboard: Scoreboard;
     private scoreboardRenderer: ScoreboardRenderer;
+    private scoreLabel: Phaser.Image;
     private clock: Clock;
     private clockRenderer: ClockRenderer;
+    private timeLabel: Phaser.Image;
     private backButton: Phaser.Button;
 
     private horizontalMargin: number;
@@ -22,10 +24,6 @@ class GameplayState extends Phaser.State {
     }
 
     create() {
-        this.background = this.add.image(0, 0, "Background");
-        this.background.width = this.game.width;
-        this.background.height = this.game.height;
-
         if(this.clock == undefined) {
             this.clock = new Clock(this.game);
         }
@@ -34,68 +32,98 @@ class GameplayState extends Phaser.State {
             this.scoreboard = new Scoreboard(this.game);
         }
 
+        this.backgroundImage = this.add.image(0, 0, "Background");
+
         this.board = new Board(this.game, this.scoreboard);
 
         this.scoreboard.Reset();
 
-        this.scoreboardRenderer = new ScoreboardRenderer(this.scoreboard, this.game);
+        this.scoreLabel = this.add.image(0, 0, "ScoreLabel");
+        this.scoreLabel.anchor.setTo(0.5);
 
-        this.clockRenderer = new ClockRenderer(this.clock, this.game);
+        this.scoreboardRenderer = new ScoreboardRenderer(this.scoreboard, this);
 
-        this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButtonClick, this);
+        this.timeLabel = this.add.image(0, 0, "TimeLabel");
+        this.timeLabel.anchor.setTo(0.5);
 
-        // Position the UI
-        this.PositionUI();
+        this.clockRenderer = new ClockRenderer(this.clock, this);
+
+        this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButton_Click, this);
+
+        this.resize();
     }
 
-    PositionUI() {
+    private OnBackButton_Click() {
+        this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
+    }
+
+    resize() {
+        this.backgroundImage.width = this.game.width;
+        this.backgroundImage.height = this.game.height;
+
         let isLandscape = this.game.height / this.game.width < 1.3 ? true : false;
 
         if(isLandscape) {
             let availableGridSpace: number = Math.min(this.game.width * 2 / 3, this.game.height);
-            BlockRenderer.CalculatedSize = (availableGridSpace * 0.9) / Board.Rows;
-            this.horizontalMargin = this.game.width * 0.95 - Board.Columns * BlockRenderer.CalculatedSize
-            this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.CalculatedSize) / 2;
+            BlockRenderer.Size = (availableGridSpace * 0.9) / Board.Rows;
+            this.horizontalMargin = this.game.width * 0.95 - Board.Columns * BlockRenderer.Size
+            this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.Size) / 2;
 
             this.board.Renderer.Group.x = this.horizontalMargin;
             this.board.Renderer.Group.y = this.verticalMargin;
 
-            this.ScaleSprite(this.backButton, this.game.width / 3, this.game.height / 6, 50, 1, false);
-            this.backButton.x = 0;
-            this.backButton.y = this.verticalMargin;
-
-            this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1, false);
-            this.clockRenderer.ClockText.x = this.game.width / 6;
-            this.clockRenderer.ClockText.y = this.verticalMargin + 200;
-            
-            this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.game.height / 3, 50, 1, false);
-            this.scoreboardRenderer.ScoreText.x = this.game.width / 6;
-            this.scoreboardRenderer.ScoreText.y = this.verticalMargin + 400;
-        } else {
-            let availableGridSpace: number = this.game.width;
-            BlockRenderer.CalculatedSize = (availableGridSpace * 0.9) / Board.Columns;
-            this.horizontalMargin = (this.game.width - Board.Columns * BlockRenderer.CalculatedSize) / 2;
-            this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.CalculatedSize) / 2;
-
-            this.board.Renderer.Group.x = this.horizontalMargin;
-            this.board.Renderer.Group.y = this.verticalMargin;
-
-            this.ScaleSprite(this.backButton, this.game.width / 3, this.verticalMargin, 10, 1, false);
+            this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1, false);
             this.backButton.x = 0;
             this.backButton.y = 0;
 
-            this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.verticalMargin, 10, 1, false);
-            this.clockRenderer.ClockText.x = this.game.world.centerX;
-            this.clockRenderer.ClockText.y = this.verticalMargin / 2;
+            this.ScaleSprite(this.timeLabel, this.game.width / 3, this.game.height / 3, 0, 1, false);
+            this.timeLabel.x = this.horizontalMargin / 2;
+            this.timeLabel.y = this.world.centerY - this.game.height / 3;
+
+            this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1, false);
+            this.clockRenderer.ClockText.x = this.horizontalMargin / 2;
+            this.clockRenderer.ClockText.y = this.world.centerY - this.game.height / 3 + this.timeLabel.height / 4;
             
-            this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.verticalMargin, 10, 1, false);
-            this.scoreboardRenderer.ScoreText.x = this.game.width - this.scoreboardRenderer.ScoreText.width / 2;
-            this.scoreboardRenderer.ScoreText.y = this.verticalMargin / 2;
+            this.ScaleSprite(this.scoreLabel, this.game.width / 3, this.game.height / 3, 0, 1, false);
+            this.scoreLabel.x = this.horizontalMargin / 2;
+            this.scoreLabel.y = this.world.centerY;
+            
+            this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.game.height / 3, 50, 1, false);
+            this.scoreboardRenderer.ScoreText.x = this.horizontalMargin / 2;
+            this.scoreboardRenderer.ScoreText.y = this.world.centerY + this.scoreLabel.height / 4;
+        } else {
+            let availableGridSpace: number = this.game.width;
+            BlockRenderer.Size = (availableGridSpace * 0.9) / Board.Columns;
+            this.horizontalMargin = (this.game.width - Board.Columns * BlockRenderer.Size) / 2;
+            this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.Size) / 2;
+
+            this.board.Renderer.Group.x = this.horizontalMargin;
+            this.board.Renderer.Group.y = this.verticalMargin;
+
+            this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1, false);
+            this.backButton.x = 0;
+            this.backButton.y = 0;
+
+            this.ScaleSprite(this.timeLabel, this.game.width / 3, this.verticalMargin, 0, 1, false);
+            this.timeLabel.x = this.game.world.centerX - this.game.width / 3 + this.horizontalMargin;
+            this.timeLabel.y = this.verticalMargin / 2;
+
+            this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.verticalMargin, 0, 0.5, false);
+            this.clockRenderer.ClockText.x = this.game.world.centerX - this.game.width / 3 + this.horizontalMargin;
+            this.clockRenderer.ClockText.y = this.verticalMargin / 2 + this.timeLabel.height / 4;
+            
+            this.ScaleSprite(this.scoreLabel, this.game.width / 3, this.verticalMargin, 0, 1, false);
+            this.scoreLabel.x = this.game.world.centerX + this.game.width / 3 - this.horizontalMargin;
+            this.scoreLabel.y = this.verticalMargin / 2;
+
+            this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.verticalMargin, 10, 0.5, false);
+            this.scoreboardRenderer.ScoreText.x = this.game.world.centerX + this.game.width / 3 - this.horizontalMargin;
+            this.scoreboardRenderer.ScoreText.y = this.verticalMargin / 2 + this.scoreLabel.height / 4;
         }
 
         for(let x = 0; x < Board.Columns; x++) {
             for(let y = 0; y < Board.Rows; y++) {
-                this.ScaleSprite(this.board.Blocks[x][y].Sprite, BlockRenderer.CalculatedSize, BlockRenderer.CalculatedSize, 0, 1, true);
+                this.ScaleSprite(this.board.Blocks[x][y].Sprite, BlockRenderer.Size, BlockRenderer.Size, 0, 1, true);
             }
         }
     }
@@ -120,18 +148,7 @@ class GameplayState extends Phaser.State {
 
         return ratio * devicePixelRatio;
     }
-
-    private OnBackButtonClick() {
-        this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
-    }
-
-    resize() {
-        this.background.width = this.game.width;
-        this.background.height = this.game.height;
-
-        this.PositionUI();
-    }
-
+    
     update() {
         this.board.Update();
         

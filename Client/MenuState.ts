@@ -1,7 +1,8 @@
 class MenuState extends Phaser.State {
-    private background: Phaser.Image;
-    private logo: Phaser.Image;
+    private backgroundImage: Phaser.Image;
+    private logoImage: Phaser.Image;
     private playButton: Phaser.Button;
+    private loginButton: Phaser.Button;
     private clock: Clock;
     private scoreboard: Scoreboard;
 
@@ -16,18 +17,6 @@ class MenuState extends Phaser.State {
     }
 
     create() {
-        this.background = this.add.image(0, 0, "Background");
-        this.background.width = this.game.width;
-        this.background.height = this.game.height;
-
-        this.logo = this.add.image(this.world.centerX, this.world.centerY - this.game.height / 3, "Logo");
-        this.logo.anchor.setTo(0.5);
-        this.ScaleSprite(this.logo, this.game.width, this.game.height / 3, 50, 1);
-
-        this.playButton = this.add.button(this.world.centerX, this.world.centerY, "PlayButton", this.StartPlay, this);
-        this.playButton.anchor.setTo(0.5);
-        this.ScaleSprite(this.playButton, this.game.width, this.game.height / 3, 50, 1);
-
         if(this.clock == undefined) {
             this.clock = new Clock(this.game);
         }
@@ -35,6 +24,57 @@ class MenuState extends Phaser.State {
         if(this.scoreboard == undefined) {
             this.scoreboard = new Scoreboard(this.game);
         }
+
+        this.backgroundImage = this.add.image(0, 0, "Background");
+
+        this.logoImage = this.add.image(0, 0, "Logo");
+        this.logoImage.anchor.setTo(0.5);
+
+        this.playButton = this.add.button(0, 0, "PlayButton", this.OnPlayButton_Click, this);
+        this.playButton.anchor.setTo(0.5);
+
+        this.loginButton = this.add.button(0, 0, "LoginButton", this.OnLoginButton_Click, this);
+        this.loginButton.anchor.setTo(0.5);
+
+        this.resize();
+    }
+
+    private OnPlayButton_Click() {
+        switch(this.clock.State) {
+            case ClockState.Gameplay:
+                this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard);
+                break;
+            
+            case ClockState.Results:
+                this.game.state.start("Results", true, false, this.clock, this.scoreboard);
+                break;
+
+            case ClockState.Leaderboard:
+                this.game.state.start("Leaderboard", true, false, this.clock, this.scoreboard);
+                break;
+        }
+    }
+
+    private OnLoginButton_Click() {
+
+    }
+
+    resize() {
+        // position the background
+        this.backgroundImage.width = this.game.width;
+        this.backgroundImage.height = this.game.height;
+
+        this.ScaleSprite(this.logoImage, this.game.width, this.game.height / 3, 0, 1);
+        this.logoImage.x = this.world.centerX;
+        this.logoImage.y = this.world.centerY - this.game.height / 3;
+
+        this.ScaleSprite(this.playButton, this.game.width / 2, this.game.height / 3, 0, 1);
+        this.playButton.x = this.world.centerX;
+        this.playButton.y = this.world.centerY;
+
+        this.ScaleSprite(this.loginButton, this.game.width / 2, this.game.height / 3, 0, 1);
+        this.loginButton.x = this.world.centerX;
+        this.loginButton.y = this.world.centerY + this.game.height / 3;
     }
 
     ScaleSprite(sprite, availableSpaceWidth: number, availableSpaceHeight: number, padding: number, scaleMultiplier: number) {
@@ -56,35 +96,6 @@ class MenuState extends Phaser.State {
         }
 
         return ratio * devicePixelRatio;
-    }
-
-    resize() {
-        this.background.width = this.game.width;
-        this.background.height = this.game.height;
-
-        this.ScaleSprite(this.logo, this.game.width, this.game.height / 3, 50, 1);
-        this.logo.x = this.world.centerX;
-        this.logo.y = this.world.centerY - this.game.height / 3;
-
-        this.ScaleSprite(this.playButton, this.game.width, this.game.height / 3, 50, 1);
-        this.playButton.x = this.world.centerX;
-        this.playButton.y = this.world.centerY;
-    }
-
-    private StartPlay() {
-        switch(this.clock.State) {
-            case ClockState.Gameplay:
-                this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard);
-                break;
-            
-            case ClockState.Results:
-                this.game.state.start("Results", true, false, this.clock, this.scoreboard);
-                break;
-
-            case ClockState.Leaderboard:
-                this.game.state.start("Leaderboard", true, false, this.clock, this.scoreboard);
-                break;
-        }
     }
 
     update() {

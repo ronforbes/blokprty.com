@@ -33,7 +33,7 @@ class LeaderboardState extends Phaser.State {
         this.leaderboardText = this.add.text(this.world.centerX, this.world.centerY, "Loading...", style);
         this.leaderboardText.anchor.setTo(0.5, 0.5);
 
-        this.clockRenderer = new ClockRenderer(this.clock, this.game);
+        this.clockRenderer = new ClockRenderer(this.clock, this);
 
         this.backButton = this.game.add.button(0, 0, "BackButton", this.OnBackButtonClick, this);
 

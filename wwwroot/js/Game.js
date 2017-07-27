@@ -169,12 +169,12 @@ var BlockRenderer = (function () {
         var timePercentage = 0;
         switch (this.block.State) {
             case BlockState.Empty:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 //this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = false;
                 break;
             case BlockState.Idle:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 //this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
@@ -183,13 +183,13 @@ var BlockRenderer = (function () {
             case BlockState.Sliding:
                 var destination = 0;
                 if (this.block.Slider.Direction == SlideDirection.Left) {
-                    destination = -BlockRenderer.CalculatedSize;
+                    destination = -BlockRenderer.Size;
                 }
                 if (this.block.Slider.Direction == SlideDirection.Right) {
-                    destination = BlockRenderer.CalculatedSize;
+                    destination = BlockRenderer.Size;
                 }
                 timePercentage = this.block.Slider.Elapsed / BlockSlider.Duration;
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2 + destination * timePercentage, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2 + destination * timePercentage, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 if (this.block.Type == -1) {
                     this.block.Sprite.visible = false;
                 }
@@ -200,33 +200,33 @@ var BlockRenderer = (function () {
                 }
                 break;
             case BlockState.WaitingToFall:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             case BlockState.Falling:
                 timePercentage = this.block.Faller.Elapsed / BlockFaller.Duration;
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2 + BlockRenderer.CalculatedSize * timePercentage);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2 + BlockRenderer.Size * timePercentage);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             case BlockState.Matched:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = 0xffffff;
                 this.localScale = new Phaser.Point(this.block.Sprite.scale.x, this.block.Sprite.scale.y);
                 break;
             case BlockState.WaitingToClear:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 break;
             case BlockState.Clearing:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.tint = this.colors[this.block.Type];
                 var alpha = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
@@ -235,14 +235,14 @@ var BlockRenderer = (function () {
                 this.block.Sprite.scale.setTo(scale * this.localScale.x, scale * this.localScale.y);
                 break;
             case BlockState.WaitingToEmpty:
-                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2, this.block.Y * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize / 2);
+                this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.scale = this.localScale;
                 this.block.Sprite.visible = false;
         }
     };
     BlockRenderer.Key = "block";
     BlockRenderer.Url = "assets/sprites/block.png";
-    BlockRenderer.CalculatedSize = 0;
+    BlockRenderer.Size = 0;
     return BlockRenderer;
 }());
 var SlideDirection;
@@ -316,8 +316,8 @@ var Board = (function () {
         this.MatchDetector.Update();
         this.boardGravity.Update();
     };
-    Board.Columns = 10;
-    Board.Rows = 10;
+    Board.Columns = 8;
+    Board.Rows = 8;
     return Board;
 }());
 var BoardController = (function () {
@@ -341,8 +341,8 @@ var BoardController = (function () {
     BoardController.prototype.Update = function () {
         if (this.selectedBlock != null) {
             var bounds = this.selectedBlock.Sprite.getBounds();
-            var leftEdge = this.board.Renderer.Group.position.x + this.selectedBlock.X * BlockRenderer.CalculatedSize;
-            var rightEdge = this.board.Renderer.Group.position.x + this.selectedBlock.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize;
+            var leftEdge = this.board.Renderer.Group.position.x + this.selectedBlock.X * BlockRenderer.Size;
+            var rightEdge = this.board.Renderer.Group.position.x + this.selectedBlock.X * BlockRenderer.Size + BlockRenderer.Size;
             var leftBlock = void 0;
             var rightBlock = void 0;
             var pointerPosition = this.phaserGame.input.activePointer.position;
@@ -537,14 +537,14 @@ var Clock = (function () {
     return Clock;
 }());
 var ClockRenderer = (function () {
-    function ClockRenderer(clock, phaserGame) {
+    function ClockRenderer(clock, state) {
         this.clock = clock;
-        var style = { font: "48px Arial", fill: "#ffffff", align: "right" };
-        this.ClockText = phaserGame.add.text(0, 0, "Time: 10", style);
+        var style = { font: "40px Arial", fill: "#ffffff", align: "right" };
+        this.ClockText = state.add.text(0, 0, "Time: 10", style);
         this.ClockText.anchor.setTo(0.5);
     }
     ClockRenderer.prototype.Update = function () {
-        this.ClockText.text = "Time: " + (this.clock.TimeRemaining / 1000).toFixed(0);
+        this.ClockText.text = (this.clock.TimeRemaining / 1000).toFixed(0);
     };
     return ClockRenderer;
 }());
@@ -582,62 +582,80 @@ var GameplayState = (function (_super) {
         }
     };
     GameplayState.prototype.create = function () {
-        this.background = this.add.image(0, 0, "Background");
-        this.background.width = this.game.width;
-        this.background.height = this.game.height;
         if (this.clock == undefined) {
             this.clock = new Clock(this.game);
         }
         if (this.scoreboard == undefined) {
             this.scoreboard = new Scoreboard(this.game);
         }
+        this.backgroundImage = this.add.image(0, 0, "Background");
         this.board = new Board(this.game, this.scoreboard);
         this.scoreboard.Reset();
-        this.scoreboardRenderer = new ScoreboardRenderer(this.scoreboard, this.game);
-        this.clockRenderer = new ClockRenderer(this.clock, this.game);
-        this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButtonClick, this);
-        // Position the UI
-        this.PositionUI();
+        this.scoreLabel = this.add.image(0, 0, "ScoreLabel");
+        this.scoreLabel.anchor.setTo(0.5);
+        this.scoreboardRenderer = new ScoreboardRenderer(this.scoreboard, this);
+        this.timeLabel = this.add.image(0, 0, "TimeLabel");
+        this.timeLabel.anchor.setTo(0.5);
+        this.clockRenderer = new ClockRenderer(this.clock, this);
+        this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButton_Click, this);
+        this.resize();
     };
-    GameplayState.prototype.PositionUI = function () {
+    GameplayState.prototype.OnBackButton_Click = function () {
+        this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
+    };
+    GameplayState.prototype.resize = function () {
+        this.backgroundImage.width = this.game.width;
+        this.backgroundImage.height = this.game.height;
         var isLandscape = this.game.height / this.game.width < 1.3 ? true : false;
         if (isLandscape) {
             var availableGridSpace = Math.min(this.game.width * 2 / 3, this.game.height);
-            BlockRenderer.CalculatedSize = (availableGridSpace * 0.9) / Board.Rows;
-            this.horizontalMargin = this.game.width * 0.95 - Board.Columns * BlockRenderer.CalculatedSize;
-            this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.CalculatedSize) / 2;
+            BlockRenderer.Size = (availableGridSpace * 0.9) / Board.Rows;
+            this.horizontalMargin = this.game.width * 0.95 - Board.Columns * BlockRenderer.Size;
+            this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.Size) / 2;
             this.board.Renderer.Group.x = this.horizontalMargin;
             this.board.Renderer.Group.y = this.verticalMargin;
-            this.ScaleSprite(this.backButton, this.game.width / 3, this.game.height / 6, 50, 1, false);
+            this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1, false);
             this.backButton.x = 0;
-            this.backButton.y = this.verticalMargin;
+            this.backButton.y = 0;
+            this.ScaleSprite(this.timeLabel, this.game.width / 3, this.game.height / 3, 0, 1, false);
+            this.timeLabel.x = this.horizontalMargin / 2;
+            this.timeLabel.y = this.world.centerY - this.game.height / 3;
             this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1, false);
-            this.clockRenderer.ClockText.x = this.game.width / 6;
-            this.clockRenderer.ClockText.y = this.verticalMargin + 200;
+            this.clockRenderer.ClockText.x = this.horizontalMargin / 2;
+            this.clockRenderer.ClockText.y = this.world.centerY - this.game.height / 3 + this.timeLabel.height / 4;
+            this.ScaleSprite(this.scoreLabel, this.game.width / 3, this.game.height / 3, 0, 1, false);
+            this.scoreLabel.x = this.horizontalMargin / 2;
+            this.scoreLabel.y = this.world.centerY;
             this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.game.height / 3, 50, 1, false);
-            this.scoreboardRenderer.ScoreText.x = this.game.width / 6;
-            this.scoreboardRenderer.ScoreText.y = this.verticalMargin + 400;
+            this.scoreboardRenderer.ScoreText.x = this.horizontalMargin / 2;
+            this.scoreboardRenderer.ScoreText.y = this.world.centerY + this.scoreLabel.height / 4;
         }
         else {
             var availableGridSpace = this.game.width;
-            BlockRenderer.CalculatedSize = (availableGridSpace * 0.9) / Board.Columns;
-            this.horizontalMargin = (this.game.width - Board.Columns * BlockRenderer.CalculatedSize) / 2;
-            this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.CalculatedSize) / 2;
+            BlockRenderer.Size = (availableGridSpace * 0.9) / Board.Columns;
+            this.horizontalMargin = (this.game.width - Board.Columns * BlockRenderer.Size) / 2;
+            this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.Size) / 2;
             this.board.Renderer.Group.x = this.horizontalMargin;
             this.board.Renderer.Group.y = this.verticalMargin;
-            this.ScaleSprite(this.backButton, this.game.width / 3, this.verticalMargin, 10, 1, false);
+            this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1, false);
             this.backButton.x = 0;
             this.backButton.y = 0;
-            this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.verticalMargin, 10, 1, false);
-            this.clockRenderer.ClockText.x = this.game.world.centerX;
-            this.clockRenderer.ClockText.y = this.verticalMargin / 2;
-            this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.verticalMargin, 10, 1, false);
-            this.scoreboardRenderer.ScoreText.x = this.game.width - this.scoreboardRenderer.ScoreText.width / 2;
-            this.scoreboardRenderer.ScoreText.y = this.verticalMargin / 2;
+            this.ScaleSprite(this.timeLabel, this.game.width / 3, this.verticalMargin, 0, 1, false);
+            this.timeLabel.x = this.game.world.centerX - this.game.width / 3 + this.horizontalMargin;
+            this.timeLabel.y = this.verticalMargin / 2;
+            this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.verticalMargin, 0, 0.5, false);
+            this.clockRenderer.ClockText.x = this.game.world.centerX - this.game.width / 3 + this.horizontalMargin;
+            this.clockRenderer.ClockText.y = this.verticalMargin / 2 + this.timeLabel.height / 4;
+            this.ScaleSprite(this.scoreLabel, this.game.width / 3, this.verticalMargin, 0, 1, false);
+            this.scoreLabel.x = this.game.world.centerX + this.game.width / 3 - this.horizontalMargin;
+            this.scoreLabel.y = this.verticalMargin / 2;
+            this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.verticalMargin, 10, 0.5, false);
+            this.scoreboardRenderer.ScoreText.x = this.game.world.centerX + this.game.width / 3 - this.horizontalMargin;
+            this.scoreboardRenderer.ScoreText.y = this.verticalMargin / 2 + this.scoreLabel.height / 4;
         }
         for (var x = 0; x < Board.Columns; x++) {
             for (var y = 0; y < Board.Rows; y++) {
-                this.ScaleSprite(this.board.Blocks[x][y].Sprite, BlockRenderer.CalculatedSize, BlockRenderer.CalculatedSize, 0, 1, true);
+                this.ScaleSprite(this.board.Blocks[x][y].Sprite, BlockRenderer.Size, BlockRenderer.Size, 0, 1, true);
             }
         }
     };
@@ -656,14 +674,6 @@ var GameplayState = (function (_super) {
             ratio = 1 / Math.max(widthRatio, heightRatio);
         }
         return ratio * devicePixelRatio;
-    };
-    GameplayState.prototype.OnBackButtonClick = function () {
-        this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
-    };
-    GameplayState.prototype.resize = function () {
-        this.background.width = this.game.width;
-        this.background.height = this.game.height;
-        this.PositionUI();
     };
     GameplayState.prototype.update = function () {
         this.board.Update();
@@ -709,7 +719,7 @@ var LeaderboardState = (function (_super) {
         var style = { font: "48px Arial", fill: "#ffffff" };
         this.leaderboardText = this.add.text(this.world.centerX, this.world.centerY, "Loading...", style);
         this.leaderboardText.anchor.setTo(0.5, 0.5);
-        this.clockRenderer = new ClockRenderer(this.clock, this.game);
+        this.clockRenderer = new ClockRenderer(this.clock, this);
         this.backButton = this.game.add.button(0, 0, "BackButton", this.OnBackButtonClick, this);
         this.PositionUI();
         this.request = new XMLHttpRequest();
@@ -785,10 +795,13 @@ var LoadingState = (function (_super) {
         this.load.setPreloadSprite(this.loadingBar);
         // Load game assets
         this.load.image("Background", "assets/sprites/background.png");
-        this.load.image("Logo", "assets/sprites/logo.png");
-        this.load.image("PlayButton", "assets/sprites/playbutton.png");
+        this.load.image("Logo", "assets/sprites/logo.png?v=1");
+        this.load.image("PlayButton", "assets/sprites/playbutton.png?v=1");
+        this.load.image("LoginButton", "assets/sprites/loginbutton.png");
         this.load.image(BlockRenderer.Key, BlockRenderer.Url);
-        this.load.image("BackButton", "assets/sprites/backbutton.png");
+        this.load.image("TimeLabel", "assets/sprites/timelabel.png");
+        this.load.image("ScoreLabel", "assets/sprites/scorelabel.png");
+        this.load.image("BackButton", "assets/sprites/backbutton.png?v=1");
     };
     LoadingState.prototype.create = function () {
         var alphaTween = this.add.tween(this.loadingBar).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
@@ -892,21 +905,49 @@ var MenuState = (function (_super) {
         }
     };
     MenuState.prototype.create = function () {
-        this.background = this.add.image(0, 0, "Background");
-        this.background.width = this.game.width;
-        this.background.height = this.game.height;
-        this.logo = this.add.image(this.world.centerX, this.world.centerY - this.game.height / 3, "Logo");
-        this.logo.anchor.setTo(0.5);
-        this.ScaleSprite(this.logo, this.game.width, this.game.height / 3, 50, 1);
-        this.playButton = this.add.button(this.world.centerX, this.world.centerY, "PlayButton", this.StartPlay, this);
-        this.playButton.anchor.setTo(0.5);
-        this.ScaleSprite(this.playButton, this.game.width, this.game.height / 3, 50, 1);
         if (this.clock == undefined) {
             this.clock = new Clock(this.game);
         }
         if (this.scoreboard == undefined) {
             this.scoreboard = new Scoreboard(this.game);
         }
+        this.backgroundImage = this.add.image(0, 0, "Background");
+        this.logoImage = this.add.image(0, 0, "Logo");
+        this.logoImage.anchor.setTo(0.5);
+        this.playButton = this.add.button(0, 0, "PlayButton", this.OnPlayButton_Click, this);
+        this.playButton.anchor.setTo(0.5);
+        this.loginButton = this.add.button(0, 0, "LoginButton", this.OnLoginButton_Click, this);
+        this.loginButton.anchor.setTo(0.5);
+        this.resize();
+    };
+    MenuState.prototype.OnPlayButton_Click = function () {
+        switch (this.clock.State) {
+            case ClockState.Gameplay:
+                this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard);
+                break;
+            case ClockState.Results:
+                this.game.state.start("Results", true, false, this.clock, this.scoreboard);
+                break;
+            case ClockState.Leaderboard:
+                this.game.state.start("Leaderboard", true, false, this.clock, this.scoreboard);
+                break;
+        }
+    };
+    MenuState.prototype.OnLoginButton_Click = function () {
+    };
+    MenuState.prototype.resize = function () {
+        // position the background
+        this.backgroundImage.width = this.game.width;
+        this.backgroundImage.height = this.game.height;
+        this.ScaleSprite(this.logoImage, this.game.width, this.game.height / 3, 0, 1);
+        this.logoImage.x = this.world.centerX;
+        this.logoImage.y = this.world.centerY - this.game.height / 3;
+        this.ScaleSprite(this.playButton, this.game.width / 2, this.game.height / 3, 0, 1);
+        this.playButton.x = this.world.centerX;
+        this.playButton.y = this.world.centerY;
+        this.ScaleSprite(this.loginButton, this.game.width / 2, this.game.height / 3, 0, 1);
+        this.loginButton.x = this.world.centerX;
+        this.loginButton.y = this.world.centerY + this.game.height / 3;
     };
     MenuState.prototype.ScaleSprite = function (sprite, availableSpaceWidth, availableSpaceHeight, padding, scaleMultiplier) {
         var scale = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
@@ -923,29 +964,6 @@ var MenuState = (function (_super) {
             ratio = 1 / Math.max(widthRatio, heightRatio);
         }
         return ratio * devicePixelRatio;
-    };
-    MenuState.prototype.resize = function () {
-        this.background.width = this.game.width;
-        this.background.height = this.game.height;
-        this.ScaleSprite(this.logo, this.game.width, this.game.height / 3, 50, 1);
-        this.logo.x = this.world.centerX;
-        this.logo.y = this.world.centerY - this.game.height / 3;
-        this.ScaleSprite(this.playButton, this.game.width, this.game.height / 3, 50, 1);
-        this.playButton.x = this.world.centerX;
-        this.playButton.y = this.world.centerY;
-    };
-    MenuState.prototype.StartPlay = function () {
-        switch (this.clock.State) {
-            case ClockState.Gameplay:
-                this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard);
-                break;
-            case ClockState.Results:
-                this.game.state.start("Results", true, false, this.clock, this.scoreboard);
-                break;
-            case ClockState.Leaderboard:
-                this.game.state.start("Leaderboard", true, false, this.clock, this.scoreboard);
-                break;
-        }
     };
     MenuState.prototype.update = function () {
         this.clock.Update();
@@ -974,7 +992,7 @@ var ResultsState = (function (_super) {
         var style = { font: "48px Arial", fill: "#ffffff" };
         this.scoreText = this.add.text(this.world.centerX, this.world.centerY, "Score: " + this.scoreboard.Score, style);
         this.scoreText.anchor.setTo(0.5, 0.5);
-        this.clockRenderer = new ClockRenderer(this.clock, this.game);
+        this.clockRenderer = new ClockRenderer(this.clock, this);
         this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButtonClick, this);
         this.PositionUI();
         this.request = new XMLHttpRequest();
@@ -1044,14 +1062,14 @@ var Scoreboard = (function () {
     return Scoreboard;
 }());
 var ScoreboardRenderer = (function () {
-    function ScoreboardRenderer(scoreboard, phaserGame) {
+    function ScoreboardRenderer(scoreboard, state) {
         this.scoreboard = scoreboard;
-        var style = { font: "48px Arial", fill: "#ffffff" };
-        this.ScoreText = phaserGame.add.text(0, 0, "Score: 0", style);
+        var style = { font: "40px Arial", fill: "#ffffff" };
+        this.ScoreText = state.add.text(0, 0, "Score: 0", style);
         this.ScoreText.anchor.setTo(0.5);
     }
     ScoreboardRenderer.prototype.Update = function () {
-        this.ScoreText.text = "Score: " + this.scoreboard.Score;
+        this.ScoreText.text = this.scoreboard.Score.toString();
     };
     return ScoreboardRenderer;
 }());

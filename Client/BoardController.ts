@@ -28,8 +28,8 @@ class BoardController {
         if(this.selectedBlock != null) {
             let bounds: PIXI.Rectangle = this.selectedBlock.Sprite.getBounds();
             
-            let leftEdge: number = this.board.Renderer.Group.position.x + this.selectedBlock.X * BlockRenderer.CalculatedSize;
-            let rightEdge: number = this.board.Renderer.Group.position.x + this.selectedBlock.X * BlockRenderer.CalculatedSize + BlockRenderer.CalculatedSize;
+            let leftEdge: number = this.board.Renderer.Group.position.x + this.selectedBlock.X * BlockRenderer.Size;
+            let rightEdge: number = this.board.Renderer.Group.position.x + this.selectedBlock.X * BlockRenderer.Size + BlockRenderer.Size;
 
             let leftBlock: Block;
             let rightBlock: Block;

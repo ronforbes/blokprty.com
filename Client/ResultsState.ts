@@ -28,7 +28,7 @@ class ResultsState extends Phaser.State {
         this.scoreText = this.add.text(this.world.centerX, this.world.centerY, "Score: " + this.scoreboard.Score, style);
         this.scoreText.anchor.setTo(0.5, 0.5);
 
-        this.clockRenderer = new ClockRenderer(this.clock, this.game);
+        this.clockRenderer = new ClockRenderer(this.clock, this);
 
         this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButtonClick, this);
 

@@ -1,7 +1,7 @@
 class Board {
     Blocks: Block[][];
-    static readonly Columns: number = 10;
-    static readonly Rows: number = 10;
+    static readonly Columns: number = 8;
+    static readonly Rows: number = 8;
     private phaserGame: Phaser.Game;
     private controller: BoardController;
     MatchDetector: MatchDetector;

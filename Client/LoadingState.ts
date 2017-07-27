@@ -10,10 +10,13 @@ class LoadingState extends Phaser.State {
 
         // Load game assets
         this.load.image("Background", "assets/sprites/background.png");
-        this.load.image("Logo", "assets/sprites/logo.png");
-        this.load.image("PlayButton", "assets/sprites/playbutton.png");
+        this.load.image("Logo", "assets/sprites/logo.png?v=1");
+        this.load.image("PlayButton", "assets/sprites/playbutton.png?v=1");
+        this.load.image("LoginButton", "assets/sprites/loginbutton.png");
         this.load.image(BlockRenderer.Key, BlockRenderer.Url);
-        this.load.image("BackButton", "assets/sprites/backbutton.png");
+        this.load.image("TimeLabel", "assets/sprites/timelabel.png");
+        this.load.image("ScoreLabel", "assets/sprites/scorelabel.png");
+        this.load.image("BackButton", "assets/sprites/backbutton.png?v=1");
     }
 
     create() {
