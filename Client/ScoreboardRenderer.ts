@@ -6,7 +6,7 @@ class ScoreboardRenderer {
         this.scoreboard = scoreboard;
 
         let style = { font: "40px Arial", fill: "#ffffff" };
-        this.ScoreText = state.add.text(0, 0, "Score: 0", style);
+        this.ScoreText = state.add.text(0, 0, "", style);
         this.ScoreText.anchor.setTo(0.5);
     }
 

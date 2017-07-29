@@ -3,8 +3,12 @@
   padding: 0;
 }
 
-div {
+div#game {
   width: 100%;
   height: 100%;
   position: absolute;
+}
+
+div#fb-root.fb-reset {
+  display: none;
 }

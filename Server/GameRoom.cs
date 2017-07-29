@@ -70,9 +70,6 @@ namespace blokprty.com_new {
                 else
                     return 0;});
 
-            Debug.WriteLine("Sorted gameResults: " + gameResults.ToString());
-            Console.WriteLine("Sorted gameResults: " + gameResults.ToString());
-
             return gameResults;
         }
 
@@ -104,6 +101,11 @@ namespace blokprty.com_new {
                         Debug.WriteLine("Changed GameRoom state to Leaderboard");
                         Console.WriteLine("Changed GameRoom state to Leaderboard");
                         LogState();
+
+                        for(int n = 0; n < GetLeaderboard().Count; n++) {
+                            Debug.WriteLine("Rank=" + n + ", Name=" + GetLeaderboard()[n].Name + ", Score=" + GetLeaderboard()[n].Score);
+                            Console.WriteLine("Rank=" + n + ", Name=" + GetLeaderboard()[n].Name + ", Score=" + GetLeaderboard()[n].Score);
+                        }
                     }
                     break;
 

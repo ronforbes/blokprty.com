@@ -5,8 +5,8 @@ class ClockRenderer {
     constructor(clock: Clock, state: Phaser.State) {
         this.clock = clock;
 
-        let style = { font: "40px Arial", fill: "#ffffff", align: "right" };
-        this.ClockText = state.add.text(0, 0, "Time: 10", style);
+        let style = { font: "40px Arial", fill: "#ffffff" };
+        this.ClockText = state.add.text(0, 0, "", style);
         this.ClockText.anchor.setTo(0.5);
     }
 

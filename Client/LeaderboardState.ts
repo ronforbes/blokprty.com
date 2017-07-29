@@ -1,21 +1,40 @@
 class LeaderboardResult {
     name: string;
     score: number;
+
+    constructor(name: string, score: number) {
+        this.name = name;
+        this.score = score;
+    }
 }
 
 class LeaderboardState extends Phaser.State {
     private clock: Clock;
+    private nextGameCountdownLabel: Phaser.Image;
     private clockRenderer: ClockRenderer;
     private scoreboard: Scoreboard;
-    private background: Phaser.Image;
-    private leaderboardText: Phaser.Text;
+    private backgroundImage: Phaser.Image;
+    private rankText: Phaser.Text;
+    private nameText: Phaser.Text;
+    private scoreText: Phaser.Text;
     private backButton: Phaser.Button;
     private request: XMLHttpRequest;
+    private leaderboardLabel: Phaser.Image;
     static LeaderboardResults: LeaderboardResult[];
+    private name: string;
 
-    init(clock: Clock, scoreboard: Scoreboard) {
-        this.scoreboard = scoreboard;
-        this.clock = clock;
+    init(clock: Clock, scoreboard: Scoreboard, name: string) {
+        if(clock != undefined) {
+            this.clock = clock;
+        }
+
+        if(scoreboard != undefined) {
+            this.scoreboard = scoreboard;
+        }
+
+        if(name != undefined) {
+            MenuState.Name = name;
+        }
     }
 
     create() {
@@ -25,29 +44,44 @@ class LeaderboardState extends Phaser.State {
         if(this.clock == undefined) {
             this.clock = new Clock(this.game);
         }
+        if(this.name == undefined) {
+            this.name = "Guest";
+        }
 
-        this.background = this.add.image(0, 0, "Background");
-        this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
+        this.backgroundImage = this.add.image(0, 0, "Background");
 
-        let style = { font: "48px Arial", fill: "#ffffff" };
-        this.leaderboardText = this.add.text(this.world.centerX, this.world.centerY, "Loading...", style);
-        this.leaderboardText.anchor.setTo(0.5, 0.5);
+        this.nextGameCountdownLabel = this.add.image(0, 0, "NextGameCountdownLabel");
+        this.nextGameCountdownLabel.anchor.setTo(0.5);
+
+        let rankStyle = { font: "20px Arial", fill: "#ffffff", align: "left" };
+        this.rankText = this.add.text(0, 0, "Loading...", rankStyle);
+        this.rankText.anchor.setTo(0, 0);
+
+        let nameStyle = { font: "20px Arial", fill: "#ffffff", align: "center" };
+        this.nameText = this.add.text(0, 0, "Loading...", nameStyle);
+        this.nameText.anchor.setTo(0.5, 0);
+
+        let scoreStyle = { font: "20px Arial", fill: "#ffffff", align: "right" };
+        this.scoreText = this.add.text(0, 0, "Loading...", scoreStyle);
+        this.scoreText.anchor.setTo(1, 0);
 
         this.clockRenderer = new ClockRenderer(this.clock, this);
 
-        this.backButton = this.game.add.button(0, 0, "BackButton", this.OnBackButtonClick, this);
+        this.backButton = this.game.add.button(0, 0, "BackButton", this.OnBackButton_Click, this);
 
-        this.PositionUI();
+        this.leaderboardLabel = this.game.add.image(0, 0, "LeaderboardLabel");
+        this.leaderboardLabel.anchor.setTo(0.5, 0);
 
         this.request = new XMLHttpRequest();
-        this.request.onreadystatechange = this.OnServerLeaderboardReceived;
-            
+        this.request.onreadystatechange = this.OnServerLeaderboardReceived;            
         this.request.open("GET", "/api/leaderboard", true);
         this.request.send();
+
+        this.resize();
     }
 
-    private OnBackButtonClick() {
-        this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
+    private OnBackButton_Click() {
+        this.game.state.start("Menu", true, false, this.clock, this.scoreboard, this.name);
     }
 
     OnServerLeaderboardReceived(this: XMLHttpRequest, ev: Event) {
@@ -58,14 +92,37 @@ class LeaderboardState extends Phaser.State {
         }
     }
 
-    PositionUI() {
-        this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1);
-        this.clockRenderer.ClockText.x = this.game.width - this.clockRenderer.ClockText.width / 2;
-        this.clockRenderer.ClockText.y = this.clockRenderer.ClockText.height / 2;
+    resize() {
+        this.backgroundImage.width = this.game.width;
+        this.backgroundImage.height = this.game.height;
 
-        this.ScaleSprite(this.backButton, this.game.width / 3, this.game.height / 6, 50, 1);
+        this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1);
         this.backButton.x = 0;
         this.backButton.y = 0;
+
+        this.ScaleSprite(this.nextGameCountdownLabel, this.game.width / 3, this.game.height / 3, 0, 1);
+        this.nextGameCountdownLabel.x = this.game.width - this.nextGameCountdownLabel.width / 2;
+        this.nextGameCountdownLabel.y = this.nextGameCountdownLabel.height / 4;
+
+        this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1);
+        this.clockRenderer.ClockText.x = this.game.width - this.nextGameCountdownLabel.width / 2;
+        this.clockRenderer.ClockText.y = this.nextGameCountdownLabel.height / 2;
+
+        this.ScaleSprite(this.leaderboardLabel, this.game.width, this.game.height / 3, 0, 1);
+        this.leaderboardLabel.x = this.world.centerX;
+        this.leaderboardLabel.y = this.nextGameCountdownLabel.height;
+
+        this.ScaleSprite(this.rankText, this.game.width / 3, this.game.height / 3, 0, 1);
+        this.rankText.x = 0;
+        this.rankText.y = this.nextGameCountdownLabel.height + this.leaderboardLabel.height;
+
+        this.ScaleSprite(this.nameText, this.game.width / 3, this.game.height / 3, 0, 1);
+        this.nameText.x = this.world.centerX;
+        this.nameText.y = this.nextGameCountdownLabel.height + this.leaderboardLabel.height;
+
+        this.ScaleSprite(this.scoreText, this.game.width / 3, this.game.height / 3, 0, 1);
+        this.scoreText.x = this.game.width;
+        this.scoreText.y = this.nextGameCountdownLabel.height + this.leaderboardLabel.height;
     }
 
     ScaleSprite(sprite, availableSpaceWidth: number, availableSpaceHeight: number, padding: number, scaleMultiplier: number) {
@@ -93,24 +150,29 @@ class LeaderboardState extends Phaser.State {
         this.clock.Update();
 
         if(LeaderboardState.LeaderboardResults != undefined) {
-            this.leaderboardText.text = "";
+            this.rankText.text = "";
+            this.nameText.text = "";
+            this.scoreText.text = "";
+
             for(let n = 0; n < LeaderboardState.LeaderboardResults.length; n++) {
-                this.leaderboardText.text += (n + 1).toString() + ". " + LeaderboardState.LeaderboardResults[n].name + ": " + LeaderboardState.LeaderboardResults[n].score + "\n";
+                this.rankText.text += (n + 1).toString() + "\n";
+                this.nameText.text += LeaderboardState.LeaderboardResults[n].name + "\n";
+                this.scoreText.text += LeaderboardState.LeaderboardResults[n].score + "\n";
             }
             
         }
-
+        
         switch(this.clock.State) {
             case ClockState.Gameplay:
-                this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard);
+                this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard, this.name);
                 break;
             case ClockState.Results:
-                this.game.state.start("Results", true, false, this.clock, this.scoreboard);
+                this.game.state.start("Results", true, false, this.clock, this.scoreboard, this.name);
                 break;
             default:
                 break;
         }
-
+        
         this.clockRenderer.Update();
     }
 }

@@ -539,8 +539,8 @@ var Clock = (function () {
 var ClockRenderer = (function () {
     function ClockRenderer(clock, state) {
         this.clock = clock;
-        var style = { font: "40px Arial", fill: "#ffffff", align: "right" };
-        this.ClockText = state.add.text(0, 0, "Time: 10", style);
+        var style = { font: "40px Arial", fill: "#ffffff" };
+        this.ClockText = state.add.text(0, 0, "", style);
         this.ClockText.anchor.setTo(0.5);
     }
     ClockRenderer.prototype.Update = function () {
@@ -573,12 +573,15 @@ var GameplayState = (function (_super) {
     function GameplayState() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    GameplayState.prototype.init = function (clock, scoreboard) {
+    GameplayState.prototype.init = function (clock, scoreboard, name) {
         if (clock != undefined) {
             this.clock = clock;
         }
         if (scoreboard != undefined) {
             this.scoreboard = scoreboard;
+        }
+        if (name != undefined) {
+            this.name = name;
         }
     };
     GameplayState.prototype.create = function () {
@@ -587,6 +590,9 @@ var GameplayState = (function (_super) {
         }
         if (this.scoreboard == undefined) {
             this.scoreboard = new Scoreboard(this.game);
+        }
+        if (this.name = undefined) {
+            this.name = "Guest";
         }
         this.backgroundImage = this.add.image(0, 0, "Background");
         this.board = new Board(this.game, this.scoreboard);
@@ -601,7 +607,7 @@ var GameplayState = (function (_super) {
         this.resize();
     };
     GameplayState.prototype.OnBackButton_Click = function () {
-        this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
+        this.game.state.start("Menu", true, false, this.clock, this.scoreboard, this.name);
     };
     GameplayState.prototype.resize = function () {
         this.backgroundImage.width = this.game.width;
@@ -680,10 +686,10 @@ var GameplayState = (function (_super) {
         this.clock.Update();
         switch (this.clock.State) {
             case ClockState.Results:
-                this.game.state.start("Results", true, false, this.clock, this.scoreboard);
+                this.game.state.start("Results", true, false, this.clock, this.scoreboard, this.name);
                 break;
             case ClockState.Leaderboard:
-                this.game.state.start("Leaderboard", true, false, this.clock, this.scoreboard);
+                this.game.state.start("Leaderboard", true, false, this.clock, this.scoreboard, this.name);
                 break;
             default:
                 break;
@@ -694,7 +700,9 @@ var GameplayState = (function (_super) {
     return GameplayState;
 }(Phaser.State));
 var LeaderboardResult = (function () {
-    function LeaderboardResult() {
+    function LeaderboardResult(name, score) {
+        this.name = name;
+        this.score = score;
     }
     return LeaderboardResult;
 }());
@@ -703,9 +711,16 @@ var LeaderboardState = (function (_super) {
     function LeaderboardState() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    LeaderboardState.prototype.init = function (clock, scoreboard) {
-        this.scoreboard = scoreboard;
-        this.clock = clock;
+    LeaderboardState.prototype.init = function (clock, scoreboard, name) {
+        if (clock != undefined) {
+            this.clock = clock;
+        }
+        if (scoreboard != undefined) {
+            this.scoreboard = scoreboard;
+        }
+        if (name != undefined) {
+            MenuState.Name = name;
+        }
     };
     LeaderboardState.prototype.create = function () {
         if (this.scoreboard == undefined) {
@@ -714,21 +729,33 @@ var LeaderboardState = (function (_super) {
         if (this.clock == undefined) {
             this.clock = new Clock(this.game);
         }
-        this.background = this.add.image(0, 0, "Background");
-        this.background.scale.setTo(this.game.width / this.background.width, this.game.height / this.background.height);
-        var style = { font: "48px Arial", fill: "#ffffff" };
-        this.leaderboardText = this.add.text(this.world.centerX, this.world.centerY, "Loading...", style);
-        this.leaderboardText.anchor.setTo(0.5, 0.5);
+        if (this.name == undefined) {
+            this.name = "Guest";
+        }
+        this.backgroundImage = this.add.image(0, 0, "Background");
+        this.nextGameCountdownLabel = this.add.image(0, 0, "NextGameCountdownLabel");
+        this.nextGameCountdownLabel.anchor.setTo(0.5);
+        var rankStyle = { font: "20px Arial", fill: "#ffffff", align: "left" };
+        this.rankText = this.add.text(0, 0, "Loading...", rankStyle);
+        this.rankText.anchor.setTo(0, 0);
+        var nameStyle = { font: "20px Arial", fill: "#ffffff", align: "center" };
+        this.nameText = this.add.text(0, 0, "Loading...", nameStyle);
+        this.nameText.anchor.setTo(0.5, 0);
+        var scoreStyle = { font: "20px Arial", fill: "#ffffff", align: "right" };
+        this.scoreText = this.add.text(0, 0, "Loading...", scoreStyle);
+        this.scoreText.anchor.setTo(1, 0);
         this.clockRenderer = new ClockRenderer(this.clock, this);
-        this.backButton = this.game.add.button(0, 0, "BackButton", this.OnBackButtonClick, this);
-        this.PositionUI();
+        this.backButton = this.game.add.button(0, 0, "BackButton", this.OnBackButton_Click, this);
+        this.leaderboardLabel = this.game.add.image(0, 0, "LeaderboardLabel");
+        this.leaderboardLabel.anchor.setTo(0.5, 0);
         this.request = new XMLHttpRequest();
         this.request.onreadystatechange = this.OnServerLeaderboardReceived;
         this.request.open("GET", "/api/leaderboard", true);
         this.request.send();
+        this.resize();
     };
-    LeaderboardState.prototype.OnBackButtonClick = function () {
-        this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
+    LeaderboardState.prototype.OnBackButton_Click = function () {
+        this.game.state.start("Menu", true, false, this.clock, this.scoreboard, this.name);
     };
     LeaderboardState.prototype.OnServerLeaderboardReceived = function (ev) {
         if (this.readyState == 4 && this.status == 200) {
@@ -736,13 +763,30 @@ var LeaderboardState = (function (_super) {
             LeaderboardState.LeaderboardResults = JSON.parse(this.responseText);
         }
     };
-    LeaderboardState.prototype.PositionUI = function () {
-        this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1);
-        this.clockRenderer.ClockText.x = this.game.width - this.clockRenderer.ClockText.width / 2;
-        this.clockRenderer.ClockText.y = this.clockRenderer.ClockText.height / 2;
-        this.ScaleSprite(this.backButton, this.game.width / 3, this.game.height / 6, 50, 1);
+    LeaderboardState.prototype.resize = function () {
+        this.backgroundImage.width = this.game.width;
+        this.backgroundImage.height = this.game.height;
+        this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1);
         this.backButton.x = 0;
         this.backButton.y = 0;
+        this.ScaleSprite(this.nextGameCountdownLabel, this.game.width / 3, this.game.height / 3, 0, 1);
+        this.nextGameCountdownLabel.x = this.game.width - this.nextGameCountdownLabel.width / 2;
+        this.nextGameCountdownLabel.y = this.nextGameCountdownLabel.height / 4;
+        this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1);
+        this.clockRenderer.ClockText.x = this.game.width - this.nextGameCountdownLabel.width / 2;
+        this.clockRenderer.ClockText.y = this.nextGameCountdownLabel.height / 2;
+        this.ScaleSprite(this.leaderboardLabel, this.game.width, this.game.height / 3, 0, 1);
+        this.leaderboardLabel.x = this.world.centerX;
+        this.leaderboardLabel.y = this.nextGameCountdownLabel.height;
+        this.ScaleSprite(this.rankText, this.game.width / 3, this.game.height / 3, 0, 1);
+        this.rankText.x = 0;
+        this.rankText.y = this.nextGameCountdownLabel.height + this.leaderboardLabel.height;
+        this.ScaleSprite(this.nameText, this.game.width / 3, this.game.height / 3, 0, 1);
+        this.nameText.x = this.world.centerX;
+        this.nameText.y = this.nextGameCountdownLabel.height + this.leaderboardLabel.height;
+        this.ScaleSprite(this.scoreText, this.game.width / 3, this.game.height / 3, 0, 1);
+        this.scoreText.x = this.game.width;
+        this.scoreText.y = this.nextGameCountdownLabel.height + this.leaderboardLabel.height;
     };
     LeaderboardState.prototype.ScaleSprite = function (sprite, availableSpaceWidth, availableSpaceHeight, padding, scaleMultiplier) {
         var scale = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
@@ -763,17 +807,21 @@ var LeaderboardState = (function (_super) {
     LeaderboardState.prototype.update = function () {
         this.clock.Update();
         if (LeaderboardState.LeaderboardResults != undefined) {
-            this.leaderboardText.text = "";
+            this.rankText.text = "";
+            this.nameText.text = "";
+            this.scoreText.text = "";
             for (var n = 0; n < LeaderboardState.LeaderboardResults.length; n++) {
-                this.leaderboardText.text += (n + 1).toString() + ". " + LeaderboardState.LeaderboardResults[n].name + ": " + LeaderboardState.LeaderboardResults[n].score + "\n";
+                this.rankText.text += (n + 1).toString() + "\n";
+                this.nameText.text += LeaderboardState.LeaderboardResults[n].name + "\n";
+                this.scoreText.text += LeaderboardState.LeaderboardResults[n].score + "\n";
             }
         }
         switch (this.clock.State) {
             case ClockState.Gameplay:
-                this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard);
+                this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard, this.name);
                 break;
             case ClockState.Results:
-                this.game.state.start("Results", true, false, this.clock, this.scoreboard);
+                this.game.state.start("Results", true, false, this.clock, this.scoreboard, this.name);
                 break;
             default:
                 break;
@@ -802,6 +850,9 @@ var LoadingState = (function (_super) {
         this.load.image("TimeLabel", "assets/sprites/timelabel.png");
         this.load.image("ScoreLabel", "assets/sprites/scorelabel.png");
         this.load.image("BackButton", "assets/sprites/backbutton.png?v=1");
+        this.load.image("NextGameCountdownLabel", "assets/sprites/nextgamecountdownlabel.png");
+        this.load.image("TotalScoreLabel", "assets/sprites/totalscorelabel.png");
+        this.load.image("LeaderboardLabel", "assets/sprites/leaderboardlabel.png");
     };
     LoadingState.prototype.create = function () {
         var alphaTween = this.add.tween(this.loadingBar).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
@@ -896,12 +947,15 @@ var MenuState = (function (_super) {
     function MenuState() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    MenuState.prototype.init = function (clock, scoreboard) {
+    MenuState.prototype.init = function (clock, scoreboard, name) {
         if (clock != undefined) {
             this.clock = clock;
         }
         if (scoreboard != undefined) {
             this.scoreboard = scoreboard;
+        }
+        if (name != undefined) {
+            MenuState.Name = name;
         }
     };
     MenuState.prototype.create = function () {
@@ -911,6 +965,9 @@ var MenuState = (function (_super) {
         if (this.scoreboard == undefined) {
             this.scoreboard = new Scoreboard(this.game);
         }
+        if (MenuState.Name == "" || MenuState.Name == undefined) {
+            MenuState.Name = "Guest";
+        }
         this.backgroundImage = this.add.image(0, 0, "Background");
         this.logoImage = this.add.image(0, 0, "Logo");
         this.logoImage.anchor.setTo(0.5);
@@ -918,22 +975,45 @@ var MenuState = (function (_super) {
         this.playButton.anchor.setTo(0.5);
         this.loginButton = this.add.button(0, 0, "LoginButton", this.OnLoginButton_Click, this);
         this.loginButton.anchor.setTo(0.5);
+        var nameStyle = { font: "20px Arial", fill: "#ffffff", align: "center" };
+        this.nameText = this.add.text(0, 0, "", nameStyle);
+        this.nameText.anchor.setTo(0.5);
+        this.nameText.visible = false;
         this.resize();
+        MenuState.LoggedIn = false;
+        FB.getLoginStatus(function (statusResponse) {
+            if (statusResponse.status == "connected") {
+                FB.api("/me", { fields: "first_name" }, function (apiResponse) {
+                    MenuState.Name = apiResponse.first_name;
+                });
+                MenuState.LoggedIn = true;
+            }
+        });
     };
     MenuState.prototype.OnPlayButton_Click = function () {
         switch (this.clock.State) {
             case ClockState.Gameplay:
-                this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard);
+                this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard, MenuState.Name);
                 break;
             case ClockState.Results:
-                this.game.state.start("Results", true, false, this.clock, this.scoreboard);
+                this.game.state.start("Results", true, false, this.clock, this.scoreboard, MenuState.Name);
                 break;
             case ClockState.Leaderboard:
-                this.game.state.start("Leaderboard", true, false, this.clock, this.scoreboard);
+                this.game.state.start("Leaderboard", true, false, this.clock, this.scoreboard, MenuState.Name);
                 break;
         }
     };
     MenuState.prototype.OnLoginButton_Click = function () {
+        FB.getLoginStatus(function (response) {
+            if (response.status != "connected") {
+                FB.login(function (loginResponse) {
+                });
+            }
+            FB.api("/me", { fields: "first_name" }, function (apiResponse) {
+                MenuState.Name = apiResponse.first_name;
+            });
+            MenuState.LoggedIn = true;
+        });
     };
     MenuState.prototype.resize = function () {
         // position the background
@@ -948,6 +1028,9 @@ var MenuState = (function (_super) {
         this.ScaleSprite(this.loginButton, this.game.width / 2, this.game.height / 3, 0, 1);
         this.loginButton.x = this.world.centerX;
         this.loginButton.y = this.world.centerY + this.game.height / 3;
+        this.ScaleSprite(this.nameText, this.game.width / 2, this.game.height / 3, 0, 1);
+        this.nameText.x = this.world.centerX;
+        this.nameText.y = this.world.centerY + this.game.height / 3;
     };
     MenuState.prototype.ScaleSprite = function (sprite, availableSpaceWidth, availableSpaceHeight, padding, scaleMultiplier) {
         var scale = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
@@ -967,6 +1050,11 @@ var MenuState = (function (_super) {
     };
     MenuState.prototype.update = function () {
         this.clock.Update();
+        if (MenuState.LoggedIn) {
+            this.loginButton.visible = false;
+            this.nameText.text = "Hello, " + MenuState.Name;
+            this.nameText.visible = true;
+        }
     };
     return MenuState;
 }(Phaser.State));
@@ -975,9 +1063,16 @@ var ResultsState = (function (_super) {
     function ResultsState() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    ResultsState.prototype.init = function (clock, scoreboard) {
-        this.scoreboard = scoreboard;
-        this.clock = clock;
+    ResultsState.prototype.init = function (clock, scoreboard, name) {
+        if (clock != undefined) {
+            this.clock = clock;
+        }
+        if (scoreboard != undefined) {
+            this.scoreboard = scoreboard;
+        }
+        if (name != undefined) {
+            this.name = name;
+        }
     };
     ResultsState.prototype.create = function () {
         if (this.scoreboard == undefined) {
@@ -986,30 +1081,27 @@ var ResultsState = (function (_super) {
         if (this.clock == undefined) {
             this.clock = new Clock(this.game);
         }
-        this.background = this.add.image(0, 0, "Background");
-        this.background.width = this.game.width;
-        this.background.height = this.game.height;
+        if (this.name == undefined) {
+            this.name = "Guest";
+        }
+        this.backgroundImage = this.add.image(0, 0, "Background");
+        this.totalScoreLabel = this.add.image(0, 0, "TotalScoreLabel");
+        this.totalScoreLabel.anchor.setTo(0.5);
         var style = { font: "48px Arial", fill: "#ffffff" };
-        this.scoreText = this.add.text(this.world.centerX, this.world.centerY, "Score: " + this.scoreboard.Score, style);
+        this.scoreText = this.add.text(0, 0, this.scoreboard.Score.toString(), style);
         this.scoreText.anchor.setTo(0.5, 0.5);
+        this.nextGameCountdownLabel = this.add.image(0, 0, "NextGameCountdownLabel");
+        this.nextGameCountdownLabel.anchor.setTo(0.5);
         this.clockRenderer = new ClockRenderer(this.clock, this);
-        this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButtonClick, this);
-        this.PositionUI();
+        this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButton_Click, this);
         this.request = new XMLHttpRequest();
         this.request.open("POST", "/api/gameresults", true);
         this.request.setRequestHeader("Content-type", "application/json");
-        this.request.send(JSON.stringify({ name: "Guest", score: this.scoreboard.Score }));
+        this.request.send(JSON.stringify({ name: this.name, score: this.scoreboard.Score }));
+        this.resize();
     };
-    ResultsState.prototype.OnBackButtonClick = function () {
-        this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
-    };
-    ResultsState.prototype.PositionUI = function () {
-        this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1);
-        this.clockRenderer.ClockText.x = this.game.width - this.clockRenderer.ClockText.width / 2;
-        this.clockRenderer.ClockText.y = this.clockRenderer.ClockText.height / 2;
-        this.ScaleSprite(this.backButton, this.game.width / 3, this.game.height / 6, 50, 1);
-        this.backButton.x = 0;
-        this.backButton.y = 0;
+    ResultsState.prototype.OnBackButton_Click = function () {
+        this.game.state.start("Menu", true, false, this.clock, this.scoreboard, this.name);
     };
     ResultsState.prototype.ScaleSprite = function (sprite, availableSpaceWidth, availableSpaceHeight, padding, scaleMultiplier) {
         var scale = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
@@ -1028,18 +1120,33 @@ var ResultsState = (function (_super) {
         return ratio * devicePixelRatio;
     };
     ResultsState.prototype.resize = function () {
-        this.background.width = this.game.width;
-        this.background.height = this.game.height;
-        this.PositionUI();
+        this.backgroundImage.width = this.game.width;
+        this.backgroundImage.height = this.game.height;
+        this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1);
+        this.backButton.x = 0;
+        this.backButton.y = 0;
+        this.ScaleSprite(this.nextGameCountdownLabel, this.game.width / 3, this.game.height / 3, 0, 1);
+        this.nextGameCountdownLabel.x = this.game.width - this.nextGameCountdownLabel.width / 2;
+        this.nextGameCountdownLabel.y = this.nextGameCountdownLabel.height / 4;
+        this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 0, 1);
+        this.clockRenderer.ClockText.x = this.game.width - this.nextGameCountdownLabel.width / 2;
+        this.clockRenderer.ClockText.y = this.nextGameCountdownLabel.height / 2;
+        // position the score
+        this.ScaleSprite(this.totalScoreLabel, this.game.width / 2, this.game.height / 3, 0, 1);
+        this.totalScoreLabel.x = this.world.centerX;
+        this.totalScoreLabel.y = this.world.centerY;
+        this.ScaleSprite(this.scoreText, this.game.width / 2, this.game.height / 3, 0, 1);
+        this.scoreText.x = this.world.centerX;
+        this.scoreText.y = this.world.centerY + this.totalScoreLabel.height / 4;
     };
     ResultsState.prototype.update = function () {
         this.clock.Update();
         switch (this.clock.State) {
             case ClockState.Leaderboard:
-                this.game.state.start("Leaderboard", true, false, this.clock, this.scoreboard);
+                this.game.state.start("Leaderboard", true, false, this.clock, this.scoreboard, this.name);
                 break;
             case ClockState.Gameplay:
-                this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard);
+                this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard, this.name);
                 break;
             default:
                 break;
@@ -1065,7 +1172,7 @@ var ScoreboardRenderer = (function () {
     function ScoreboardRenderer(scoreboard, state) {
         this.scoreboard = scoreboard;
         var style = { font: "40px Arial", fill: "#ffffff" };
-        this.ScoreText = state.add.text(0, 0, "Score: 0", style);
+        this.ScoreText = state.add.text(0, 0, "", style);
         this.ScoreText.anchor.setTo(0.5);
     }
     ScoreboardRenderer.prototype.Update = function () {

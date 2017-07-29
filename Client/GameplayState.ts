@@ -8,18 +8,21 @@ class GameplayState extends Phaser.State {
     private clockRenderer: ClockRenderer;
     private timeLabel: Phaser.Image;
     private backButton: Phaser.Button;
-
     private horizontalMargin: number;
     private verticalMargin: number;
-    
+    private name: string;
 
-    init(clock: Clock, scoreboard: Scoreboard) {
+    init(clock: Clock, scoreboard: Scoreboard, name: string) {
         if(clock != undefined) {
             this.clock = clock;
         }
 
         if(scoreboard != undefined) {
             this.scoreboard = scoreboard;
+        }
+
+        if(name != undefined) {
+            this.name = name;
         }
     }
 
@@ -30,6 +33,10 @@ class GameplayState extends Phaser.State {
 
         if(this.scoreboard == undefined) {
             this.scoreboard = new Scoreboard(this.game);
+        }
+
+        if(this.name = undefined) {
+            this.name = "Guest";
         }
 
         this.backgroundImage = this.add.image(0, 0, "Background");
@@ -54,7 +61,7 @@ class GameplayState extends Phaser.State {
     }
 
     private OnBackButton_Click() {
-        this.game.state.start("Menu", true, false, this.clock, this.scoreboard);
+        this.game.state.start("Menu", true, false, this.clock, this.scoreboard, this.name);
     }
 
     resize() {
@@ -156,10 +163,10 @@ class GameplayState extends Phaser.State {
 
         switch(this.clock.State) {
             case ClockState.Results:
-                this.game.state.start("Results", true, false, this.clock, this.scoreboard);
+                this.game.state.start("Results", true, false, this.clock, this.scoreboard, this.name);
                 break;
             case ClockState.Leaderboard:
-                this.game.state.start("Leaderboard", true, false, this.clock, this.scoreboard);
+                this.game.state.start("Leaderboard", true, false, this.clock, this.scoreboard, this.name);
                 break;
             default:
                 break;
