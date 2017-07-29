@@ -36,6 +36,9 @@ namespace blokprty.com_new {
 
         List<GameResults> gameResults;
 
+        List<string> botNames;
+        Random random;
+
         public GameRoom() {
             State = GameState.Game;
             TimeRemaining = gameDuration;
@@ -45,6 +48,25 @@ namespace blokprty.com_new {
 
             gameResults = new List<GameResults>();
             
+            botNames = new List<string>();
+            botNames.Add("Ron");
+            botNames.Add("Jen");
+            botNames.Add("Andrew");
+            botNames.Add("Christian");
+            botNames.Add("Carlton");
+            botNames.Add("Jai");
+            botNames.Add("Jay");
+            botNames.Add("Nikki");
+            botNames.Add("Jimmy");
+            botNames.Add("Denise");
+            botNames.Add("Naomi");
+            botNames.Add("Ally");
+            botNames.Add("Suzie");
+            botNames.Add("Dacia");
+            botNames.Add("Lara");
+
+            random = new Random();
+
             Debug.WriteLine("Initialized Game Room");
             Console.WriteLine("Initialized Game Room");
             LogState();
@@ -90,6 +112,10 @@ namespace blokprty.com_new {
                         Debug.WriteLine("Changed GameRoom state to Results");
                         Console.WriteLine("Changed GameRoom state to Results");
                         LogState();
+
+                        foreach(string name in botNames) {
+                            AddGameResults(new GameResults(name, random.Next(200) * 10));
+                        }
                     }
                     break;
 

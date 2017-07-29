@@ -591,7 +591,7 @@ var GameplayState = (function (_super) {
         if (this.scoreboard == undefined) {
             this.scoreboard = new Scoreboard(this.game);
         }
-        if (this.name = undefined) {
+        if (this.name == undefined) {
             this.name = "Guest";
         }
         this.backgroundImage = this.add.image(0, 0, "Background");
@@ -983,8 +983,10 @@ var MenuState = (function (_super) {
         MenuState.LoggedIn = false;
         FB.getLoginStatus(function (statusResponse) {
             if (statusResponse.status == "connected") {
-                FB.api("/me", { fields: "first_name" }, function (apiResponse) {
-                    MenuState.Name = apiResponse.first_name;
+                FB.api("/me", { fields: "first_name,last_name" }, function (apiResponse) {
+                    var s = apiResponse.last_name;
+                    var lastInitial = s.charAt(0);
+                    MenuState.Name = apiResponse.first_name + " " + lastInitial + ".";
                 });
                 MenuState.LoggedIn = true;
             }
@@ -1009,8 +1011,10 @@ var MenuState = (function (_super) {
                 FB.login(function (loginResponse) {
                 });
             }
-            FB.api("/me", { fields: "first_name" }, function (apiResponse) {
-                MenuState.Name = apiResponse.first_name;
+            FB.api("/me", { fields: "first_name,last_name" }, function (apiResponse) {
+                var s = apiResponse.last_name;
+                var lastInitial = s.charAt(0);
+                MenuState.Name = apiResponse.first_name + " " + lastInitial + ".";
             });
             MenuState.LoggedIn = true;
         });

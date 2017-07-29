@@ -58,8 +58,10 @@ class MenuState extends Phaser.State {
 
         FB.getLoginStatus(function(statusResponse) {
             if(statusResponse.status == "connected") {
-                FB.api("/me", { fields: "first_name" }, function(apiResponse) {
-                    MenuState.Name = apiResponse.first_name;
+                FB.api("/me", { fields: "first_name,last_name" }, function(apiResponse) {
+                    let s: string = apiResponse.last_name;
+                    let lastInitial: string = s.charAt(0);
+                    MenuState.Name = apiResponse.first_name + " " + lastInitial + ".";
                 });
 
                 MenuState.LoggedIn = true;
@@ -90,8 +92,10 @@ class MenuState extends Phaser.State {
                 });
             }
 
-            FB.api("/me", { fields: "first_name" }, function(apiResponse) {
-                MenuState.Name = apiResponse.first_name;
+            FB.api("/me", { fields: "first_name,last_name" }, function(apiResponse) {
+                let s: string = apiResponse.last_name;
+                let lastInitial: string = s.charAt(0);
+                MenuState.Name = apiResponse.first_name + " " + lastInitial + ".";
             });
 
             MenuState.LoggedIn = true;

@@ -35,7 +35,7 @@ class GameplayState extends Phaser.State {
             this.scoreboard = new Scoreboard(this.game);
         }
 
-        if(this.name = undefined) {
+        if(this.name == undefined) {
             this.name = "Guest";
         }
 
