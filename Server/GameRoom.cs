@@ -49,21 +49,31 @@ namespace blokprty.com_new {
             gameResults = new List<GameResults>();
             
             botNames = new List<string>();
-            botNames.Add("Ron");
-            botNames.Add("Jen");
-            botNames.Add("Andrew");
-            botNames.Add("Christian");
-            botNames.Add("Carlton");
-            botNames.Add("Jai");
-            botNames.Add("Jay");
-            botNames.Add("Nikki");
-            botNames.Add("Jimmy");
-            botNames.Add("Denise");
-            botNames.Add("Naomi");
-            botNames.Add("Ally");
-            botNames.Add("Suzie");
-            botNames.Add("Dacia");
-            botNames.Add("Lara");
+            botNames.Add("Ron F.");
+            botNames.Add("Jen D.");
+            botNames.Add("Andrew I.");
+            botNames.Add("Christian G.");
+            botNames.Add("Carlton F.");
+            botNames.Add("Jai J.");
+            botNames.Add("Jay F.");
+            botNames.Add("Nikki H.");
+            botNames.Add("Jimmy C.");
+            botNames.Add("Denise T.");
+            botNames.Add("Naomi D.");
+            botNames.Add("Ally B.");
+            botNames.Add("Suzie L.");
+            botNames.Add("Dacia N.");
+            botNames.Add("Lara B.");
+            botNames.Add("Steve S.");
+            botNames.Add("Alicia F.");
+            botNames.Add("Melanie G.");
+            botNames.Add("Jason G.");
+            botNames.Add("Eliot G.");
+            botNames.Add("Spencer G.");
+            botNames.Add("Alice H.");
+            botNames.Add("Brittany H.");
+            botNames.Add("Nikki M.");
+            botNames.Add("Pravina S.");
 
             random = new Random();
 
