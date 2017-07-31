@@ -13,6 +13,7 @@ class LoadingState extends Phaser.State {
         this.load.image("Logo", "assets/sprites/logo.png?v=1");
         this.load.image("PlayButton", "assets/sprites/playbutton.png?v=1");
         this.load.image("LoginButton", "assets/sprites/loginbutton.png");
+        this.load.image("UseResponseLogo", "assets/sprites/UseResponseLogo.png");
         this.load.image(BlockRenderer.Key, BlockRenderer.Url);
         this.load.image("TimeLabel", "assets/sprites/timelabel.png");
         this.load.image("ScoreLabel", "assets/sprites/scorelabel.png");

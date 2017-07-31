@@ -846,6 +846,7 @@ var LoadingState = (function (_super) {
         this.load.image("Logo", "assets/sprites/logo.png?v=1");
         this.load.image("PlayButton", "assets/sprites/playbutton.png?v=1");
         this.load.image("LoginButton", "assets/sprites/loginbutton.png");
+        this.load.image("UseResponseLogo", "assets/sprites/UseResponseLogo.png");
         this.load.image(BlockRenderer.Key, BlockRenderer.Url);
         this.load.image("TimeLabel", "assets/sprites/timelabel.png");
         this.load.image("ScoreLabel", "assets/sprites/scorelabel.png");
@@ -979,6 +980,11 @@ var MenuState = (function (_super) {
         this.nameText = this.add.text(0, 0, "", nameStyle);
         this.nameText.anchor.setTo(0.5);
         this.nameText.visible = false;
+        this.feedbackButton = this.add.button(0, 0, "UseResponseLogo", this.OnFeedbackButton_Click, this);
+        this.feedbackButton.anchor.setTo(0, 1);
+        var feedbackStyle = { font: "20px Arial", fill: "#ffffff" };
+        this.feedbackLabel = this.add.text(0, 0, "Send Feedback", feedbackStyle);
+        this.feedbackLabel.anchor.setTo(0, 1);
         this.resize();
         MenuState.LoggedIn = false;
         FB.getLoginStatus(function (statusResponse) {
@@ -1019,6 +1025,9 @@ var MenuState = (function (_super) {
             MenuState.LoggedIn = true;
         });
     };
+    MenuState.prototype.OnFeedbackButton_Click = function () {
+        window.open("https://blokprty.useresponse.com/");
+    };
     MenuState.prototype.resize = function () {
         // position the background
         this.backgroundImage.width = this.game.width;
@@ -1035,6 +1044,12 @@ var MenuState = (function (_super) {
         this.ScaleSprite(this.nameText, this.game.width / 2, this.game.height / 3, 0, 1);
         this.nameText.x = this.world.centerX;
         this.nameText.y = this.world.centerY + this.game.height / 3;
+        this.ScaleSprite(this.feedbackLabel, this.game.width / 10, this.game.height / 10, 0, 1);
+        this.feedbackLabel.x = 0;
+        this.feedbackLabel.y = this.game.height;
+        this.ScaleSprite(this.feedbackButton, this.game.width / 10, this.game.height / 10, 0, 1);
+        this.feedbackButton.x = 0;
+        this.feedbackButton.y = this.game.height - this.feedbackLabel.height;
     };
     MenuState.prototype.ScaleSprite = function (sprite, availableSpaceWidth, availableSpaceHeight, padding, scaleMultiplier) {
         var scale = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);

@@ -3,6 +3,8 @@ class MenuState extends Phaser.State {
     private logoImage: Phaser.Image;
     private playButton: Phaser.Button;
     private loginButton: Phaser.Button;
+    private feedbackButton: Phaser.Button;
+    private feedbackLabel: Phaser.Text;
     private clock: Clock;
     private scoreboard: Scoreboard;
     static Name: string;
@@ -51,6 +53,13 @@ class MenuState extends Phaser.State {
         this.nameText = this.add.text(0, 0, "", nameStyle);
         this.nameText.anchor.setTo(0.5);
         this.nameText.visible = false;
+
+        this.feedbackButton = this.add.button(0, 0, "UseResponseLogo", this.OnFeedbackButton_Click, this);
+        this.feedbackButton.anchor.setTo(0, 1);
+
+        let feedbackStyle = { font: "20px Arial", fill: "#ffffff" };
+        this.feedbackLabel = this.add.text(0, 0, "Send Feedback", feedbackStyle);
+        this.feedbackLabel.anchor.setTo(0, 1);
 
         this.resize();
 
@@ -102,6 +111,10 @@ class MenuState extends Phaser.State {
         });
     }
 
+    private OnFeedbackButton_Click() {
+        window.open("https://blokprty.useresponse.com/");
+    }
+
     resize() {
         // position the background
         this.backgroundImage.width = this.game.width;
@@ -122,6 +135,14 @@ class MenuState extends Phaser.State {
         this.ScaleSprite(this.nameText, this.game.width / 2, this.game.height / 3, 0, 1);
         this.nameText.x = this.world.centerX;
         this.nameText.y = this.world.centerY + this.game.height / 3;
+
+        this.ScaleSprite(this.feedbackLabel, this.game.width / 10, this.game.height / 10, 0, 1);
+        this.feedbackLabel.x = 0;
+        this.feedbackLabel.y = this.game.height;
+
+        this.ScaleSprite(this.feedbackButton, this.game.width / 10, this.game.height / 10, 0, 1);
+        this.feedbackButton.x = 0;
+        this.feedbackButton.y = this.game.height - this.feedbackLabel.height;
     }
 
     ScaleSprite(sprite, availableSpaceWidth: number, availableSpaceHeight: number, padding: number, scaleMultiplier: number) {
