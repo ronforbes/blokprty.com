@@ -31,7 +31,6 @@ class Clock {
 
     OnServerClockReceived(this: XMLHttpRequest, ev: Event) {
         if(this.readyState == 4 && this.status == 200) {
-            console.log(JSON.parse(this.responseText));
             let state: number = JSON.parse(this.responseText).state;               
             let time: number = JSON.parse(this.responseText).timeRemaining;
                 
@@ -47,7 +46,6 @@ class Clock {
         if(Clock.CheckServerState) {
             this.State = Clock.ServerState;
             this.TimeRemaining = Clock.ServerTimeRemaining;
-            console.log("Synced to server state=" + this.State + ", time=" + this.TimeRemaining);
             Clock.CheckServerState = false;
         }
 

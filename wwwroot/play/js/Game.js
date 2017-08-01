@@ -501,7 +501,6 @@ var Clock = (function () {
     }
     Clock.prototype.OnServerClockReceived = function (ev) {
         if (this.readyState == 4 && this.status == 200) {
-            console.log(JSON.parse(this.responseText));
             var state = JSON.parse(this.responseText).state;
             var time = JSON.parse(this.responseText).timeRemaining;
             Clock.ServerState = state;
@@ -514,7 +513,6 @@ var Clock = (function () {
         if (Clock.CheckServerState) {
             this.State = Clock.ServerState;
             this.TimeRemaining = Clock.ServerTimeRemaining;
-            console.log("Synced to server state=" + this.State + ", time=" + this.TimeRemaining);
             Clock.CheckServerState = false;
         }
         if (this.TimeRemaining <= 0) {
