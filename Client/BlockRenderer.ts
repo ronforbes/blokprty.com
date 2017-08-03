@@ -1,7 +1,5 @@
 class BlockRenderer {
     private block: Block;
-    static readonly Key: string = "block";
-    static readonly Url: string = "assets/sprites/block.png";
     static Size: number = 0;
     private readonly colors: number[] = [
         0xff0000,

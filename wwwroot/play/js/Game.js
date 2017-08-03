@@ -22,7 +22,7 @@ var BlockState;
 })(BlockState || (BlockState = {}));
 var Block = (function () {
     function Block(board, group, scoreboard) {
-        this.Sprite = group.create(0, 0, BlockRenderer.Key);
+        this.Sprite = group.create(0, 0, "Block");
         this.renderer = new BlockRenderer(this);
         this.Slider = new BlockSlider(this, board.MatchDetector);
         this.Matcher = new BlockMatcher(this);
@@ -240,8 +240,6 @@ var BlockRenderer = (function () {
                 this.block.Sprite.visible = false;
         }
     };
-    BlockRenderer.Key = "block";
-    BlockRenderer.Url = "assets/sprites/block.png";
     BlockRenderer.Size = 0;
     return BlockRenderer;
 }());
@@ -467,15 +465,7 @@ var BootState = (function (_super) {
         this.input.maxPointers = 1;
         // Disable pausing when page loses focus
         this.stage.disableVisibilityChange = true;
-        // Enable advanced timing to track fps
-        this.game.time.advancedTiming = true;
         this.game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
-        if (this.game.device.desktop) {
-            // desktop specific settings
-        }
-        else {
-            // mobile specific settings
-        }
         this.game.state.start("Loading");
     };
     return BootState;
@@ -549,9 +539,7 @@ var ClockRenderer = (function () {
 var Game = (function (_super) {
     __extends(Game, _super);
     function Game() {
-        var _this = _super.call(this, window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'game', null) || this;
-        _this.logicalWidth = 1920;
-        _this.logicalHeight = 1080;
+        var _this = _super.call(this, "100%", "100%", Phaser.AUTO, 'game', null) || this;
         _this.state.add("Boot", BootState);
         _this.state.add("Loading", LoadingState);
         _this.state.add("Menu", MenuState);
@@ -834,6 +822,16 @@ var LoadingState = (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     LoadingState.prototype.preload = function () {
+        // Setup the Blok Prty logo
+        this.logoText = this.add.text(0, 0, "Blok Prty LLC", { font: "40px Arial", fill: "#ffffff" });
+        this.logoText.anchor.setTo(0.5);
+        this.logoText.x = this.world.centerX;
+        this.logoText.y = this.game.height / 3;
+        // Set the "Presents" text
+        this.presentsText = this.add.text(0, 0, "Presents...", { font: "20px Arial", fill: "#ffffff" });
+        this.presentsText.anchor.setTo(0.5);
+        this.presentsText.x = this.world.centerX;
+        this.presentsText.y = this.game.height / 3 + this.logoText.height;
         // Setup the preload bar
         this.loadingBar = this.add.sprite(0, 0, "LoadingBar");
         this.loadingBar.anchor.setTo(0.5);
@@ -845,10 +843,10 @@ var LoadingState = (function (_super) {
         this.load.image("PlayButton", "assets/sprites/playbutton.png?v=1");
         this.load.image("LoginButton", "assets/sprites/loginbutton.png");
         this.load.image("UseResponseLogo", "assets/sprites/UseResponseLogo.png");
-        this.load.image(BlockRenderer.Key, BlockRenderer.Url);
+        this.load.image("Block", "assets/sprites/block.png");
         this.load.image("TimeLabel", "assets/sprites/timelabel.png");
         this.load.image("ScoreLabel", "assets/sprites/scorelabel.png");
-        this.load.image("BackButton", "assets/sprites/backbutton.png?v=1");
+        this.load.image("BackButton", "assets/sprites/backbutton.png?v=2");
         this.load.image("NextGameCountdownLabel", "assets/sprites/nextgamecountdownlabel.png");
         this.load.image("TotalScoreLabel", "assets/sprites/totalscorelabel.png");
         this.load.image("LeaderboardLabel", "assets/sprites/leaderboardlabel.png");
@@ -974,14 +972,14 @@ var MenuState = (function (_super) {
         this.playButton.anchor.setTo(0.5);
         this.loginButton = this.add.button(0, 0, "LoginButton", this.OnLoginButton_Click, this);
         this.loginButton.anchor.setTo(0.5);
-        var nameStyle = { font: "20px Arial", fill: "#ffffff", align: "center" };
+        var nameStyle = { font: "30px Arial", fill: "#ffffff", align: "center" };
         this.nameText = this.add.text(0, 0, "", nameStyle);
         this.nameText.anchor.setTo(0.5);
         this.nameText.visible = false;
         this.feedbackButton = this.add.button(0, 0, "UseResponseLogo", this.OnFeedbackButton_Click, this);
         this.feedbackButton.anchor.setTo(0, 1);
         var feedbackStyle = { font: "20px Arial", fill: "#ffffff" };
-        this.feedbackLabel = this.add.text(0, 0, "Send Feedback", feedbackStyle);
+        this.feedbackLabel = this.add.text(0, 0, "Feedback", feedbackStyle);
         this.feedbackLabel.anchor.setTo(0, 1);
         this.resize();
         MenuState.LoggedIn = false;
@@ -1027,49 +1025,37 @@ var MenuState = (function (_super) {
         window.open("https://blokprty.useresponse.com/");
     };
     MenuState.prototype.resize = function () {
-        // position the background
         this.backgroundImage.width = this.game.width;
         this.backgroundImage.height = this.game.height;
-        this.ScaleSprite(this.logoImage, this.game.width, this.game.height / 3, 0, 1);
+        this.logoImage.width = this.game.width * 0.9;
+        this.logoImage.height = this.game.height / 3 * 0.9;
         this.logoImage.x = this.world.centerX;
         this.logoImage.y = this.world.centerY - this.game.height / 3;
-        this.ScaleSprite(this.playButton, this.game.width / 2, this.game.height / 3, 0, 1);
+        this.playButton.width = this.game.width * 0.5;
+        this.playButton.height = this.game.height / 3 * 0.9;
         this.playButton.x = this.world.centerX;
         this.playButton.y = this.world.centerY;
-        this.ScaleSprite(this.loginButton, this.game.width / 2, this.game.height / 3, 0, 1);
+        this.loginButton.width = this.game.width * 0.5;
+        this.loginButton.height = this.game.height / 3 * 0.45;
         this.loginButton.x = this.world.centerX;
         this.loginButton.y = this.world.centerY + this.game.height / 3;
-        this.ScaleSprite(this.nameText, this.game.width / 2, this.game.height / 3, 0, 1);
         this.nameText.x = this.world.centerX;
         this.nameText.y = this.world.centerY + this.game.height / 3;
-        this.ScaleSprite(this.feedbackLabel, this.game.width / 10, this.game.height / 10, 0, 1);
-        this.feedbackLabel.x = 0;
+        this.feedbackLabel.width = this.game.width / 20;
+        this.feedbackLabel.height = this.game.width / 40;
+        this.feedbackLabel.x = this.game.width / 20;
         this.feedbackLabel.y = this.game.height;
-        this.ScaleSprite(this.feedbackButton, this.game.width / 10, this.game.height / 10, 0, 1);
-        this.feedbackButton.x = 0;
+        this.feedbackButton.width = this.game.width / 20;
+        this.feedbackButton.height = this.game.width / 20;
+        this.feedbackButton.x = this.game.width / 20;
         this.feedbackButton.y = this.game.height - this.feedbackLabel.height;
-    };
-    MenuState.prototype.ScaleSprite = function (sprite, availableSpaceWidth, availableSpaceHeight, padding, scaleMultiplier) {
-        var scale = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
-        sprite.scale.x = scale * scaleMultiplier;
-        sprite.scale.y = scale * scaleMultiplier;
-    };
-    MenuState.prototype.GetSpriteScale = function (spriteWidth, spriteHeight, availableSpaceWidth, availableSpaceHeight, minimumPadding) {
-        var ratio = 1;
-        var devicePixelRatio = window.devicePixelRatio;
-        // sprite needs to fit in either width or height
-        var widthRatio = (spriteWidth * devicePixelRatio + 2 * minimumPadding) / availableSpaceWidth;
-        var heightRatio = (spriteHeight * devicePixelRatio + 2 * minimumPadding) / availableSpaceHeight;
-        if (widthRatio > 1 || heightRatio > 1) {
-            ratio = 1 / Math.max(widthRatio, heightRatio);
-        }
-        return ratio * devicePixelRatio;
     };
     MenuState.prototype.update = function () {
         this.clock.Update();
         if (MenuState.LoggedIn) {
             this.loginButton.visible = false;
             this.nameText.text = "Hello, " + MenuState.Name;
+            this.nameText.addColor("#ff5817", 7);
             this.nameText.visible = true;
         }
     };

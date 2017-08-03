@@ -49,7 +49,7 @@ class MenuState extends Phaser.State {
         this.loginButton = this.add.button(0, 0, "LoginButton", this.OnLoginButton_Click, this);
         this.loginButton.anchor.setTo(0.5);
 
-        let nameStyle = { font: "20px Arial", fill: "#ffffff", align: "center" };
+        let nameStyle = { font: "30px Arial", fill: "#ffffff", align: "center" };
         this.nameText = this.add.text(0, 0, "", nameStyle);
         this.nameText.anchor.setTo(0.5);
         this.nameText.visible = false;
@@ -58,7 +58,7 @@ class MenuState extends Phaser.State {
         this.feedbackButton.anchor.setTo(0, 1);
 
         let feedbackStyle = { font: "20px Arial", fill: "#ffffff" };
-        this.feedbackLabel = this.add.text(0, 0, "Send Feedback", feedbackStyle);
+        this.feedbackLabel = this.add.text(0, 0, "Feedback", feedbackStyle);
         this.feedbackLabel.anchor.setTo(0, 1);
 
         this.resize();
@@ -116,54 +116,36 @@ class MenuState extends Phaser.State {
     }
 
     resize() {
-        // position the background
         this.backgroundImage.width = this.game.width;
         this.backgroundImage.height = this.game.height;
 
-        this.ScaleSprite(this.logoImage, this.game.width, this.game.height / 3, 0, 1);
+        this.logoImage.width = this.game.width * 0.9;
+        this.logoImage.height = this.game.height / 3 * 0.9;
         this.logoImage.x = this.world.centerX;
         this.logoImage.y = this.world.centerY - this.game.height / 3;
 
-        this.ScaleSprite(this.playButton, this.game.width / 2, this.game.height / 3, 0, 1);
+        this.playButton.width = this.game.width * 0.5;
+        this.playButton.height = this.game.height / 3 * 0.9;
         this.playButton.x = this.world.centerX;
         this.playButton.y = this.world.centerY;
 
-        this.ScaleSprite(this.loginButton, this.game.width / 2, this.game.height / 3, 0, 1);
+        this.loginButton.width = this.game.width * 0.5;
+        this.loginButton.height = this.game.height / 3 * 0.45;
         this.loginButton.x = this.world.centerX;
         this.loginButton.y = this.world.centerY + this.game.height / 3;
 
-        this.ScaleSprite(this.nameText, this.game.width / 2, this.game.height / 3, 0, 1);
         this.nameText.x = this.world.centerX;
         this.nameText.y = this.world.centerY + this.game.height / 3;
 
-        this.ScaleSprite(this.feedbackLabel, this.game.width / 10, this.game.height / 10, 0, 1);
-        this.feedbackLabel.x = 0;
+        this.feedbackLabel.width = this.game.width / 20;
+        this.feedbackLabel.height = this.game.width / 40;
+        this.feedbackLabel.x = this.game.width / 20;
         this.feedbackLabel.y = this.game.height;
 
-        this.ScaleSprite(this.feedbackButton, this.game.width / 10, this.game.height / 10, 0, 1);
-        this.feedbackButton.x = 0;
+        this.feedbackButton.width = this.game.width / 20;
+        this.feedbackButton.height = this.game.width / 20;
+        this.feedbackButton.x = this.game.width / 20;
         this.feedbackButton.y = this.game.height - this.feedbackLabel.height;
-    }
-
-    ScaleSprite(sprite, availableSpaceWidth: number, availableSpaceHeight: number, padding: number, scaleMultiplier: number) {
-        let scale: number = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
-        sprite.scale.x = scale * scaleMultiplier;
-        sprite.scale.y = scale * scaleMultiplier;
-    }
-
-    GetSpriteScale(spriteWidth: number, spriteHeight: number, availableSpaceWidth: number, availableSpaceHeight: number, minimumPadding: number): number {
-        let ratio: number = 1;
-        let devicePixelRatio = window.devicePixelRatio;
-
-        // sprite needs to fit in either width or height
-        let widthRatio = (spriteWidth * devicePixelRatio + 2 * minimumPadding) / availableSpaceWidth;
-        let heightRatio = (spriteHeight * devicePixelRatio + 2 * minimumPadding) / availableSpaceHeight;
-
-        if(widthRatio > 1 || heightRatio > 1) {
-            ratio = 1 / Math.max(widthRatio, heightRatio);
-        }
-
-        return ratio * devicePixelRatio;
     }
 
     update() {
@@ -172,8 +154,8 @@ class MenuState extends Phaser.State {
         if(MenuState.LoggedIn) {
             this.loginButton.visible = false;
             this.nameText.text = "Hello, " + MenuState.Name;
+            this.nameText.addColor("#ff5817", 7);
             this.nameText.visible = true;
         }
-        
     }
 }

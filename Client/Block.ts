@@ -25,7 +25,7 @@ class Block {
     Faller: BlockFaller;
 
     constructor(board: Board, group: Phaser.Group, scoreboard: Scoreboard) {
-        this.Sprite = group.create(0, 0, BlockRenderer.Key);
+        this.Sprite = group.create(0, 0, "Block");
 
         this.renderer = new BlockRenderer(this);
         this.Slider = new BlockSlider(this, board.MatchDetector);

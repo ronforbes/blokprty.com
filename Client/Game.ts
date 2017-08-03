@@ -1,10 +1,8 @@
 class Game extends Phaser.Game {
     private game: Phaser.Game;
-    private readonly logicalWidth: number = 1920;
-    private readonly logicalHeight: number = 1080;
 
     constructor() {
-        super(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'game', null);// { preload: this.preload, create: this.create, update: this.update, render: this.render })
+        super("100%", "100%", Phaser.AUTO, 'game', null);
 
         this.state.add("Boot", BootState);
         this.state.add("Loading", LoadingState);
