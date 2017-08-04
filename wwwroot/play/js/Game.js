@@ -928,6 +928,7 @@ var MenuState = (function (_super) {
         var feedbackStyle = { font: "20px Arial", fill: "#ffffff" };
         this.feedbackLabel = this.add.text(0, 0, "Feedback", feedbackStyle);
         this.feedbackLabel.anchor.setTo(0, 1);
+        this.scale.onOrientationChange.add(this.resize);
         this.resize();
         MenuState.LoggedIn = false;
         FB.getLoginStatus(function (statusResponse) {
