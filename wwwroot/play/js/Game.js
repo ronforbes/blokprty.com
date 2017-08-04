@@ -583,12 +583,10 @@ var GameplayState = (function (_super) {
         this.backgroundImage = this.add.image(0, 0, "Background");
         this.board = new Board(this.game, this.scoreboard);
         this.scoreboard.Reset();
-        this.scoreLabel = this.add.image(0, 0, "ScoreLabel");
-        this.scoreLabel.anchor.setTo(0.5);
-        this.scoreboardRenderer = new ScoreboardRenderer(this.scoreboard, this);
-        this.timeLabel = this.add.image(0, 0, "TimeLabel");
-        this.timeLabel.anchor.setTo(0.5);
-        this.clockRenderer = new ClockRenderer(this.clock, this);
+        this.scoreText = this.add.text(0, 0, "0", { font: "70px Arial", fill: "#ffffff", align: "center" });
+        this.scoreText.anchor.setTo(0.5, 0);
+        this.clockText = this.add.text(0, 0, "120", { font: "40px Arial", fill: "#ffffff", align: "right" });
+        this.clockText.anchor.setTo(1, 0);
         this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButton_Click, this);
         this.resize();
     };
@@ -598,74 +596,25 @@ var GameplayState = (function (_super) {
     GameplayState.prototype.resize = function () {
         this.backgroundImage.width = this.game.width;
         this.backgroundImage.height = this.game.height;
-        var isLandscape = this.game.height / this.game.width < 1.3 ? true : false;
-        if (isLandscape) {
-            var availableGridSpace = Math.min(this.game.width * 2 / 3, this.game.height);
-            BlockRenderer.Size = (availableGridSpace * 0.9) / Board.Rows;
-            this.horizontalMargin = this.game.width * 0.95 - Board.Columns * BlockRenderer.Size;
-            this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.Size) / 2;
-            this.board.Renderer.Group.x = this.horizontalMargin;
-            this.board.Renderer.Group.y = this.verticalMargin;
-            this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1, false);
-            this.backButton.x = 0;
-            this.backButton.y = 0;
-            this.ScaleSprite(this.timeLabel, this.game.width / 3, this.game.height / 3, 0, 1, false);
-            this.timeLabel.x = this.horizontalMargin / 2;
-            this.timeLabel.y = this.world.centerY - this.game.height / 3;
-            this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1, false);
-            this.clockRenderer.ClockText.x = this.horizontalMargin / 2;
-            this.clockRenderer.ClockText.y = this.world.centerY - this.game.height / 3 + this.timeLabel.height / 4;
-            this.ScaleSprite(this.scoreLabel, this.game.width / 3, this.game.height / 3, 0, 1, false);
-            this.scoreLabel.x = this.horizontalMargin / 2;
-            this.scoreLabel.y = this.world.centerY;
-            this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.game.height / 3, 50, 1, false);
-            this.scoreboardRenderer.ScoreText.x = this.horizontalMargin / 2;
-            this.scoreboardRenderer.ScoreText.y = this.world.centerY + this.scoreLabel.height / 4;
-        }
-        else {
-            var availableGridSpace = this.game.width;
-            BlockRenderer.Size = (availableGridSpace * 0.9) / Board.Columns;
-            this.horizontalMargin = (this.game.width - Board.Columns * BlockRenderer.Size) / 2;
-            this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.Size) / 2;
-            this.board.Renderer.Group.x = this.horizontalMargin;
-            this.board.Renderer.Group.y = this.verticalMargin;
-            this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1, false);
-            this.backButton.x = 0;
-            this.backButton.y = 0;
-            this.ScaleSprite(this.timeLabel, this.game.width / 3, this.verticalMargin, 0, 1, false);
-            this.timeLabel.x = this.game.world.centerX - this.game.width / 3 + this.horizontalMargin;
-            this.timeLabel.y = this.verticalMargin / 2;
-            this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.verticalMargin, 0, 0.5, false);
-            this.clockRenderer.ClockText.x = this.game.world.centerX - this.game.width / 3 + this.horizontalMargin;
-            this.clockRenderer.ClockText.y = this.verticalMargin / 2 + this.timeLabel.height / 4;
-            this.ScaleSprite(this.scoreLabel, this.game.width / 3, this.verticalMargin, 0, 1, false);
-            this.scoreLabel.x = this.game.world.centerX + this.game.width / 3 - this.horizontalMargin;
-            this.scoreLabel.y = this.verticalMargin / 2;
-            this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.verticalMargin, 10, 0.5, false);
-            this.scoreboardRenderer.ScoreText.x = this.game.world.centerX + this.game.width / 3 - this.horizontalMargin;
-            this.scoreboardRenderer.ScoreText.y = this.verticalMargin / 2 + this.scoreLabel.height / 4;
-        }
+        var shortDimension = Math.min(this.game.width, this.game.height);
+        BlockRenderer.Size = shortDimension * 0.8 / Board.Rows;
+        this.board.Renderer.Group.x = this.world.centerX - BlockRenderer.Size * Board.Columns / 2;
+        this.board.Renderer.Group.y = this.world.centerY - BlockRenderer.Size * Board.Rows / 2;
         for (var x = 0; x < Board.Columns; x++) {
             for (var y = 0; y < Board.Rows; y++) {
-                this.ScaleSprite(this.board.Blocks[x][y].Sprite, BlockRenderer.Size, BlockRenderer.Size, 0, 1, true);
+                this.board.Blocks[x][y].Sprite.width = BlockRenderer.Size;
+                this.board.Blocks[x][y].Sprite.height = BlockRenderer.Size;
             }
         }
-    };
-    GameplayState.prototype.ScaleSprite = function (sprite, availableSpaceWidth, availableSpaceHeight, padding, scaleMultiplier, isFullScale) {
-        var scale = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding, isFullScale);
-        sprite.scale.x = scale * scaleMultiplier;
-        sprite.scale.y = scale * scaleMultiplier;
-    };
-    GameplayState.prototype.GetSpriteScale = function (spriteWidth, spriteHeight, availableSpaceWidth, availableSpaceHeight, minimumPadding, isFullScale) {
-        var ratio = 1;
-        var devicePixelRatio = window.devicePixelRatio;
-        // Sprite needs to fit in either width or height
-        var widthRatio = (spriteWidth * devicePixelRatio + 2 * minimumPadding) / availableSpaceWidth;
-        var heightRatio = (spriteHeight * devicePixelRatio + 2 * minimumPadding) / availableSpaceHeight;
-        if (widthRatio > 1 || heightRatio > 1 || isFullScale) {
-            ratio = 1 / Math.max(widthRatio, heightRatio);
-        }
-        return ratio * devicePixelRatio;
+        this.backButton.width = 50;
+        this.backButton.height = 50;
+        this.backButton.x = 10;
+        this.backButton.y = 10;
+        this.scoreText.fontSize = shortDimension * 0.1;
+        this.scoreText.x = this.world.centerX;
+        this.scoreText.y = 0;
+        this.clockText.x = this.game.width - 10;
+        this.clockText.y = 10;
     };
     GameplayState.prototype.update = function () {
         this.board.Update();
@@ -680,8 +629,8 @@ var GameplayState = (function (_super) {
             default:
                 break;
         }
-        this.scoreboardRenderer.Update();
-        this.clockRenderer.Update();
+        this.scoreText.text = this.scoreboard.Score.toLocaleString();
+        this.clockText.text = (this.clock.TimeRemaining / 1000).toFixed(0);
     };
     return GameplayState;
 }(Phaser.State));
@@ -844,8 +793,6 @@ var LoadingState = (function (_super) {
         this.load.image("LoginButton", "assets/sprites/loginbutton.png");
         this.load.image("UseResponseLogo", "assets/sprites/UseResponseLogo.png");
         this.load.image("Block", "assets/sprites/block.png");
-        this.load.image("TimeLabel", "assets/sprites/timelabel.png");
-        this.load.image("ScoreLabel", "assets/sprites/scorelabel.png");
         this.load.image("BackButton", "assets/sprites/backbutton.png?v=2");
         this.load.image("NextGameCountdownLabel", "assets/sprites/nextgamecountdownlabel.png");
         this.load.image("TotalScoreLabel", "assets/sprites/totalscorelabel.png");

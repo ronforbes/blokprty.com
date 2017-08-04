@@ -1,15 +1,11 @@
 class GameplayState extends Phaser.State {
     private backgroundImage: Phaser.Image;
+    private scoreText: Phaser.Text;
+    private clockText: Phaser.Text;
     private board: Board;
     private scoreboard: Scoreboard;
-    private scoreboardRenderer: ScoreboardRenderer;
-    private scoreLabel: Phaser.Image;
     private clock: Clock;
-    private clockRenderer: ClockRenderer;
-    private timeLabel: Phaser.Image;
     private backButton: Phaser.Button;
-    private horizontalMargin: number;
-    private verticalMargin: number;
     private name: string;
 
     init(clock: Clock, scoreboard: Scoreboard, name: string) {
@@ -45,15 +41,11 @@ class GameplayState extends Phaser.State {
 
         this.scoreboard.Reset();
 
-        this.scoreLabel = this.add.image(0, 0, "ScoreLabel");
-        this.scoreLabel.anchor.setTo(0.5);
+        this.scoreText = this.add.text(0, 0, "0", { font: "70px Arial", fill: "#ffffff", align: "center" });
+        this.scoreText.anchor.setTo(0.5, 0);
 
-        this.scoreboardRenderer = new ScoreboardRenderer(this.scoreboard, this);
-
-        this.timeLabel = this.add.image(0, 0, "TimeLabel");
-        this.timeLabel.anchor.setTo(0.5);
-
-        this.clockRenderer = new ClockRenderer(this.clock, this);
+        this.clockText = this.add.text(0, 0, "120", { font: "40px Arial", fill: "#ffffff", align: "right" });
+        this.clockText.anchor.setTo(1, 0);
 
         this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButton_Click, this);
 
@@ -68,92 +60,30 @@ class GameplayState extends Phaser.State {
         this.backgroundImage.width = this.game.width;
         this.backgroundImage.height = this.game.height;
 
-        let isLandscape = this.game.height / this.game.width < 1.3 ? true : false;
+        let shortDimension: number = Math.min(this.game.width, this.game.height);
+        BlockRenderer.Size = shortDimension * 0.8 / Board.Rows;
 
-        if(isLandscape) {
-            let availableGridSpace: number = Math.min(this.game.width * 2 / 3, this.game.height);
-            BlockRenderer.Size = (availableGridSpace * 0.9) / Board.Rows;
-            this.horizontalMargin = this.game.width * 0.95 - Board.Columns * BlockRenderer.Size
-            this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.Size) / 2;
-
-            this.board.Renderer.Group.x = this.horizontalMargin;
-            this.board.Renderer.Group.y = this.verticalMargin;
-
-            this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1, false);
-            this.backButton.x = 0;
-            this.backButton.y = 0;
-
-            this.ScaleSprite(this.timeLabel, this.game.width / 3, this.game.height / 3, 0, 1, false);
-            this.timeLabel.x = this.horizontalMargin / 2;
-            this.timeLabel.y = this.world.centerY - this.game.height / 3;
-
-            this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1, false);
-            this.clockRenderer.ClockText.x = this.horizontalMargin / 2;
-            this.clockRenderer.ClockText.y = this.world.centerY - this.game.height / 3 + this.timeLabel.height / 4;
-            
-            this.ScaleSprite(this.scoreLabel, this.game.width / 3, this.game.height / 3, 0, 1, false);
-            this.scoreLabel.x = this.horizontalMargin / 2;
-            this.scoreLabel.y = this.world.centerY;
-            
-            this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.game.height / 3, 50, 1, false);
-            this.scoreboardRenderer.ScoreText.x = this.horizontalMargin / 2;
-            this.scoreboardRenderer.ScoreText.y = this.world.centerY + this.scoreLabel.height / 4;
-        } else {
-            let availableGridSpace: number = this.game.width;
-            BlockRenderer.Size = (availableGridSpace * 0.9) / Board.Columns;
-            this.horizontalMargin = (this.game.width - Board.Columns * BlockRenderer.Size) / 2;
-            this.verticalMargin = (this.game.height - Board.Rows * BlockRenderer.Size) / 2;
-
-            this.board.Renderer.Group.x = this.horizontalMargin;
-            this.board.Renderer.Group.y = this.verticalMargin;
-
-            this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1, false);
-            this.backButton.x = 0;
-            this.backButton.y = 0;
-
-            this.ScaleSprite(this.timeLabel, this.game.width / 3, this.verticalMargin, 0, 1, false);
-            this.timeLabel.x = this.game.world.centerX - this.game.width / 3 + this.horizontalMargin;
-            this.timeLabel.y = this.verticalMargin / 2;
-
-            this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.verticalMargin, 0, 0.5, false);
-            this.clockRenderer.ClockText.x = this.game.world.centerX - this.game.width / 3 + this.horizontalMargin;
-            this.clockRenderer.ClockText.y = this.verticalMargin / 2 + this.timeLabel.height / 4;
-            
-            this.ScaleSprite(this.scoreLabel, this.game.width / 3, this.verticalMargin, 0, 1, false);
-            this.scoreLabel.x = this.game.world.centerX + this.game.width / 3 - this.horizontalMargin;
-            this.scoreLabel.y = this.verticalMargin / 2;
-
-            this.ScaleSprite(this.scoreboardRenderer.ScoreText, this.game.width / 3, this.verticalMargin, 10, 0.5, false);
-            this.scoreboardRenderer.ScoreText.x = this.game.world.centerX + this.game.width / 3 - this.horizontalMargin;
-            this.scoreboardRenderer.ScoreText.y = this.verticalMargin / 2 + this.scoreLabel.height / 4;
-        }
+        this.board.Renderer.Group.x = this.world.centerX - BlockRenderer.Size * Board.Columns / 2;
+        this.board.Renderer.Group.y = this.world.centerY - BlockRenderer.Size * Board.Rows / 2;
 
         for(let x = 0; x < Board.Columns; x++) {
             for(let y = 0; y < Board.Rows; y++) {
-                this.ScaleSprite(this.board.Blocks[x][y].Sprite, BlockRenderer.Size, BlockRenderer.Size, 0, 1, true);
+                this.board.Blocks[x][y].Sprite.width = BlockRenderer.Size;
+                this.board.Blocks[x][y].Sprite.height = BlockRenderer.Size;
             }
         }
-    }
 
-    ScaleSprite(sprite, availableSpaceWidth: number, availableSpaceHeight: number, padding: number, scaleMultiplier: number, isFullScale) {
-        let scale: number = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding, isFullScale);
-        sprite.scale.x = scale * scaleMultiplier;
-        sprite.scale.y = scale * scaleMultiplier;
-    }
+        this.backButton.width = 50;
+        this.backButton.height = 50;
+        this.backButton.x = 10;
+        this.backButton.y = 10;
 
-    GetSpriteScale(spriteWidth: number, spriteHeight: number, availableSpaceWidth: number, availableSpaceHeight: number, minimumPadding: number, isFullScale: boolean): number {
-        let ratio: number = 1;
-        let devicePixelRatio = window.devicePixelRatio;
+        this.scoreText.fontSize = shortDimension * 0.1;
+        this.scoreText.x = this.world.centerX;
+        this.scoreText.y = 0;
 
-        // Sprite needs to fit in either width or height
-        let widthRatio = (spriteWidth * devicePixelRatio + 2 * minimumPadding) / availableSpaceWidth;
-        let heightRatio = (spriteHeight * devicePixelRatio + 2 * minimumPadding) / availableSpaceHeight;
-
-        if(widthRatio > 1 || heightRatio > 1 || isFullScale) {
-            ratio = 1 / Math.max(widthRatio, heightRatio);
-        }
-
-        return ratio * devicePixelRatio;
+        this.clockText.x = this.game.width - 10;
+        this.clockText.y = 10;
     }
     
     update() {
@@ -172,7 +102,8 @@ class GameplayState extends Phaser.State {
                 break;
         }
 
-        this.scoreboardRenderer.Update();
-        this.clockRenderer.Update();
+        this.scoreText.text = this.scoreboard.Score.toLocaleString();
+
+        this.clockText.text = (this.clock.TimeRemaining / 1000).toFixed(0);
     }
 }

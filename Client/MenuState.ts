@@ -3,12 +3,12 @@ class MenuState extends Phaser.State {
     private logoImage: Phaser.Image;
     private playButton: Phaser.Button;
     private loginButton: Phaser.Button;
+    private nameText: Phaser.Text;
     private feedbackButton: Phaser.Button;
     private feedbackLabel: Phaser.Text;
     private clock: Clock;
     private scoreboard: Scoreboard;
     static Name: string;
-    private nameText: Phaser.Text;
     static LoggedIn: boolean;
 
     init(clock: Clock, scoreboard: Scoreboard, name: string) {
