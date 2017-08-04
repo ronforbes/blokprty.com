@@ -73,7 +73,7 @@ class GameplayState extends Phaser.State {
             }
         }
 
-        this.backButton.width = 50;
+        this.backButton.width = 40;
         this.backButton.height = 50;
         this.backButton.x = 10;
         this.backButton.y = 10;

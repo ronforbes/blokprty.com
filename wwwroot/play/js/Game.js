@@ -606,7 +606,7 @@ var GameplayState = (function (_super) {
                 this.board.Blocks[x][y].Sprite.height = BlockRenderer.Size;
             }
         }
-        this.backButton.width = 50;
+        this.backButton.width = 40;
         this.backButton.height = 50;
         this.backButton.x = 10;
         this.backButton.y = 10;
@@ -793,7 +793,7 @@ var LoadingState = (function (_super) {
         this.load.image("LoginButton", "assets/sprites/loginbutton.png");
         this.load.image("UseResponseLogo", "assets/sprites/UseResponseLogo.png");
         this.load.image("Block", "assets/sprites/block.png?v=1");
-        this.load.image("BackButton", "assets/sprites/backbutton.png?v=2");
+        this.load.image("BackButton", "assets/sprites/backbutton.png?v=3");
         this.load.image("NextGameCountdownLabel", "assets/sprites/nextgamecountdownlabel.png");
         this.load.image("TotalScoreLabel", "assets/sprites/totalscorelabel.png");
         this.load.image("LeaderboardLabel", "assets/sprites/leaderboardlabel.png");
