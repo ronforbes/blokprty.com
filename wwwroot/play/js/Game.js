@@ -792,7 +792,7 @@ var LoadingState = (function (_super) {
         this.load.image("PlayButton", "assets/sprites/playbutton.png?v=1");
         this.load.image("LoginButton", "assets/sprites/loginbutton.png");
         this.load.image("UseResponseLogo", "assets/sprites/UseResponseLogo.png");
-        this.load.image("Block", "assets/sprites/block.png");
+        this.load.image("Block", "assets/sprites/block.png?v=1");
         this.load.image("BackButton", "assets/sprites/backbutton.png?v=2");
         this.load.image("NextGameCountdownLabel", "assets/sprites/nextgamecountdownlabel.png");
         this.load.image("TotalScoreLabel", "assets/sprites/totalscorelabel.png");
