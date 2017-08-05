@@ -10,18 +10,19 @@ class LeaderboardResult {
 
 class LeaderboardState extends Phaser.State {
     private clock: Clock;
-    private nextGameCountdownLabel: Phaser.Image;
-    private clockRenderer: ClockRenderer;
     private scoreboard: Scoreboard;
+    private name: string;
+    private request: XMLHttpRequest;
     private backgroundImage: Phaser.Image;
+    private clockText: Phaser.Text;
+    private rankLabel: Phaser.Text;
     private rankText: Phaser.Text;
+    private nameLabel: Phaser.Text;
     private nameText: Phaser.Text;
+    private scoreLabel: Phaser.Text;
     private scoreText: Phaser.Text;
     private backButton: Phaser.Button;
-    private request: XMLHttpRequest;
-    private leaderboardLabel: Phaser.Image;
     static LeaderboardResults: LeaderboardResult[];
-    private name: string;
 
     init(clock: Clock, scoreboard: Scoreboard, name: string) {
         if(clock != undefined) {
@@ -50,27 +51,31 @@ class LeaderboardState extends Phaser.State {
 
         this.backgroundImage = this.add.image(0, 0, "Background");
 
-        this.nextGameCountdownLabel = this.add.image(0, 0, "NextGameCountdownLabel");
-        this.nextGameCountdownLabel.anchor.setTo(0.5);
+        this.clockText = this.add.text(0, 0, "15", { font: "40px Arial", fill: "#ffffff", align: "right" });
+        this.clockText.anchor.setTo(1, 0);
 
-        let rankStyle = { font: "20px Arial", fill: "#ffffff", align: "left" };
+        this.rankLabel = this.add.text(0, 0, "Rank", { font: "bold 20px Arial", fill: "#ffffff", align: "left" });
+        this.rankLabel.anchor.setTo(0, 0);
+
+        let rankStyle = { font: "20px Arial", fill: "#ffffff", align: "right" };
         this.rankText = this.add.text(0, 0, "Loading...", rankStyle);
-        this.rankText.anchor.setTo(0, 0);
+        this.rankText.anchor.setTo(1, 0);
 
-        let nameStyle = { font: "20px Arial", fill: "#ffffff", align: "center" };
+        this.nameLabel = this.add.text(0, 0, "Name", { font: "bold 20px Arial", fill: "#ffffff", align: "left" });
+        this.nameLabel.anchor.setTo(0, 0);
+
+        let nameStyle = { font: "20px Arial", fill: "#ffffff", align: "left" };
         this.nameText = this.add.text(0, 0, "Loading...", nameStyle);
-        this.nameText.anchor.setTo(0.5, 0);
+        this.nameText.anchor.setTo(0, 0);
+
+        this.scoreLabel = this.add.text(0, 0, "Score", { font: "bold 20px Arial", fill: "#ffffff", align: "right" });
+        this.scoreLabel.anchor.setTo(1, 0);
 
         let scoreStyle = { font: "20px Arial", fill: "#ffffff", align: "right" };
         this.scoreText = this.add.text(0, 0, "Loading...", scoreStyle);
         this.scoreText.anchor.setTo(1, 0);
 
-        this.clockRenderer = new ClockRenderer(this.clock, this);
-
         this.backButton = this.game.add.button(0, 0, "BackButton", this.OnBackButton_Click, this);
-
-        this.leaderboardLabel = this.game.add.image(0, 0, "LeaderboardLabel");
-        this.leaderboardLabel.anchor.setTo(0.5, 0);
 
         this.request = new XMLHttpRequest();
         this.request.onreadystatechange = this.OnServerLeaderboardReceived;            
@@ -96,54 +101,31 @@ class LeaderboardState extends Phaser.State {
         this.backgroundImage.width = this.game.width;
         this.backgroundImage.height = this.game.height;
 
-        this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1);
-        this.backButton.x = 0;
-        this.backButton.y = 0;
+        this.backButton.width = 40;
+        this.backButton.height = 50;
+        this.backButton.x = 10;
+        this.backButton.y = 10;
 
-        this.ScaleSprite(this.nextGameCountdownLabel, this.game.width / 3, this.game.height / 3, 0, 1);
-        this.nextGameCountdownLabel.x = this.game.width - this.nextGameCountdownLabel.width / 2;
-        this.nextGameCountdownLabel.y = this.nextGameCountdownLabel.height / 4;
+        this.clockText.x = this.game.width - 10;
+        this.clockText.y = 10;
 
-        this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1);
-        this.clockRenderer.ClockText.x = this.game.width - this.nextGameCountdownLabel.width / 2;
-        this.clockRenderer.ClockText.y = this.nextGameCountdownLabel.height / 2;
+        this.rankLabel.x = 10;
+        this.rankLabel.y = this.clockText.y + this.clockText.height + 10;
 
-        this.ScaleSprite(this.leaderboardLabel, this.game.width, this.game.height / 3, 0, 1);
-        this.leaderboardLabel.x = this.world.centerX;
-        this.leaderboardLabel.y = this.nextGameCountdownLabel.height;
+        this.nameLabel.x = this.rankLabel.x + this.rankLabel.width + 10;
+        this.nameLabel.y = this.rankLabel.y;
 
-        this.ScaleSprite(this.rankText, this.game.width / 3, this.game.height / 3, 0, 1);
-        this.rankText.x = 0;
-        this.rankText.y = this.nextGameCountdownLabel.height + this.leaderboardLabel.height;
+        this.scoreLabel.x = this.game.width - 10;
+        this.scoreLabel.y = this.rankLabel.y;
 
-        this.ScaleSprite(this.nameText, this.game.width / 3, this.game.height / 3, 0, 1);
-        this.nameText.x = this.world.centerX;
-        this.nameText.y = this.nextGameCountdownLabel.height + this.leaderboardLabel.height;
+        this.rankText.x = this.rankLabel.x + this.rankLabel.width;
+        this.rankText.y = this.rankLabel.y + this.rankLabel.height;
 
-        this.ScaleSprite(this.scoreText, this.game.width / 3, this.game.height / 3, 0, 1);
-        this.scoreText.x = this.game.width;
-        this.scoreText.y = this.nextGameCountdownLabel.height + this.leaderboardLabel.height;
-    }
+        this.nameText.x = this.nameLabel.x;
+        this.nameText.y = this.nameLabel.y + this.nameLabel.height;
 
-    ScaleSprite(sprite, availableSpaceWidth: number, availableSpaceHeight: number, padding: number, scaleMultiplier: number) {
-        let scale: number = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
-        sprite.scale.x = scale * scaleMultiplier;
-        sprite.scale.y = scale * scaleMultiplier;
-    }
-
-    GetSpriteScale(spriteWidth: number, spriteHeight: number, availableSpaceWidth: number, availableSpaceHeight: number, minimumPadding: number): number {
-        let ratio: number = 1;
-        let devicePixelRatio = window.devicePixelRatio;
-
-        // sprite needs to fit in either width or height
-        let widthRatio = (spriteWidth * devicePixelRatio + 2 * minimumPadding) / availableSpaceWidth;
-        let heightRatio = (spriteHeight * devicePixelRatio + 2 * minimumPadding) / availableSpaceHeight;
-
-        if(widthRatio > 1 || heightRatio > 1) {
-            ratio = 1 / Math.max(widthRatio, heightRatio);
-        }
-
-        return ratio * devicePixelRatio;
+        this.scoreText.x = this.scoreLabel.x;
+        this.scoreText.y = this.scoreLabel.y + this.scoreLabel.height;
     }
 
     update() {
@@ -173,6 +155,6 @@ class LeaderboardState extends Phaser.State {
                 break;
         }
         
-        this.clockRenderer.Update();
+        this.clockText.text = (this.clock.TimeRemaining / 1000).toFixed(0);
     }
 }

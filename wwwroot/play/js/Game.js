@@ -668,21 +668,24 @@ var LeaderboardState = (function (_super) {
             this.name = "Guest";
         }
         this.backgroundImage = this.add.image(0, 0, "Background");
-        this.nextGameCountdownLabel = this.add.image(0, 0, "NextGameCountdownLabel");
-        this.nextGameCountdownLabel.anchor.setTo(0.5);
-        var rankStyle = { font: "20px Arial", fill: "#ffffff", align: "left" };
+        this.clockText = this.add.text(0, 0, "15", { font: "40px Arial", fill: "#ffffff", align: "right" });
+        this.clockText.anchor.setTo(1, 0);
+        this.rankLabel = this.add.text(0, 0, "Rank", { font: "bold 20px Arial", fill: "#ffffff", align: "left" });
+        this.rankLabel.anchor.setTo(0, 0);
+        var rankStyle = { font: "20px Arial", fill: "#ffffff", align: "right" };
         this.rankText = this.add.text(0, 0, "Loading...", rankStyle);
-        this.rankText.anchor.setTo(0, 0);
-        var nameStyle = { font: "20px Arial", fill: "#ffffff", align: "center" };
+        this.rankText.anchor.setTo(1, 0);
+        this.nameLabel = this.add.text(0, 0, "Name", { font: "bold 20px Arial", fill: "#ffffff", align: "left" });
+        this.nameLabel.anchor.setTo(0, 0);
+        var nameStyle = { font: "20px Arial", fill: "#ffffff", align: "left" };
         this.nameText = this.add.text(0, 0, "Loading...", nameStyle);
-        this.nameText.anchor.setTo(0.5, 0);
+        this.nameText.anchor.setTo(0, 0);
+        this.scoreLabel = this.add.text(0, 0, "Score", { font: "bold 20px Arial", fill: "#ffffff", align: "right" });
+        this.scoreLabel.anchor.setTo(1, 0);
         var scoreStyle = { font: "20px Arial", fill: "#ffffff", align: "right" };
         this.scoreText = this.add.text(0, 0, "Loading...", scoreStyle);
         this.scoreText.anchor.setTo(1, 0);
-        this.clockRenderer = new ClockRenderer(this.clock, this);
         this.backButton = this.game.add.button(0, 0, "BackButton", this.OnBackButton_Click, this);
-        this.leaderboardLabel = this.game.add.image(0, 0, "LeaderboardLabel");
-        this.leaderboardLabel.anchor.setTo(0.5, 0);
         this.request = new XMLHttpRequest();
         this.request.onreadystatechange = this.OnServerLeaderboardReceived;
         this.request.open("GET", "/api/leaderboard", true);
@@ -701,43 +704,24 @@ var LeaderboardState = (function (_super) {
     LeaderboardState.prototype.resize = function () {
         this.backgroundImage.width = this.game.width;
         this.backgroundImage.height = this.game.height;
-        this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1);
-        this.backButton.x = 0;
-        this.backButton.y = 0;
-        this.ScaleSprite(this.nextGameCountdownLabel, this.game.width / 3, this.game.height / 3, 0, 1);
-        this.nextGameCountdownLabel.x = this.game.width - this.nextGameCountdownLabel.width / 2;
-        this.nextGameCountdownLabel.y = this.nextGameCountdownLabel.height / 4;
-        this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 50, 1);
-        this.clockRenderer.ClockText.x = this.game.width - this.nextGameCountdownLabel.width / 2;
-        this.clockRenderer.ClockText.y = this.nextGameCountdownLabel.height / 2;
-        this.ScaleSprite(this.leaderboardLabel, this.game.width, this.game.height / 3, 0, 1);
-        this.leaderboardLabel.x = this.world.centerX;
-        this.leaderboardLabel.y = this.nextGameCountdownLabel.height;
-        this.ScaleSprite(this.rankText, this.game.width / 3, this.game.height / 3, 0, 1);
-        this.rankText.x = 0;
-        this.rankText.y = this.nextGameCountdownLabel.height + this.leaderboardLabel.height;
-        this.ScaleSprite(this.nameText, this.game.width / 3, this.game.height / 3, 0, 1);
-        this.nameText.x = this.world.centerX;
-        this.nameText.y = this.nextGameCountdownLabel.height + this.leaderboardLabel.height;
-        this.ScaleSprite(this.scoreText, this.game.width / 3, this.game.height / 3, 0, 1);
-        this.scoreText.x = this.game.width;
-        this.scoreText.y = this.nextGameCountdownLabel.height + this.leaderboardLabel.height;
-    };
-    LeaderboardState.prototype.ScaleSprite = function (sprite, availableSpaceWidth, availableSpaceHeight, padding, scaleMultiplier) {
-        var scale = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
-        sprite.scale.x = scale * scaleMultiplier;
-        sprite.scale.y = scale * scaleMultiplier;
-    };
-    LeaderboardState.prototype.GetSpriteScale = function (spriteWidth, spriteHeight, availableSpaceWidth, availableSpaceHeight, minimumPadding) {
-        var ratio = 1;
-        var devicePixelRatio = window.devicePixelRatio;
-        // sprite needs to fit in either width or height
-        var widthRatio = (spriteWidth * devicePixelRatio + 2 * minimumPadding) / availableSpaceWidth;
-        var heightRatio = (spriteHeight * devicePixelRatio + 2 * minimumPadding) / availableSpaceHeight;
-        if (widthRatio > 1 || heightRatio > 1) {
-            ratio = 1 / Math.max(widthRatio, heightRatio);
-        }
-        return ratio * devicePixelRatio;
+        this.backButton.width = 40;
+        this.backButton.height = 50;
+        this.backButton.x = 10;
+        this.backButton.y = 10;
+        this.clockText.x = this.game.width - 10;
+        this.clockText.y = 10;
+        this.rankLabel.x = 10;
+        this.rankLabel.y = this.clockText.y + this.clockText.height + 10;
+        this.nameLabel.x = this.rankLabel.x + this.rankLabel.width + 10;
+        this.nameLabel.y = this.rankLabel.y;
+        this.scoreLabel.x = this.game.width - 10;
+        this.scoreLabel.y = this.rankLabel.y;
+        this.rankText.x = this.rankLabel.x + this.rankLabel.width;
+        this.rankText.y = this.rankLabel.y + this.rankLabel.height;
+        this.nameText.x = this.nameLabel.x;
+        this.nameText.y = this.nameLabel.y + this.nameLabel.height;
+        this.scoreText.x = this.scoreLabel.x;
+        this.scoreText.y = this.scoreLabel.y + this.scoreLabel.height;
     };
     LeaderboardState.prototype.update = function () {
         this.clock.Update();
@@ -761,7 +745,7 @@ var LeaderboardState = (function (_super) {
             default:
                 break;
         }
-        this.clockRenderer.Update();
+        this.clockText.text = (this.clock.TimeRemaining / 1000).toFixed(0);
     };
     return LeaderboardState;
 }(Phaser.State));
@@ -1036,14 +1020,12 @@ var ResultsState = (function (_super) {
             this.name = "Guest";
         }
         this.backgroundImage = this.add.image(0, 0, "Background");
-        this.totalScoreLabel = this.add.image(0, 0, "TotalScoreLabel");
-        this.totalScoreLabel.anchor.setTo(0.5);
-        var style = { font: "48px Arial", fill: "#ffffff" };
-        this.scoreText = this.add.text(0, 0, this.scoreboard.Score.toString(), style);
-        this.scoreText.anchor.setTo(0.5, 0.5);
-        this.nextGameCountdownLabel = this.add.image(0, 0, "NextGameCountdownLabel");
-        this.nextGameCountdownLabel.anchor.setTo(0.5);
-        this.clockRenderer = new ClockRenderer(this.clock, this);
+        this.scoreLabel = this.add.text(0, 0, "Final Score", { font: "70px Arial", fill: "#ffffff", align: "center" });
+        this.scoreLabel.anchor.setTo(0.5, 0);
+        this.scoreText = this.add.text(0, 0, this.scoreboard.Score.toLocaleString(), { font: "70px Arial", fill: "#ffffff", align: "center" });
+        this.scoreText.anchor.setTo(0.5, 0);
+        this.clockText = this.add.text(0, 0, "15", { font: "40px Arial", fill: "#ffffff", align: "right" });
+        this.clockText.anchor.setTo(1, 0);
         this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButton_Click, this);
         this.request = new XMLHttpRequest();
         this.request.open("POST", "/api/gameresults", true);
@@ -1054,41 +1036,22 @@ var ResultsState = (function (_super) {
     ResultsState.prototype.OnBackButton_Click = function () {
         this.game.state.start("Menu", true, false, this.clock, this.scoreboard, this.name);
     };
-    ResultsState.prototype.ScaleSprite = function (sprite, availableSpaceWidth, availableSpaceHeight, padding, scaleMultiplier) {
-        var scale = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
-        sprite.scale.x = scale * scaleMultiplier;
-        sprite.scale.y = scale * scaleMultiplier;
-    };
-    ResultsState.prototype.GetSpriteScale = function (spriteWidth, spriteHeight, availableSpaceWidth, availableSpaceHeight, minimumPadding) {
-        var ratio = 1;
-        var devicePixelRatio = window.devicePixelRatio;
-        // sprite needs to fit in either width or height
-        var widthRatio = (spriteWidth * devicePixelRatio + 2 * minimumPadding) / availableSpaceWidth;
-        var heightRatio = (spriteHeight * devicePixelRatio + 2 * minimumPadding) / availableSpaceHeight;
-        if (widthRatio > 1 || heightRatio > 1) {
-            ratio = 1 / Math.max(widthRatio, heightRatio);
-        }
-        return ratio * devicePixelRatio;
-    };
     ResultsState.prototype.resize = function () {
         this.backgroundImage.width = this.game.width;
         this.backgroundImage.height = this.game.height;
-        this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1);
-        this.backButton.x = 0;
-        this.backButton.y = 0;
-        this.ScaleSprite(this.nextGameCountdownLabel, this.game.width / 3, this.game.height / 3, 0, 1);
-        this.nextGameCountdownLabel.x = this.game.width - this.nextGameCountdownLabel.width / 2;
-        this.nextGameCountdownLabel.y = this.nextGameCountdownLabel.height / 4;
-        this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 0, 1);
-        this.clockRenderer.ClockText.x = this.game.width - this.nextGameCountdownLabel.width / 2;
-        this.clockRenderer.ClockText.y = this.nextGameCountdownLabel.height / 2;
-        // position the score
-        this.ScaleSprite(this.totalScoreLabel, this.game.width / 2, this.game.height / 3, 0, 1);
-        this.totalScoreLabel.x = this.world.centerX;
-        this.totalScoreLabel.y = this.world.centerY;
-        this.ScaleSprite(this.scoreText, this.game.width / 2, this.game.height / 3, 0, 1);
+        this.backButton.width = 40;
+        this.backButton.height = 50;
+        this.backButton.x = 10;
+        this.backButton.y = 10;
+        this.clockText.x = this.game.width - 10;
+        this.clockText.y = 10;
+        var shortDimension = Math.min(this.game.width, this.game.height);
+        this.scoreText.fontSize = shortDimension * 0.1;
         this.scoreText.x = this.world.centerX;
-        this.scoreText.y = this.world.centerY + this.totalScoreLabel.height / 4;
+        this.scoreText.y = this.world.centerY;
+        this.scoreLabel.fontSize = shortDimension * 0.1;
+        this.scoreLabel.x = this.world.centerX;
+        this.scoreLabel.y = this.world.centerY - this.scoreText.height;
     };
     ResultsState.prototype.update = function () {
         this.clock.Update();
@@ -1102,7 +1065,7 @@ var ResultsState = (function (_super) {
             default:
                 break;
         }
-        this.clockRenderer.Update();
+        this.clockText.text = (this.clock.TimeRemaining / 1000).toFixed(0);
     };
     return ResultsState;
 }(Phaser.State));

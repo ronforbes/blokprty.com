@@ -1,14 +1,13 @@
 class ResultsState extends Phaser.State {
-    private backgroundImage: Phaser.Image;
-    private scoreboard: Scoreboard;
-    private scoreText: Phaser.Text;
     private clock: Clock;
-    private clockRenderer: ClockRenderer;
-    private backButton: Phaser.Button;
-    private nextGameCountdownLabel: Phaser.Image;
-    private totalScoreLabel: Phaser.Image;
-    private request: XMLHttpRequest;
+    private scoreboard: Scoreboard;
     private name: string;
+    private request: XMLHttpRequest;
+    private backgroundImage: Phaser.Image;
+    private scoreLabel: Phaser.Text;
+    private scoreText: Phaser.Text;
+    private clockText: Phaser.Text;
+    private backButton: Phaser.Button;
 
     init(clock: Clock, scoreboard: Scoreboard, name: string) {
         if(clock != undefined) {
@@ -37,17 +36,14 @@ class ResultsState extends Phaser.State {
 
         this.backgroundImage = this.add.image(0, 0, "Background");
 
-        this.totalScoreLabel = this.add.image(0, 0, "TotalScoreLabel");
-        this.totalScoreLabel.anchor.setTo(0.5);
+        this.scoreLabel = this.add.text(0, 0, "Final Score", { font: "70px Arial", fill: "#ffffff", align: "center" });
+        this.scoreLabel.anchor.setTo(0.5, 0);
 
-        let style = { font: "48px Arial", fill: "#ffffff" };
-        this.scoreText = this.add.text(0, 0, this.scoreboard.Score.toString(), style);
-        this.scoreText.anchor.setTo(0.5, 0.5);
+        this.scoreText = this.add.text(0, 0, this.scoreboard.Score.toLocaleString(), { font: "70px Arial", fill: "#ffffff", align: "center" });
+        this.scoreText.anchor.setTo(0.5, 0);
 
-        this.nextGameCountdownLabel = this.add.image(0, 0, "NextGameCountdownLabel");
-        this.nextGameCountdownLabel.anchor.setTo(0.5);
-
-        this.clockRenderer = new ClockRenderer(this.clock, this);
+        this.clockText = this.add.text(0, 0, "15", { font: "40px Arial", fill: "#ffffff", align: "right" });
+        this.clockText.anchor.setTo(1, 0);
 
         this.backButton = this.add.button(0, 0, "BackButton", this.OnBackButton_Click, this);
 
@@ -63,51 +59,26 @@ class ResultsState extends Phaser.State {
         this.game.state.start("Menu", true, false, this.clock, this.scoreboard, this.name);
     }
 
-    ScaleSprite(sprite, availableSpaceWidth: number, availableSpaceHeight: number, padding: number, scaleMultiplier: number) {
-        let scale: number = this.GetSpriteScale(sprite.width, sprite.height, availableSpaceWidth, availableSpaceHeight, padding);
-        sprite.scale.x = scale * scaleMultiplier;
-        sprite.scale.y = scale * scaleMultiplier;
-    }
-
-    GetSpriteScale(spriteWidth: number, spriteHeight: number, availableSpaceWidth: number, availableSpaceHeight: number, minimumPadding: number): number {
-        let ratio: number = 1;
-        let devicePixelRatio = window.devicePixelRatio;
-
-        // sprite needs to fit in either width or height
-        let widthRatio = (spriteWidth * devicePixelRatio + 2 * minimumPadding) / availableSpaceWidth;
-        let heightRatio = (spriteHeight * devicePixelRatio + 2 * minimumPadding) / availableSpaceHeight;
-
-        if(widthRatio > 1 || heightRatio > 1) {
-            ratio = 1 / Math.max(widthRatio, heightRatio);
-        }
-
-        return ratio * devicePixelRatio;
-    }
-
     resize() {
         this.backgroundImage.width = this.game.width;
         this.backgroundImage.height = this.game.height;
 
-        this.ScaleSprite(this.backButton, this.game.width / 10, this.game.height / 10, 0, 1);
-        this.backButton.x = 0;
-        this.backButton.y = 0;
+        this.backButton.width = 40;
+        this.backButton.height = 50;
+        this.backButton.x = 10;
+        this.backButton.y = 10;
 
-        this.ScaleSprite(this.nextGameCountdownLabel, this.game.width / 3, this.game.height / 3, 0, 1);
-        this.nextGameCountdownLabel.x = this.game.width - this.nextGameCountdownLabel.width / 2;
-        this.nextGameCountdownLabel.y = this.nextGameCountdownLabel.height / 4;
-
-        this.ScaleSprite(this.clockRenderer.ClockText, this.game.width / 3, this.game.height / 3, 0, 1);
-        this.clockRenderer.ClockText.x = this.game.width - this.nextGameCountdownLabel.width / 2;
-        this.clockRenderer.ClockText.y = this.nextGameCountdownLabel.height / 2;
-
-        // position the score
-        this.ScaleSprite(this.totalScoreLabel, this.game.width / 2, this.game.height / 3, 0, 1);
-        this.totalScoreLabel.x = this.world.centerX;
-        this.totalScoreLabel.y = this.world.centerY;
+        this.clockText.x = this.game.width - 10;
+        this.clockText.y = 10;
         
-        this.ScaleSprite(this.scoreText, this.game.width / 2, this.game.height / 3, 0, 1);
+        let shortDimension: number = Math.min(this.game.width, this.game.height);
+        this.scoreText.fontSize = shortDimension * 0.1;
         this.scoreText.x = this.world.centerX;
-        this.scoreText.y = this.world.centerY + this.totalScoreLabel.height / 4;
+        this.scoreText.y = this.world.centerY;
+
+        this.scoreLabel.fontSize = shortDimension * 0.1;
+        this.scoreLabel.x = this.world.centerX;
+        this.scoreLabel.y = this.world.centerY - this.scoreText.height;
     }
 
     update() {
@@ -124,6 +95,6 @@ class ResultsState extends Phaser.State {
                 break;
         }
         
-        this.clockRenderer.Update();
+        this.clockText.text = (this.clock.TimeRemaining / 1000).toFixed(0);
     }
 }
