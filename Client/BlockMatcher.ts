@@ -1,6 +1,6 @@
 class BlockMatcher {
     private block: Block;
-    private elapsed: number;
+    Elapsed: number;
     private readonly duration: number = 1000;
 
     constructor(block: Block) {
@@ -10,7 +10,7 @@ class BlockMatcher {
     Match(matchedBlockCount: number, delayCounter: number) {
         this.block.State = BlockState.Matched;
 
-        this.elapsed = 0;
+        this.Elapsed = 0;
 
         this.block.Clearer.DelayDuration = (matchedBlockCount - delayCounter) * BlockClearer.DelayInterval;
         this.block.Emptier.DelayDuration = delayCounter * BlockEmptier.DelayInterval;
@@ -20,9 +20,9 @@ class BlockMatcher {
         // to do: return immediately if the game hasn't started or is over
 
         if(this.block.State == BlockState.Matched) {
-            this.elapsed += elapsedGameTime;
+            this.Elapsed += elapsedGameTime;
 
-            if(this.elapsed >= this.duration) {
+            if(this.Elapsed >= this.duration) {
                 this.block.Clearer.Clear();
             }
         }

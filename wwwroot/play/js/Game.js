@@ -137,15 +137,15 @@ var BlockMatcher = (function () {
     }
     BlockMatcher.prototype.Match = function (matchedBlockCount, delayCounter) {
         this.block.State = BlockState.Matched;
-        this.elapsed = 0;
+        this.Elapsed = 0;
         this.block.Clearer.DelayDuration = (matchedBlockCount - delayCounter) * BlockClearer.DelayInterval;
         this.block.Emptier.DelayDuration = delayCounter * BlockEmptier.DelayInterval;
     };
     BlockMatcher.prototype.Update = function (elapsedGameTime) {
         // to do: return immediately if the game hasn't started or is over
         if (this.block.State == BlockState.Matched) {
-            this.elapsed += elapsedGameTime;
-            if (this.elapsed >= this.duration) {
+            this.Elapsed += elapsedGameTime;
+            if (this.Elapsed >= this.duration) {
                 this.block.Clearer.Clear();
             }
         }
@@ -164,18 +164,36 @@ var BlockRenderer = (function () {
         ];
         this.block = block;
         this.block.Sprite.anchor.setTo(0.5);
+        if (BlockRenderer.StarEmitter == undefined) {
+            BlockRenderer.StarEmitter = this.block.Sprite.game.add.emitter(-100, -100, 10 * Board.Columns * Board.Rows);
+            BlockRenderer.StarEmitter.makeParticles("StarParticle");
+            BlockRenderer.StarEmitter.gravity = 0;
+            BlockRenderer.StarEmitter.minParticleScale = BlockRenderer.StarEmitter.maxParticleScale = 0.25;
+            BlockRenderer.StarEmitter.setAlpha(1, 0, 2000);
+            BlockRenderer.StarEmitter.setScale(0.25, 0, 0.25, 0, 2000);
+            BlockRenderer.StarEmitter.setXSpeed(-50, 50);
+            BlockRenderer.StarEmitter.setYSpeed(-50, 50);
+        }
+        if (BlockRenderer.CircleEmitter == undefined) {
+            BlockRenderer.CircleEmitter = this.block.Sprite.game.add.emitter(0, 0, Board.Columns * Board.Rows);
+            BlockRenderer.CircleEmitter.makeParticles("CircleParticle");
+            BlockRenderer.CircleEmitter.gravity = 0;
+            BlockRenderer.CircleEmitter.minParticleScale = BlockRenderer.StarEmitter.maxParticleScale = 0.5;
+            BlockRenderer.CircleEmitter.setAlpha(1, 0, 1500);
+            BlockRenderer.CircleEmitter.setScale(0, 1, 0, 1, 2000);
+            BlockRenderer.CircleEmitter.setXSpeed(0, 0);
+            BlockRenderer.CircleEmitter.setYSpeed(0, 0);
+        }
     }
     BlockRenderer.prototype.Update = function () {
         var timePercentage = 0;
         switch (this.block.State) {
             case BlockState.Empty:
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
-                //this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = false;
                 break;
             case BlockState.Idle:
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
-                //this.block.Sprite.scale.setTo(1, 1);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
                 this.block.Sprite.tint = this.colors[this.block.Type];
@@ -216,7 +234,7 @@ var BlockRenderer = (function () {
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
-                this.block.Sprite.tint = 0xffffff;
+                this.block.Sprite.tint = this.block.Matcher.Elapsed % 20 < 10 ? 0xffffff : this.colors[this.block.Type];
                 this.localScale = new Phaser.Point(this.block.Sprite.scale.x, this.block.Sprite.scale.y);
                 break;
             case BlockState.WaitingToClear:
@@ -233,6 +251,14 @@ var BlockRenderer = (function () {
                 this.block.Sprite.alpha = alpha;
                 var scale = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
                 this.block.Sprite.scale.setTo(scale * this.localScale.x, scale * this.localScale.y);
+                if (this.block.Clearer.Elapsed < BlockClearer.Duration * 0.1) {
+                    BlockRenderer.StarEmitter.x = this.block.Sprite.worldPosition.x;
+                    BlockRenderer.StarEmitter.y = this.block.Sprite.worldPosition.y;
+                    BlockRenderer.StarEmitter.start(true, 2000, null, 10);
+                    BlockRenderer.CircleEmitter.x = this.block.Sprite.worldPosition.x;
+                    BlockRenderer.CircleEmitter.y = this.block.Sprite.worldPosition.y;
+                    BlockRenderer.CircleEmitter.start(true, 2000, null, 1);
+                }
                 break;
             case BlockState.WaitingToEmpty:
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
@@ -469,6 +495,7 @@ var BootState = (function (_super) {
         // Disable pausing when page loses focus
         this.stage.disableVisibilityChange = true;
         this.game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
+        this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.state.start("Loading");
     };
     return BootState;
@@ -767,12 +794,11 @@ var LoadingState = (function (_super) {
         this.load.image("Logo", "assets/sprites/logo.png?v=1");
         this.load.image("PlayButton", "assets/sprites/playbutton.png?v=1");
         this.load.image("LoginButton", "assets/sprites/loginbutton.png");
-        this.load.image("UseResponseLogo", "assets/sprites/UseResponseLogo.png");
+        this.load.image("UseResponseLogo", "assets/sprites/useresponselogo.png");
         this.load.image("Block", "assets/sprites/block.png?v=1");
         this.load.image("BackButton", "assets/sprites/backbutton.png?v=3");
-        this.load.image("NextGameCountdownLabel", "assets/sprites/nextgamecountdownlabel.png");
-        this.load.image("TotalScoreLabel", "assets/sprites/totalscorelabel.png");
-        this.load.image("LeaderboardLabel", "assets/sprites/leaderboardlabel.png");
+        this.load.image("StarParticle", "assets/sprites/starparticle.png");
+        this.load.image("CircleParticle", "assets/sprites/circleparticle.png");
     };
     LoadingState.prototype.create = function () {
         var alphaTween = this.add.tween(this.loadingBar).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);

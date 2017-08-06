@@ -12,6 +12,8 @@ class BootState extends Phaser.State {
 
         this.game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
 
+        this.game.physics.startSystem(Phaser.Physics.ARCADE);
+        
         this.game.state.start("Loading");
     }
 }
