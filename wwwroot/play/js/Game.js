@@ -315,7 +315,7 @@ var Board = (function () {
         this.boardGravity.Update();
     };
     Board.Columns = 8;
-    Board.Rows = 8;
+    Board.Rows = 9;
     return Board;
 }());
 var BoardController = (function () {
@@ -440,16 +440,19 @@ var BoardRenderer = (function () {
     function BoardRenderer(board, phaserGame, group) {
         this.phaserGame = phaserGame;
         this.Group = group;
-        //this.background = this.phaserGame.add.graphics(0, 0);
-        //this.Group.addChild(this.background);
-        //this.background.beginFill(0x333333);
-        //this.background.drawRect(0, 0, Board.Columns * BlockRenderer.Width, Board.Rows * BlockRenderer.Height);
-        //this.mask = this.phaserGame.add.graphics(0, 0);
-        //this.group.addChild(this.mask);
-        //this.mask.beginFill(0xffffff);
-        //this.mask.drawRect(-10, BlockRenderer.Height, Board.Columns * BlockRenderer.Width + 20, Board.Rows * BlockRenderer.Height - BlockRenderer.Height + 10);
-        //this.group.mask = this.mask;
+        this.background = this.phaserGame.add.graphics(0, 0);
+        this.Group.addChild(this.background);
+        this.mask = this.phaserGame.add.graphics(0, 0);
+        this.Group.addChild(this.mask);
+        this.Resize();
     }
+    BoardRenderer.prototype.Resize = function () {
+        this.background.beginFill(0x333333);
+        this.background.drawRect(0, BlockRenderer.Size, Board.Columns * BlockRenderer.Size, (Board.Rows - 1) * BlockRenderer.Size);
+        this.mask.beginFill(0xffffff);
+        this.mask.drawRect(0, BlockRenderer.Size, Board.Columns * BlockRenderer.Size, (Board.Rows - 1) * BlockRenderer.Size);
+        this.Group.mask = this.mask;
+    };
     return BoardRenderer;
 }());
 var BootState = (function (_super) {
@@ -524,18 +527,6 @@ var Clock = (function () {
     };
     return Clock;
 }());
-var ClockRenderer = (function () {
-    function ClockRenderer(clock, state) {
-        this.clock = clock;
-        var style = { font: "40px Arial", fill: "#ffffff" };
-        this.ClockText = state.add.text(0, 0, "", style);
-        this.ClockText.anchor.setTo(0.5);
-    }
-    ClockRenderer.prototype.Update = function () {
-        this.ClockText.text = (this.clock.TimeRemaining / 1000).toFixed(0);
-    };
-    return ClockRenderer;
-}());
 var Game = (function (_super) {
     __extends(Game, _super);
     function Game() {
@@ -597,9 +588,10 @@ var GameplayState = (function (_super) {
         this.backgroundImage.width = this.game.width;
         this.backgroundImage.height = this.game.height;
         var shortDimension = Math.min(this.game.width, this.game.height);
-        BlockRenderer.Size = shortDimension * 0.8 / Board.Rows;
+        BlockRenderer.Size = shortDimension * 0.8 / (Board.Rows - 1);
         this.board.Renderer.Group.x = this.world.centerX - BlockRenderer.Size * Board.Columns / 2;
         this.board.Renderer.Group.y = this.world.centerY - BlockRenderer.Size * Board.Rows / 2;
+        this.board.Renderer.Resize();
         for (var x = 0; x < Board.Columns; x++) {
             for (var y = 0; y < Board.Rows; y++) {
                 this.board.Blocks[x][y].Sprite.width = BlockRenderer.Size;
@@ -1081,16 +1073,4 @@ var Scoreboard = (function () {
         this.Score += this.matchValue;
     };
     return Scoreboard;
-}());
-var ScoreboardRenderer = (function () {
-    function ScoreboardRenderer(scoreboard, state) {
-        this.scoreboard = scoreboard;
-        var style = { font: "40px Arial", fill: "#ffffff" };
-        this.ScoreText = state.add.text(0, 0, "", style);
-        this.ScoreText.anchor.setTo(0.5);
-    }
-    ScoreboardRenderer.prototype.Update = function () {
-        this.ScoreText.text = this.scoreboard.Score.toString();
-    };
-    return ScoreboardRenderer;
 }());

@@ -61,10 +61,11 @@ class GameplayState extends Phaser.State {
         this.backgroundImage.height = this.game.height;
 
         let shortDimension: number = Math.min(this.game.width, this.game.height);
-        BlockRenderer.Size = shortDimension * 0.8 / Board.Rows;
+        BlockRenderer.Size = shortDimension * 0.8 / (Board.Rows - 1);
 
         this.board.Renderer.Group.x = this.world.centerX - BlockRenderer.Size * Board.Columns / 2;
         this.board.Renderer.Group.y = this.world.centerY - BlockRenderer.Size * Board.Rows / 2;
+        this.board.Renderer.Resize();
 
         for(let x = 0; x < Board.Columns; x++) {
             for(let y = 0; y < Board.Rows; y++) {
