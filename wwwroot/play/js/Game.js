@@ -21,12 +21,12 @@ var BlockState;
     BlockState[BlockState["WaitingToEmpty"] = 8] = "WaitingToEmpty";
 })(BlockState || (BlockState = {}));
 var Block = (function () {
-    function Block(board, group, scoreboard) {
+    function Block(board, group, scoreboard, signManager) {
         this.Sprite = group.create(0, 0, "Block");
         this.renderer = new BlockRenderer(this);
         this.Slider = new BlockSlider(this, board.MatchDetector);
         this.Matcher = new BlockMatcher(this);
-        this.Clearer = new BlockClearer(this, scoreboard);
+        this.Clearer = new BlockClearer(this, scoreboard, signManager);
         this.Emptier = new BlockEmptier(this);
         this.Faller = new BlockFaller(this);
     }
@@ -42,9 +42,10 @@ var Block = (function () {
     return Block;
 }());
 var BlockClearer = (function () {
-    function BlockClearer(block, scoreboard) {
+    function BlockClearer(block, scoreboard, signManager) {
         this.block = block;
         this.scoreboard = scoreboard;
+        this.signManager = signManager;
     }
     BlockClearer.prototype.Clear = function () {
         this.block.State = BlockState.WaitingToClear;
@@ -58,6 +59,7 @@ var BlockClearer = (function () {
                 this.block.State = BlockState.Clearing;
                 this.Elapsed = 0;
                 this.scoreboard.ScoreMatch();
+                this.signManager.CreateSign(this.block.X, this.block.Y, Scoreboard.MatchValue.toString(), BlockRenderer.Colors[this.block.Type]);
             }
         }
         if (this.block.State == BlockState.Clearing) {
@@ -154,14 +156,6 @@ var BlockMatcher = (function () {
 }());
 var BlockRenderer = (function () {
     function BlockRenderer(block) {
-        this.colors = [
-            0xff0000,
-            0x00ff00,
-            0x0000ff,
-            0xffff00,
-            0xff00ff,
-            0x00ffff
-        ];
         this.block = block;
         this.block.Sprite.anchor.setTo(0.5);
         if (BlockRenderer.StarEmitter == undefined) {
@@ -196,7 +190,7 @@ var BlockRenderer = (function () {
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
-                this.block.Sprite.tint = this.colors[this.block.Type];
+                this.block.Sprite.tint = BlockRenderer.Colors[this.block.Type];
                 break;
             case BlockState.Sliding:
                 var destination = 0;
@@ -214,39 +208,39 @@ var BlockRenderer = (function () {
                 else {
                     this.block.Sprite.visible = true;
                     this.block.Sprite.alpha = 1;
-                    this.block.Sprite.tint = this.colors[this.block.Type];
+                    this.block.Sprite.tint = BlockRenderer.Colors[this.block.Type];
                 }
                 break;
             case BlockState.WaitingToFall:
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
-                this.block.Sprite.tint = this.colors[this.block.Type];
+                this.block.Sprite.tint = BlockRenderer.Colors[this.block.Type];
                 break;
             case BlockState.Falling:
                 timePercentage = this.block.Faller.Elapsed / BlockFaller.Duration;
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2 + BlockRenderer.Size * timePercentage);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
-                this.block.Sprite.tint = this.colors[this.block.Type];
+                this.block.Sprite.tint = BlockRenderer.Colors[this.block.Type];
                 break;
             case BlockState.Matched:
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
-                this.block.Sprite.tint = this.block.Matcher.Elapsed % 20 < 10 ? 0xffffff : this.colors[this.block.Type];
+                this.block.Sprite.tint = this.block.Matcher.Elapsed % 20 < 10 ? 0xffffff : BlockRenderer.Colors[this.block.Type];
                 this.localScale = new Phaser.Point(this.block.Sprite.scale.x, this.block.Sprite.scale.y);
                 break;
             case BlockState.WaitingToClear:
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
-                this.block.Sprite.tint = this.colors[this.block.Type];
+                this.block.Sprite.tint = BlockRenderer.Colors[this.block.Type];
                 break;
             case BlockState.Clearing:
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
-                this.block.Sprite.tint = this.colors[this.block.Type];
+                this.block.Sprite.tint = BlockRenderer.Colors[this.block.Type];
                 var alpha = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
                 this.block.Sprite.alpha = alpha;
                 var scale = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
@@ -267,6 +261,14 @@ var BlockRenderer = (function () {
         }
     };
     BlockRenderer.Size = 0;
+    BlockRenderer.Colors = [
+        0xff0000,
+        0x00ff00,
+        0x0000ff,
+        0xffff00,
+        0xff00ff,
+        0x00ffff
+    ];
     return BlockRenderer;
 }());
 var SlideDirection;
@@ -308,11 +310,12 @@ var Board = (function () {
         this.MatchDetector = new MatchDetector(this);
         this.boardGroup = this.phaserGame.add.group();
         this.Renderer = new BoardRenderer(this, this.phaserGame, this.boardGroup);
+        this.signManager = new SignManager(phaserGame, this.boardGroup);
         this.Blocks = [];
         for (var x = 0; x < Board.Columns; x++) {
             this.Blocks[x] = [];
             for (var y = 0; y < Board.Rows; y++) {
-                this.Blocks[x][y] = new Block(this, this.boardGroup, scoreboard);
+                this.Blocks[x][y] = new Block(this, this.boardGroup, scoreboard, this.signManager);
                 this.Blocks[x][y].X = x;
                 this.Blocks[x][y].Y = y;
                 var type = this.GetRandomBlockType(x, y);
@@ -339,6 +342,7 @@ var Board = (function () {
         this.controller.Update();
         this.MatchDetector.Update();
         this.boardGravity.Update();
+        this.signManager.Update(this.phaserGame.time.elapsed);
     };
     Board.Columns = 8;
     Board.Rows = 9;
@@ -1089,14 +1093,102 @@ var ResultsState = (function (_super) {
 }(Phaser.State));
 var Scoreboard = (function () {
     function Scoreboard(phaserGame) {
-        this.matchValue = 10;
         this.Reset();
     }
     Scoreboard.prototype.Reset = function () {
         this.Score = 0;
     };
     Scoreboard.prototype.ScoreMatch = function () {
-        this.Score += this.matchValue;
+        this.Score += Scoreboard.MatchValue;
     };
+    Scoreboard.MatchValue = 10;
     return Scoreboard;
+}());
+var Sign = (function () {
+    function Sign(game, group) {
+        this.renderer = new SignRenderer(this, game, group);
+    }
+    Sign.prototype.Create = function (text, color) {
+        this.Text = text;
+        this.Color = color;
+        this.Active = true;
+        this.Elapsed = 0;
+    };
+    Sign.prototype.Update = function (elapsedGameTime) {
+        if (this.Active) {
+            this.Elapsed += elapsedGameTime;
+            this.renderer.Update(elapsedGameTime);
+            if (this.Elapsed >= Sign.Duration) {
+                this.Active = false;
+            }
+        }
+    };
+    Sign.Duration = 1000;
+    return Sign;
+}());
+var SignManager = (function () {
+    function SignManager(game, group) {
+        this.Signs = [];
+        for (var x = 0; x < Board.Columns; x++) {
+            this.Signs[x] = [];
+            for (var y = 0; y < Board.Rows; y++) {
+                this.Signs[x][y] = new Sign(game, group);
+                this.Signs[x][y].X = x;
+                this.Signs[x][y].Y = y;
+            }
+        }
+    }
+    SignManager.prototype.CreateSign = function (x, y, text, color) {
+        this.Signs[x][y].Create(text, color);
+    };
+    SignManager.prototype.Update = function (elapsedGameTime) {
+        for (var x = 0; x < Board.Columns; x++) {
+            for (var y = 0; y < Board.Rows; y++) {
+                this.Signs[x][y].Update(elapsedGameTime);
+            }
+        }
+    };
+    return SignManager;
+}());
+var SignRenderer = (function () {
+    function SignRenderer(sign, game, group) {
+        this.sign = sign;
+        this.text = game.add.text(0, 0, "", { font: "40px Arial" });
+        this.text.anchor.setTo(0.5);
+        this.group = group;
+        this.group.addChild(this.text);
+        this.group.bringToTop(this.text);
+    }
+    SignRenderer.prototype.Update = function (elapsedGameTime) {
+        if (this.sign.Active) {
+            this.text.x = this.sign.X * BlockRenderer.Size + BlockRenderer.Size / 2;
+            this.text.y = this.sign.Y * BlockRenderer.Size + BlockRenderer.Size / 2 - (this.sign.Elapsed / Sign.Duration) * BlockRenderer.Size;
+            this.text.alpha = 1 - (this.sign.Elapsed / Sign.Duration);
+            this.text.text = this.sign.Text;
+            var colorString = void 0;
+            switch (this.sign.Color) {
+                case 0x0000ff:
+                    colorString = "#0000ff";
+                    break;
+                case 0x00ff00:
+                    colorString = "#00ff00";
+                    break;
+                case 0xff0000:
+                    colorString = "#ff0000";
+                    break;
+                case 0x00ffff:
+                    colorString = "#00ffff";
+                    break;
+                case 0xff00ff:
+                    colorString = "#ff00ff";
+                    break;
+                case 0xffff00:
+                    colorString = "#ffff00";
+                    break;
+            }
+            this.text.addColor(colorString, 0);
+            this.group.bringToTop(this.text);
+        }
+    };
+    return SignRenderer;
 }());

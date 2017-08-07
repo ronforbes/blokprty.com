@@ -1,7 +1,7 @@
 class BlockRenderer {
     private block: Block;
     static Size: number = 0;
-    private readonly colors: number[] = [
+    static Colors: number[] = [
         0xff0000,
         0x00ff00,
         0x0000ff,
@@ -52,7 +52,7 @@ class BlockRenderer {
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
-                this.block.Sprite.tint = this.colors[this.block.Type];
+                this.block.Sprite.tint = BlockRenderer.Colors[this.block.Type];
                 break;
             
             case BlockState.Sliding:
@@ -74,7 +74,7 @@ class BlockRenderer {
                 else {
                     this.block.Sprite.visible = true;
                     this.block.Sprite.alpha = 1;
-                    this.block.Sprite.tint = this.colors[this.block.Type];
+                    this.block.Sprite.tint = BlockRenderer.Colors[this.block.Type];
                 }
                 break;
 
@@ -82,7 +82,7 @@ class BlockRenderer {
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
-                this.block.Sprite.tint = this.colors[this.block.Type];
+                this.block.Sprite.tint = BlockRenderer.Colors[this.block.Type];
                 break;
             
             case BlockState.Falling:
@@ -90,14 +90,14 @@ class BlockRenderer {
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2 + BlockRenderer.Size * timePercentage);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
-                this.block.Sprite.tint = this.colors[this.block.Type];
+                this.block.Sprite.tint = BlockRenderer.Colors[this.block.Type];
                 break;
             
             case BlockState.Matched:
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
-                this.block.Sprite.tint = this.block.Matcher.Elapsed % 20 < 10 ? 0xffffff : this.colors[this.block.Type];
+                this.block.Sprite.tint = this.block.Matcher.Elapsed % 20 < 10 ? 0xffffff : BlockRenderer.Colors[this.block.Type];
                 this.localScale = new Phaser.Point(this.block.Sprite.scale.x, this.block.Sprite.scale.y);
                 break;
 
@@ -105,13 +105,13 @@ class BlockRenderer {
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
                 this.block.Sprite.alpha = 1;
-                this.block.Sprite.tint = this.colors[this.block.Type];
+                this.block.Sprite.tint = BlockRenderer.Colors[this.block.Type];
                 break;
             
             case BlockState.Clearing:
                 this.block.Sprite.position.setTo(this.block.X * BlockRenderer.Size + BlockRenderer.Size / 2, this.block.Y * BlockRenderer.Size + BlockRenderer.Size / 2);
                 this.block.Sprite.visible = true;
-                this.block.Sprite.tint = this.colors[this.block.Type];
+                this.block.Sprite.tint = BlockRenderer.Colors[this.block.Type];
 
                 let alpha: number = 1.0 - this.block.Clearer.Elapsed / BlockClearer.Duration;
                 this.block.Sprite.alpha = alpha;
@@ -128,8 +128,7 @@ class BlockRenderer {
                     BlockRenderer.CircleEmitter.y = this.block.Sprite.worldPosition.y;
                     BlockRenderer.CircleEmitter.start(true, 2000, null, 1);
                 }
-                
-
+            
                 break;
 
             case BlockState.WaitingToEmpty:

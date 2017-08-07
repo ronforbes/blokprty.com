@@ -6,10 +6,12 @@ class BlockClearer {
     Elapsed: number;
     static readonly Duration: number = 250;
     private scoreboard: Scoreboard;
+    private signManager: SignManager;
 
-    constructor(block: Block, scoreboard: Scoreboard) {
+    constructor(block: Block, scoreboard: Scoreboard, signManager: SignManager) {
         this.block = block;
         this.scoreboard = scoreboard;
+        this.signManager = signManager;
     }
 
     Clear() {
@@ -30,6 +32,8 @@ class BlockClearer {
                 this.Elapsed = 0;
 
                 this.scoreboard.ScoreMatch();
+                
+                this.signManager.CreateSign(this.block.X, this.block.Y, Scoreboard.MatchValue.toString(), BlockRenderer.Colors[this.block.Type]);
             }
         }
 

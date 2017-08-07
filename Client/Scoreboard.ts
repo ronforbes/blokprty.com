@@ -1,6 +1,6 @@
 class Scoreboard {
     Score: number;
-    private readonly matchValue: number = 10;
+    static readonly MatchValue: number = 10;
 
     constructor(phaserGame: Phaser.Game) {
         this.Reset();
@@ -11,6 +11,6 @@ class Scoreboard {
     }
 
     ScoreMatch() {
-        this.Score += this.matchValue;
+        this.Score += Scoreboard.MatchValue;
     }
 }

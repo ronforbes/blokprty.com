@@ -1,7 +1,6 @@
 class BoardRenderer {
     private mask: Phaser.Graphics;
     private background: Phaser.Graphics;
-    //private position: Phaser.Point;
     private phaserGame: Phaser.Game;
     Group: Phaser.Group;
 

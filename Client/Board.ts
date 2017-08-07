@@ -7,6 +7,7 @@ class Board {
     MatchDetector: MatchDetector;
     private boardGravity: BoardGravity;
     private boardGroup: Phaser.Group;
+    private signManager: SignManager;
     Renderer: BoardRenderer;
 
     constructor(phaserGame: Phaser.Game, scoreboard: Scoreboard) {
@@ -18,13 +19,15 @@ class Board {
 
         this.Renderer = new BoardRenderer(this, this.phaserGame, this.boardGroup);        
 
+        this.signManager = new SignManager(phaserGame, this.boardGroup);
+        
         this.Blocks = [];
 
         for(let x = 0; x < Board.Columns; x++) {
             this.Blocks[x] = [];
 
             for(let y = 0; y < Board.Rows; y++) {
-                this.Blocks[x][y] = new Block(this, this.boardGroup, scoreboard);
+                this.Blocks[x][y] = new Block(this, this.boardGroup, scoreboard, this.signManager);
                 this.Blocks[x][y].X = x;
                 this.Blocks[x][y].Y = y;
 
@@ -62,5 +65,7 @@ class Board {
         this.MatchDetector.Update();
 
         this.boardGravity.Update();
+
+        this.signManager.Update(this.phaserGame.time.elapsed);
     }
 }
