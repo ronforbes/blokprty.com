@@ -23,6 +23,7 @@ class Block {
     Clearer: BlockClearer;
     Emptier: BlockEmptier;
     Faller: BlockFaller;
+    Chainer: BlockChainer;
 
     constructor(board: Board, group: Phaser.Group, scoreboard: Scoreboard, signManager: SignManager) {
         this.Sprite = group.create(0, 0, "Block");
@@ -33,6 +34,7 @@ class Block {
         this.Clearer = new BlockClearer(this, scoreboard, signManager);
         this.Emptier = new BlockEmptier(this);
         this.Faller = new BlockFaller(this);
+        this.Chainer = new BlockChainer();
     }
 
     Update(elapsedGameTime: number) {

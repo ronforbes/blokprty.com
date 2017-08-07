@@ -8,19 +8,22 @@ class Board {
     private boardGravity: BoardGravity;
     private boardGroup: Phaser.Group;
     private signManager: SignManager;
+    private chainDetector: ChainDetector;
     Renderer: BoardRenderer;
 
     constructor(phaserGame: Phaser.Game, scoreboard: Scoreboard) {
         this.phaserGame = phaserGame;
-
-        this.MatchDetector = new MatchDetector(this);
         
         this.boardGroup = this.phaserGame.add.group();
 
         this.Renderer = new BoardRenderer(this, this.phaserGame, this.boardGroup);        
 
         this.signManager = new SignManager(phaserGame, this.boardGroup);
-        
+
+        this.chainDetector = new ChainDetector(this, scoreboard);
+
+        this.MatchDetector = new MatchDetector(this, scoreboard, this.signManager, this.chainDetector);
+
         this.Blocks = [];
 
         for(let x = 0; x < Board.Columns; x++) {
@@ -63,6 +66,8 @@ class Board {
         this.controller.Update();
 
         this.MatchDetector.Update();
+
+        this.chainDetector.Update();
 
         this.boardGravity.Update();
 

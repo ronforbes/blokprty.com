@@ -5,7 +5,7 @@ class SignRenderer {
 
     constructor(sign: Sign, game: Phaser.Game, group: Phaser.Group) {
         this.sign = sign;
-        this.text = game.add.text(0, 0, "", { font: "40px Arial" });
+        this.text = game.add.text(0, 0, "", { font: "bold 40px Arial" });
         this.text.anchor.setTo(0.5);
         this.group = group;
         this.group.addChild(this.text);
@@ -37,6 +37,9 @@ class SignRenderer {
                     break;
                 case 0xffff00:
                     colorString = "#ffff00";
+                    break;
+                case 0xffffff:
+                    colorString = "#ffffff";
                     break;
             }
             this.text.addColor(colorString, 0);

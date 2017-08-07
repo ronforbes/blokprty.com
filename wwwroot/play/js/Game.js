@@ -29,6 +29,7 @@ var Block = (function () {
         this.Clearer = new BlockClearer(this, scoreboard, signManager);
         this.Emptier = new BlockEmptier(this);
         this.Faller = new BlockFaller(this);
+        this.Chainer = new BlockChainer();
     }
     Block.prototype.Update = function (elapsedGameTime) {
         this.renderer.Update();
@@ -40,6 +41,11 @@ var Block = (function () {
     };
     Block.TypeCount = 6;
     return Block;
+}());
+var BlockChainer = (function () {
+    function BlockChainer() {
+    }
+    return BlockChainer;
 }());
 var BlockClearer = (function () {
     function BlockClearer(block, scoreboard, signManager) {
@@ -88,6 +94,7 @@ var BlockEmptier = (function () {
             if (this.delayElapsed >= this.DelayDuration) {
                 this.block.State = BlockState.Empty;
                 this.block.Type = -1;
+                this.block.Chainer.JustEmptied = true;
             }
         }
     };
@@ -307,10 +314,11 @@ var BlockSlider = (function () {
 var Board = (function () {
     function Board(phaserGame, scoreboard) {
         this.phaserGame = phaserGame;
-        this.MatchDetector = new MatchDetector(this);
         this.boardGroup = this.phaserGame.add.group();
         this.Renderer = new BoardRenderer(this, this.phaserGame, this.boardGroup);
         this.signManager = new SignManager(phaserGame, this.boardGroup);
+        this.chainDetector = new ChainDetector(this, scoreboard);
+        this.MatchDetector = new MatchDetector(this, scoreboard, this.signManager, this.chainDetector);
         this.Blocks = [];
         for (var x = 0; x < Board.Columns; x++) {
             this.Blocks[x] = [];
@@ -341,6 +349,7 @@ var Board = (function () {
         }
         this.controller.Update();
         this.MatchDetector.Update();
+        this.chainDetector.Update();
         this.boardGravity.Update();
         this.signManager.Update(this.phaserGame.time.elapsed);
     };
@@ -504,6 +513,56 @@ var BootState = (function (_super) {
     };
     return BootState;
 }(Phaser.State));
+var ChainDetector = (function () {
+    function ChainDetector(board, scoreboard) {
+        this.board = board;
+        this.scoreboard = scoreboard;
+    }
+    ChainDetector.prototype.IncrementChain = function () {
+        this.ChainLength++;
+        this.scoreboard.ScoreChain(this.ChainLength);
+    };
+    ChainDetector.prototype.Update = function () {
+        var stopChain = true;
+        // detect blocks that are eligible to participate in chains
+        for (var x = 0; x < Board.Columns; x++) {
+            for (var y = Board.Rows - 1; y >= 0; y--) {
+                if (this.board.Blocks[x][y].Chainer.JustEmptied) {
+                    for (var chainEligibleRow = y - 1; chainEligibleRow >= 0; chainEligibleRow--) {
+                        if (this.board.Blocks[x][chainEligibleRow].State == BlockState.Idle) {
+                            this.board.Blocks[x][chainEligibleRow].Chainer.ChainEligible = true;
+                            stopChain = false;
+                        }
+                    }
+                }
+                this.board.Blocks[x][y].Chainer.JustEmptied = false;
+            }
+        }
+        // stop the current chain if all of the blocks are idle or empty
+        for (var x = 0; x < Board.Columns; x++) {
+            for (var y = 0; y < Board.Rows; y++) {
+                var state = this.board.Blocks[x][y].State;
+                if (state != BlockState.Idle &&
+                    state != BlockState.Empty &&
+                    state != BlockState.Sliding) {
+                    stopChain = false;
+                }
+            }
+        }
+        if (stopChain) {
+            for (var x = 0; x < Board.Columns; x++) {
+                for (var y = 0; y < Board.Rows; y++) {
+                    this.board.Blocks[x][y].Chainer.ChainEligible = false;
+                }
+            }
+            if (this.ChainLength > 1) {
+                // TODO: Play fanfare
+            }
+            this.ChainLength = 1;
+        }
+    };
+    return ChainDetector;
+}());
 var ClockState;
 (function (ClockState) {
     ClockState[ClockState["Gameplay"] = 0] = "Gameplay";
@@ -820,9 +879,12 @@ var MatchDetection = (function () {
     return MatchDetection;
 }());
 var MatchDetector = (function () {
-    function MatchDetector(board) {
+    function MatchDetector(board, scoreboard, signManager, chainDetector) {
         this.matchDetections = [];
         this.board = board;
+        this.scoreboard = scoreboard;
+        this.signManager = signManager;
+        this.chainDetector = chainDetector;
     }
     MatchDetector.prototype.RequestMatchDetection = function (block) {
         this.matchDetections.push(new MatchDetection(block));
@@ -837,6 +899,7 @@ var MatchDetector = (function () {
         }
     };
     MatchDetector.prototype.DetectMatch = function (block) {
+        var incrementChain = false;
         // look in four directions for matching blocks
         var left = block.X;
         while (left > 0 && this.board.Blocks[left - 1][block.Y].State == BlockState.Idle && this.board.Blocks[left - 1][block.Y].Type == block.Type) {
@@ -880,13 +943,27 @@ var MatchDetector = (function () {
             for (var x = left; x < right; x++) {
                 this.board.Blocks[x][block.Y].Matcher.Match(matchedBlockCount, delayCounter);
                 delayCounter--;
+                if (this.board.Blocks[x][block.Y].Chainer.ChainEligible) {
+                    incrementChain = true;
+                }
             }
         }
         if (verticalMatch) {
             for (var y = top; y < bottom; y++) {
                 this.board.Blocks[block.X][y].Matcher.Match(matchedBlockCount, delayCounter);
                 delayCounter--;
+                if (this.board.Blocks[block.X][y].Chainer.ChainEligible) {
+                    incrementChain = true;
+                }
             }
+        }
+        if (matchedBlockCount > MatchDetector.MinimumMatchLength) {
+            this.scoreboard.ScoreCombo(matchedBlockCount);
+            this.signManager.CreateSign(block.X, block.Y, matchedBlockCount.toString(), 0xffffff);
+        }
+        if (incrementChain) {
+            this.chainDetector.IncrementChain();
+            this.signManager.CreateSign(block.X, block.Y, this.chainDetector.ChainLength.toString() + "x", 0xffffff);
         }
     };
     MatchDetector.MinimumMatchLength = 3;
@@ -1101,7 +1178,15 @@ var Scoreboard = (function () {
     Scoreboard.prototype.ScoreMatch = function () {
         this.Score += Scoreboard.MatchValue;
     };
+    Scoreboard.prototype.ScoreCombo = function (length) {
+        this.Score += length * Scoreboard.ComboValue;
+    };
+    Scoreboard.prototype.ScoreChain = function (length) {
+        this.Score += length * Scoreboard.ChainValue;
+    };
     Scoreboard.MatchValue = 10;
+    Scoreboard.ComboValue = 100;
+    Scoreboard.ChainValue = 1000;
     return Scoreboard;
 }());
 var Sign = (function () {
@@ -1153,7 +1238,7 @@ var SignManager = (function () {
 var SignRenderer = (function () {
     function SignRenderer(sign, game, group) {
         this.sign = sign;
-        this.text = game.add.text(0, 0, "", { font: "40px Arial" });
+        this.text = game.add.text(0, 0, "", { font: "bold 40px Arial" });
         this.text.anchor.setTo(0.5);
         this.group = group;
         this.group.addChild(this.text);
@@ -1184,6 +1269,9 @@ var SignRenderer = (function () {
                     break;
                 case 0xffff00:
                     colorString = "#ffff00";
+                    break;
+                case 0xffffff:
+                    colorString = "#ffffff";
                     break;
             }
             this.text.addColor(colorString, 0);

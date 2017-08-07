@@ -9,11 +9,17 @@ class MatchDetection {
 class MatchDetector {
     private matchDetections: MatchDetection[];
     private board: Board;
+    private scoreboard: Scoreboard;
+    private signManager: SignManager;
+    private chainDetector: ChainDetector;
     static readonly MinimumMatchLength: number = 3;
 
-    constructor(board: Board) {
+    constructor(board: Board, scoreboard: Scoreboard, signManager: SignManager, chainDetector: ChainDetector) {
         this.matchDetections = [];
         this.board = board;
+        this.scoreboard = scoreboard;
+        this.signManager = signManager;
+        this.chainDetector = chainDetector;
     }
 
     RequestMatchDetection(block: Block) {
@@ -32,6 +38,8 @@ class MatchDetector {
     }
 
     private DetectMatch(block: Block) {
+        let incrementChain: boolean = false;
+
         // look in four directions for matching blocks
         let left: number = block.X;
         while(left > 0 && this.board.Blocks[left - 1][block.Y].State == BlockState.Idle && this.board.Blocks[left - 1][block.Y].Type == block.Type) {
@@ -85,6 +93,10 @@ class MatchDetector {
             for(let x: number = left; x < right; x++) {
                 this.board.Blocks[x][block.Y].Matcher.Match(matchedBlockCount, delayCounter);
                 delayCounter--;
+
+                if(this.board.Blocks[x][block.Y].Chainer.ChainEligible) {
+                    incrementChain = true;
+                }
             }
         }
 
@@ -92,7 +104,21 @@ class MatchDetector {
             for(let y: number = top; y < bottom; y++) {
                 this.board.Blocks[block.X][y].Matcher.Match(matchedBlockCount, delayCounter);
                 delayCounter--;
+
+                if(this.board.Blocks[block.X][y].Chainer.ChainEligible) {
+                    incrementChain = true;
+                }
             }
+        }
+
+        if(matchedBlockCount > MatchDetector.MinimumMatchLength) {
+            this.scoreboard.ScoreCombo(matchedBlockCount);
+            this.signManager.CreateSign(block.X, block.Y, matchedBlockCount.toString(), 0xffffff);
+        }
+
+        if(incrementChain) {
+            this.chainDetector.IncrementChain();
+            this.signManager.CreateSign(block.X, block.Y, this.chainDetector.ChainLength.toString() + "x", 0xffffff);
         }
     }
 }

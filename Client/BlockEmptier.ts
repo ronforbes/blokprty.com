@@ -23,6 +23,7 @@ class BlockEmptier {
             if(this.delayElapsed >= this.DelayDuration) {
                 this.block.State = BlockState.Empty;
                 this.block.Type = -1;
+                this.block.Chainer.JustEmptied = true;
             }
         }
     }

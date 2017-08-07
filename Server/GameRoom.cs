@@ -124,7 +124,7 @@ namespace blokprty.com_new {
                         LogState();
 
                         foreach(string name in botNames) {
-                            AddGameResults(new GameResults(name, random.Next(200) * 10));
+                            AddGameResults(new GameResults(name, random.Next(2000) * 10));
                         }
                     }
                     break;
