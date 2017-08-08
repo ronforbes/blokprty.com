@@ -853,8 +853,10 @@ var LoadingState = (function (_super) {
         this.loadingBar.position.setTo(this.world.centerX, this.world.centerY);
         this.load.setPreloadSprite(this.loadingBar);
         // Load game assets
-        this.load.image("Background", "assets/sprites/background.png");
+        this.load.image("Background", "assets/sprites/background.png?v=2");
+        this.load.image("BlokPrtyBG", "assets/sprites/blokprtybg.png");
         this.load.image("Logo", "assets/sprites/logo.png?v=1");
+        this.load.image("BlokPrty-Fixed", "assets/sprites/blokprty-fixed.png");
         this.load.image("PlayButton", "assets/sprites/playbutton.png?v=1");
         this.load.image("LoginButton", "assets/sprites/loginbutton.png");
         this.load.image("UseResponseLogo", "assets/sprites/useresponselogo.png");
@@ -995,16 +997,16 @@ var MenuState = (function (_super) {
         if (MenuState.Name == "" || MenuState.Name == undefined) {
             MenuState.Name = "Guest";
         }
-        this.backgroundImage = this.add.image(0, 0, "Background");
-        this.logoImage = this.add.image(0, 0, "Logo");
-        this.logoImage.anchor.setTo(0.5);
+        this.backgroundImage = this.add.tileSprite(0, 0, 1600, 1600, "BlokPrtyBG");
+        this.logoImage = this.add.image(0, 0, "BlokPrty-Fixed");
+        this.logoImage.anchor.setTo(0.5, 0);
         this.playButton = this.add.button(0, 0, "PlayButton", this.OnPlayButton_Click, this);
-        this.playButton.anchor.setTo(0.5);
+        this.playButton.anchor.setTo(0.5, 0);
         this.loginButton = this.add.button(0, 0, "LoginButton", this.OnLoginButton_Click, this);
-        this.loginButton.anchor.setTo(0.5);
+        this.loginButton.anchor.setTo(0.5, 0);
         var nameStyle = { font: "30px Arial", fill: "#ffffff", align: "center" };
         this.nameText = this.add.text(0, 0, "", nameStyle);
-        this.nameText.anchor.setTo(0.5);
+        this.nameText.anchor.setTo(0.5, 0);
         this.nameText.visible = false;
         this.feedbackButton = this.add.button(0, 0, "UseResponseLogo", this.OnFeedbackButton_Click, this);
         this.feedbackButton.anchor.setTo(0, 1);
@@ -1058,20 +1060,20 @@ var MenuState = (function (_super) {
     MenuState.prototype.resize = function () {
         this.backgroundImage.width = this.game.width;
         this.backgroundImage.height = this.game.height;
-        this.logoImage.width = this.game.width * 0.9;
-        this.logoImage.height = this.game.height / 3 * 0.9;
+        this.logoImage.width = this.game.width * 0.5;
+        this.logoImage.height = this.game.height * 0.5;
         this.logoImage.x = this.world.centerX;
-        this.logoImage.y = this.world.centerY - this.game.height / 3;
+        this.logoImage.y = this.game.height * 0.05;
         this.playButton.width = this.game.width * 0.5;
-        this.playButton.height = this.game.height / 3 * 0.9;
+        this.playButton.height = this.game.height * 0.2;
         this.playButton.x = this.world.centerX;
-        this.playButton.y = this.world.centerY;
+        this.playButton.y = this.world.centerY + this.game.height * 0.05;
         this.loginButton.width = this.game.width * 0.5;
-        this.loginButton.height = this.game.height / 3 * 0.45;
+        this.loginButton.height = this.game.height * 0.2;
         this.loginButton.x = this.world.centerX;
-        this.loginButton.y = this.world.centerY + this.game.height / 3;
+        this.loginButton.y = this.playButton.y + this.playButton.height + this.game.height * 0.05;
         this.nameText.x = this.world.centerX;
-        this.nameText.y = this.world.centerY + this.game.height / 3;
+        this.nameText.y = this.playButton.y + this.playButton.height + this.game.height * 0.05;
         this.feedbackLabel.width = this.game.width / 20;
         this.feedbackLabel.height = this.game.width / 40;
         this.feedbackLabel.x = this.game.width / 20;
@@ -1082,6 +1084,8 @@ var MenuState = (function (_super) {
         this.feedbackButton.y = this.game.height - this.feedbackLabel.height;
     };
     MenuState.prototype.update = function () {
+        this.backgroundImage.tilePosition.x += 1;
+        this.backgroundImage.tilePosition.y += 1;
         this.clock.Update();
         if (MenuState.LoggedIn) {
             this.loginButton.visible = false;
