@@ -91,8 +91,6 @@ class LeaderboardState extends Phaser.State {
 
     OnServerLeaderboardReceived(this: XMLHttpRequest, ev: Event) {
         if(this.readyState == 4 && this.status == 200) {
-            console.log(JSON.parse(this.responseText));
-                
             LeaderboardState.LeaderboardResults = JSON.parse(this.responseText);
         }
     }
