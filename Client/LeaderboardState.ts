@@ -139,7 +139,7 @@ class LeaderboardState extends Phaser.State {
             for(let n = 0; n < LeaderboardState.LeaderboardResults.length; n++) {
                 this.rankText.text += (n + 1).toString() + "\n";
                 this.nameText.text += LeaderboardState.LeaderboardResults[n].name + "\n";
-                this.scoreText.text += LeaderboardState.LeaderboardResults[n].score + "\n";
+                this.scoreText.text += LeaderboardState.LeaderboardResults[n].score.toLocaleString() + "\n";
             }
             
         }
