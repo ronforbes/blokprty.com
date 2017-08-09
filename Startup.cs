@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,9 +9,26 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.Rewrite;
+using Microsoft.AspNetCore.Http;
 
 namespace blokprty.com_new
 {
+    public class NonWwwRule : IRule
+{
+    public void ApplyRule(RewriteContext context)
+    {
+        var req = context.HttpContext.Request;
+        var currentHost = req.Host;
+        if (currentHost.Host.StartsWith("www."))
+        {
+            var newHost = new HostString(currentHost.Host.Substring(4), currentHost.Port ?? 80);
+            var newUrl = new StringBuilder().Append("http://").Append(newHost).Append(req.PathBase).Append(req.Path).Append(req.QueryString);
+            context.HttpContext.Response.Redirect(newUrl.ToString());
+            context.Result = RuleResult.EndResponse;
+        }
+    }
+}
     public class Startup
     {
         public Startup(IHostingEnvironment env)
@@ -38,9 +56,12 @@ namespace blokprty.com_new
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            var options = new RewriteOptions();
+            options.Rules.Add(new NonWwwRule());
             app.UseMvc();
             app.UseDefaultFiles();
             app.UseStaticFiles();
+            app.UseRewriter(options);
         }
     }
 }
