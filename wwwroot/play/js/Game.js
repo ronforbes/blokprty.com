@@ -855,7 +855,6 @@ var LoadingState = (function (_super) {
         // Load game assets
         this.load.image("Background", "assets/sprites/background.png?v=2");
         this.load.image("BlokPrtyBG", "assets/sprites/blokprtybg.png");
-        this.load.image("Logo", "assets/sprites/logo.png?v=1");
         this.load.image("BlokPrty-Fixed", "assets/sprites/blokprty-fixed.png");
         this.load.image("PlayButton", "assets/sprites/playbutton.png?v=1");
         this.load.image("LoginButton", "assets/sprites/loginbutton.png");
