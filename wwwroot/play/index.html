@@ -12,8 +12,9 @@
     <body>
         <script>
             window.fbAsyncInit = function() {
+                var id = location.hostname == "localhost" ? '138618186724870' : '201588503575577';
                 FB.init({
-                    appId      : '201588503575577',
+                    appId      : id,
                     cookie     : true,
                     xfbml      : true,
                     version    : 'v2.8'
