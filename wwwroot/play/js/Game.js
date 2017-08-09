@@ -856,15 +856,15 @@ var LoadingState = (function (_super) {
         this.load.setPreloadSprite(this.loadingBar);
         // Load game assets
         this.load.image("Background", "assets/sprites/background.png?v=2");
-        this.load.image("BlokPrtyBG", "assets/sprites/blokprtybg.png");
-        this.load.image("BlokPrty-Fixed", "assets/sprites/blokprty-fixed.png");
-        this.load.image("PlayButton", "assets/sprites/playbutton.png?v=1");
-        this.load.image("LoginButton", "assets/sprites/loginbutton.png");
-        this.load.image("UseResponseLogo", "assets/sprites/useresponselogo.png");
-        this.load.image("Block", "assets/sprites/block.png?v=1");
-        this.load.image("BackButton", "assets/sprites/backbutton.png?v=3");
-        this.load.image("StarParticle", "assets/sprites/starparticle.png");
-        this.load.image("CircleParticle", "assets/sprites/circleparticle.png");
+        this.load.image("BlokPrtyBG", "assets/sprites/blokprtybg.png?v=2");
+        this.load.image("BlokPrty-Fixed", "assets/sprites/blokprty-fixed.png?v=2");
+        this.load.image("PlayButton", "assets/sprites/playbutton.png?v=2");
+        this.load.image("LoginButton", "assets/sprites/loginbutton.png?v=2");
+        this.load.image("UseResponseLogo", "assets/sprites/useresponselogo.png?v=2");
+        this.load.image("Block", "assets/sprites/block.png?v=2");
+        this.load.image("BackButton", "assets/sprites/backbutton.png?v=2");
+        this.load.image("StarParticle", "assets/sprites/starparticle.png?v=2");
+        this.load.image("CircleParticle", "assets/sprites/circleparticle.png?v=2");
     };
     LoadingState.prototype.create = function () {
         var alphaTween = this.add.tween(this.loadingBar).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
