@@ -672,6 +672,7 @@ var GameplayState = (function (_super) {
         this.resize();
     };
     GameplayState.prototype.OnBackButton_Click = function () {
+        ga('send', 'event', 'Gameplay', 'Quit Game');
         this.game.state.start("Menu", true, false, this.clock, this.scoreboard, this.name);
     };
     GameplayState.prototype.resize = function () {
@@ -703,6 +704,7 @@ var GameplayState = (function (_super) {
         this.clock.Update();
         switch (this.clock.State) {
             case ClockState.Results:
+                ga('send', 'event', 'Gameplay', 'Finished Game');
                 this.game.state.start("Results", true, false, this.clock, this.scoreboard, this.name);
                 break;
             case ClockState.Leaderboard:
@@ -779,7 +781,6 @@ var LeaderboardState = (function (_super) {
     };
     LeaderboardState.prototype.OnServerLeaderboardReceived = function (ev) {
         if (this.readyState == 4 && this.status == 200) {
-            console.log(JSON.parse(this.responseText));
             LeaderboardState.LeaderboardResults = JSON.parse(this.responseText);
         }
     };
@@ -1027,6 +1028,7 @@ var MenuState = (function (_super) {
         });
     };
     MenuState.prototype.OnPlayButton_Click = function () {
+        ga('send', 'event', 'Menu', 'Play');
         switch (this.clock.State) {
             case ClockState.Gameplay:
                 this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard, MenuState.Name);
@@ -1052,6 +1054,7 @@ var MenuState = (function (_super) {
             });
             MenuState.LoggedIn = true;
         });
+        ga('send', 'event', 'Menu', 'Login');
     };
     MenuState.prototype.OnFeedbackButton_Click = function () {
         window.open("https://blokprty.useresponse.com/");

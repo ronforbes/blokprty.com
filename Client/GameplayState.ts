@@ -53,6 +53,8 @@ class GameplayState extends Phaser.State {
     }
 
     private OnBackButton_Click() {
+        ga('send', 'event', 'Gameplay', 'Quit Game');
+
         this.game.state.start("Menu", true, false, this.clock, this.scoreboard, this.name);
     }
 
@@ -94,6 +96,7 @@ class GameplayState extends Phaser.State {
 
         switch(this.clock.State) {
             case ClockState.Results:
+                ga('send', 'event', 'Gameplay', 'Finished Game');
                 this.game.state.start("Results", true, false, this.clock, this.scoreboard, this.name);
                 break;
             case ClockState.Leaderboard:

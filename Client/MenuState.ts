@@ -80,6 +80,8 @@ class MenuState extends Phaser.State {
     }
 
     private OnPlayButton_Click() {
+        ga('send', 'event', 'Menu', 'Play');
+
         switch(this.clock.State) {
             case ClockState.Gameplay:
                 this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard, MenuState.Name);
@@ -110,6 +112,8 @@ class MenuState extends Phaser.State {
 
             MenuState.LoggedIn = true;
         });
+
+        ga('send', 'event', 'Menu', 'Login');
     }
 
     private OnFeedbackButton_Click() {
