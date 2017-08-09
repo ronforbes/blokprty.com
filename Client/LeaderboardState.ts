@@ -144,6 +144,7 @@ class LeaderboardState extends Phaser.State {
         
         switch(this.clock.State) {
             case ClockState.Gameplay:
+                ga('send', 'event', 'Leaderboard', 'Started Next Game');
                 this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard, this.name);
                 break;
             case ClockState.Results:

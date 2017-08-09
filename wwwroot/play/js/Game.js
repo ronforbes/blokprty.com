@@ -820,6 +820,7 @@ var LeaderboardState = (function (_super) {
         }
         switch (this.clock.State) {
             case ClockState.Gameplay:
+                ga('send', 'event', 'Leaderboard', 'Started Next Game');
                 this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard, this.name);
                 break;
             case ClockState.Results:
@@ -1028,7 +1029,7 @@ var MenuState = (function (_super) {
         });
     };
     MenuState.prototype.OnPlayButton_Click = function () {
-        ga('send', 'event', 'Menu', 'Play');
+        ga('send', 'event', 'Menu', 'Started Playing');
         switch (this.clock.State) {
             case ClockState.Gameplay:
                 this.game.state.start("Gameplay", true, false, this.clock, this.scoreboard, MenuState.Name);
@@ -1054,7 +1055,7 @@ var MenuState = (function (_super) {
             });
             MenuState.LoggedIn = true;
         });
-        ga('send', 'event', 'Menu', 'Login');
+        ga('send', 'event', 'Menu', 'Logged In');
     };
     MenuState.prototype.OnFeedbackButton_Click = function () {
         window.open("https://blokprty.useresponse.com/");
