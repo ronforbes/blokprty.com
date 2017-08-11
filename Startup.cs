@@ -29,7 +29,7 @@ namespace blokprty.com_new
             }
         }
     }
-    
+
     public class Startup
     {
         public Startup(IHostingEnvironment env)
@@ -49,6 +49,7 @@ namespace blokprty.com_new
         {
             // Add framework services.
             services.AddMvc();
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -59,6 +60,7 @@ namespace blokprty.com_new
 
             var options = new RewriteOptions();
             options.Rules.Add(new NonWwwRule());
+            app.UseCors(builder => builder.AllowAnyOrigin());
             app.UseMvc();
             app.UseDefaultFiles();
             app.UseStaticFiles();
