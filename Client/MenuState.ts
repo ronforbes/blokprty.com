@@ -4,8 +4,16 @@ class MenuState extends Phaser.State {
     private playButton: Phaser.Button;
     private loginButton: Phaser.Button;
     private nameText: Phaser.Text;
-    private feedbackButton: Phaser.Button;
+    private facebookLabel: Phaser.Text;
+    private facebookButton: Phaser.Button;
+    private twitterLabel: Phaser.Text;
+    private twitterButton: Phaser.Button;
+    private instagramLabel: Phaser.Text;
+    private instagramButton: Phaser.Button;
+    private tumblrLabel: Phaser.Text;
+    private tumblrButton: Phaser.Button;
     private feedbackLabel: Phaser.Text;
+    private feedbackButton: Phaser.Button;
     private clock: Clock;
     private scoreboard: Scoreboard;
     static Name: string;
@@ -54,12 +62,36 @@ class MenuState extends Phaser.State {
         this.nameText.anchor.setTo(0.5, 0);
         this.nameText.visible = false;
 
-        this.feedbackButton = this.add.button(0, 0, "UseResponseLogo", this.OnFeedbackButton_Click, this);
-        this.feedbackButton.anchor.setTo(0, 1);
+        let textStyle = { font: "20px Arial", fill: "#ffffff", align: "right" };
+        this.facebookLabel = this.add.text(0, 0, "Facebook", textStyle);
+        this.facebookLabel.anchor.setTo(1, 1);
+        
+        this.facebookButton = this.add.button(0, 0, "FacebookLogo", this.OnFacebookButton_Click, this);
+        this.facebookButton.anchor.setTo(1, 1);
 
-        let feedbackStyle = { font: "20px Arial", fill: "#ffffff" };
-        this.feedbackLabel = this.add.text(0, 0, "Feedback", feedbackStyle);
-        this.feedbackLabel.anchor.setTo(0, 1);
+        this.twitterLabel = this.add.text(0, 0, "Twitter", textStyle);
+        this.twitterLabel.anchor.setTo(1, 1);
+
+        this.twitterButton = this.add.button(0, 0, "TwitterLogo", this.OnTwitterButton_Click, this);
+        this.twitterButton.anchor.setTo(1, 1);
+
+        this.instagramLabel = this.add.text(0, 0, "Instagram", textStyle);
+        this.instagramLabel.anchor.setTo(1, 1);
+
+        this.instagramButton = this.add.button(0, 0, "InstagramLogo", this.OnInstagramButton_Click, this);
+        this.instagramButton.anchor.setTo(1, 1);
+
+        this.tumblrLabel = this.add.text(0, 0, "Tumblr", textStyle);
+        this.tumblrLabel.anchor.setTo(1, 1);
+
+        this.tumblrButton = this.add.button(0, 0, "TumblrLogo", this.OnTumblrButton_Click, this);
+        this.tumblrButton.anchor.setTo(1, 1);
+
+        this.feedbackLabel = this.add.text(0, 0, "Feedback", textStyle);
+        this.feedbackLabel.anchor.setTo(1, 1);
+
+        this.feedbackButton = this.add.button(0, 0, "UseResponseLogo", this.OnFeedbackButton_Click, this);
+        this.feedbackButton.anchor.setTo(1, 1);
 
         this.scale.onOrientationChange.add(this.resize);
         this.resize();
@@ -116,6 +148,22 @@ class MenuState extends Phaser.State {
         ga('send', 'event', 'Menu', 'Logged In');
     }
 
+    private OnFacebookButton_Click() {
+        window.open("https://www.facebook.com/Blok-Prty-206750359857091/");
+    }
+
+    private OnTwitterButton_Click() {
+        window.open("https://twitter.com/blokprtyllc");
+    }
+
+    private OnInstagramButton_Click() {
+        window.open("https://www.instagram.com/blokprty/");
+    }
+
+    private OnTumblrButton_Click() {
+        window.open("https://blokprty.tumblr.com/");
+    }
+
     private OnFeedbackButton_Click() {
         window.open("https://blokprty.useresponse.com/");
     }
@@ -142,15 +190,40 @@ class MenuState extends Phaser.State {
         this.nameText.x = this.world.centerX;
         this.nameText.y = this.playButton.y + this.playButton.height + this.game.height * 0.05;
 
-        this.feedbackLabel.width = this.game.width / 20;
-        this.feedbackLabel.height = this.game.width / 40;
-        this.feedbackLabel.x = this.game.width / 20;
+        this.feedbackLabel.x = this.game.width;
         this.feedbackLabel.y = this.game.height;
 
-        this.feedbackButton.width = this.game.width / 20;
-        this.feedbackButton.height = this.game.width / 20;
-        this.feedbackButton.x = this.game.width / 20;
-        this.feedbackButton.y = this.game.height - this.feedbackLabel.height;
+        this.feedbackButton.width = this.feedbackButton.height = this.feedbackLabel.height;
+        this.feedbackButton.x = this.feedbackLabel.x - this.feedbackLabel.width;
+        this.feedbackButton.y = this.feedbackLabel.y;
+
+        this.tumblrLabel.x = this.game.width;
+        this.tumblrLabel.y = this.feedbackLabel.y - this.feedbackLabel.height;
+
+        this.tumblrButton.width = this.tumblrButton.height = this.tumblrLabel.height;
+        this.tumblrButton.x = this.tumblrLabel.x - this.tumblrLabel.width;
+        this.tumblrButton.y = this.tumblrLabel.y;
+
+        this.instagramLabel.x = this.game.width;
+        this.instagramLabel.y = this.tumblrLabel.y - this.tumblrLabel.height;
+
+        this.instagramButton.width = this.instagramButton.height = this.instagramLabel.height;
+        this.instagramButton.x = this.instagramLabel.x - this.instagramLabel.width;
+        this.instagramButton.y = this.instagramLabel.y;
+
+        this.twitterLabel.x = this.game.width;
+        this.twitterLabel.y = this.instagramLabel.y - this.instagramLabel.height;
+
+        this.twitterButton.width = this.twitterButton.height = this.twitterLabel.height;
+        this.twitterButton.x = this.twitterLabel.x - this.twitterLabel.width;
+        this.twitterButton.y = this.twitterLabel.y;
+
+        this.facebookLabel.x = this.game.width;
+        this.facebookLabel.y = this.twitterLabel.y - this.twitterLabel.height;
+
+        this.facebookButton.width = this.facebookButton.height = this.facebookLabel.height;
+        this.facebookButton.x = this.facebookLabel.x - this.facebookLabel.width;
+        this.facebookButton.y = this.facebookLabel.y;
     }
 
     update() {
