@@ -15,20 +15,21 @@ using Microsoft.AspNetCore.Http;
 namespace blokprty.com_new
 {
     public class NonWwwRule : IRule
-{
-    public void ApplyRule(RewriteContext context)
     {
-        var req = context.HttpContext.Request;
-        var currentHost = req.Host;
-        if (currentHost.Host.StartsWith("www."))
+        public void ApplyRule(RewriteContext context)
         {
-            var newHost = new HostString(currentHost.Host.Substring(4), currentHost.Port ?? 80);
-            var newUrl = new StringBuilder().Append("http://").Append(newHost).Append(req.PathBase).Append(req.Path).Append(req.QueryString);
-            context.HttpContext.Response.Redirect(newUrl.ToString());
-            context.Result = RuleResult.EndResponse;
+            var req = context.HttpContext.Request;
+            var currentHost = req.Host;
+            if (currentHost.Host.StartsWith("www."))
+            {
+                var newHost = new HostString(currentHost.Host.Substring(4), currentHost.Port ?? 80);
+                var newUrl = new StringBuilder().Append("http://").Append(newHost).Append(req.PathBase).Append(req.Path).Append(req.QueryString);
+                context.HttpContext.Response.Redirect(newUrl.ToString());
+                context.Result = RuleResult.EndResponse;
+            }
         }
     }
-}
+    
     public class Startup
     {
         public Startup(IHostingEnvironment env)
