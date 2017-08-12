@@ -76,10 +76,6 @@ namespace blokprty.com_new {
             botNames.Add("Pravina S.");
 
             random = new Random();
-
-            Debug.WriteLine("Initialized Game Room");
-            Console.WriteLine("Initialized Game Room");
-            LogState();
         }
 
         public void LogState() {
@@ -89,8 +85,6 @@ namespace blokprty.com_new {
 
         public void AddGameResults(GameResults results) {
             gameResults.Add(results);
-            Debug.WriteLine("Added GameResults: Name=" + results.Name + ", Score=" + results.Score);
-            Console.WriteLine("Added GameResults: Name=" + results.Name + ", Score=" + results.Score);
         }
 
         public List<GameResults> GetLeaderboard() {
@@ -119,10 +113,6 @@ namespace blokprty.com_new {
 
                         gameResults.Clear();
 
-                        Debug.WriteLine("Changed GameRoom state to Results");
-                        Console.WriteLine("Changed GameRoom state to Results");
-                        LogState();
-
                         foreach(string name in botNames) {
                             AddGameResults(new GameResults(name, random.Next(2000) * 10));
                         }
@@ -133,15 +123,6 @@ namespace blokprty.com_new {
                     if(TimeRemaining <= 0.0f) {
                         State = GameState.Leaderboard;
                         TimeRemaining = leaderboardDuration;
-
-                        Debug.WriteLine("Changed GameRoom state to Leaderboard");
-                        Console.WriteLine("Changed GameRoom state to Leaderboard");
-                        LogState();
-
-                        for(int n = 0; n < GetLeaderboard().Count; n++) {
-                            Debug.WriteLine("Rank=" + n + ", Name=" + GetLeaderboard()[n].Name + ", Score=" + GetLeaderboard()[n].Score);
-                            Console.WriteLine("Rank=" + n + ", Name=" + GetLeaderboard()[n].Name + ", Score=" + GetLeaderboard()[n].Score);
-                        }
                     }
                     break;
 
@@ -149,10 +130,6 @@ namespace blokprty.com_new {
                     if(TimeRemaining <= 0.0f) {
                         State = GameState.Game;
                         TimeRemaining = gameDuration;
-
-                        Debug.WriteLine("Changed GameRoom state to Game");
-                        Console.WriteLine("Changed GameRoom state to Game");
-                        LogState();
                     }
                     break;
             }

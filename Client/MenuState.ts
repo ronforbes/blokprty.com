@@ -4,6 +4,8 @@ class MenuState extends Phaser.State {
     private playButton: Phaser.Button;
     private loginButton: Phaser.Button;
     private nameText: Phaser.Text;
+    private websiteLabel: Phaser.Text;
+    private websiteButton: Phaser.Button;
     private facebookLabel: Phaser.Text;
     private facebookButton: Phaser.Button;
     private twitterLabel: Phaser.Text;
@@ -63,6 +65,13 @@ class MenuState extends Phaser.State {
         this.nameText.visible = false;
 
         let textStyle = { font: "20px Arial", fill: "#ffffff", align: "right" };
+
+        this.websiteLabel = this.add.text(0, 0, "Website", textStyle);
+        this.websiteLabel.anchor.setTo(1, 1);
+
+        this.websiteButton = this.add.button(0, 0, "BlokPrtyLLCLogoCropped", this.OnWebsiteButton_Click, this);
+        this.websiteButton.anchor.setTo(1, 1);
+
         this.facebookLabel = this.add.text(0, 0, "Facebook", textStyle);
         this.facebookLabel.anchor.setTo(1, 1);
         
@@ -148,6 +157,10 @@ class MenuState extends Phaser.State {
         ga('send', 'event', 'Menu', 'Logged In');
     }
 
+    private OnWebsiteButton_Click() {
+        window.open("http://www.blokprty.com");
+    }
+
     private OnFacebookButton_Click() {
         window.open("https://www.facebook.com/Blok-Prty-206750359857091/");
     }
@@ -224,6 +237,13 @@ class MenuState extends Phaser.State {
         this.facebookButton.width = this.facebookButton.height = this.facebookLabel.height;
         this.facebookButton.x = this.facebookLabel.x - this.facebookLabel.width;
         this.facebookButton.y = this.facebookLabel.y;
+
+        this.websiteLabel.x = this.game.width;
+        this.websiteLabel.y = this.facebookLabel.y - this.facebookLabel.height;
+
+        this.websiteButton.width = this.websiteButton.height = this.websiteLabel.height;
+        this.websiteButton.x = this.websiteLabel.x - this.websiteLabel.width;
+        this.websiteButton.y = this.websiteLabel.y;
     }
 
     update() {

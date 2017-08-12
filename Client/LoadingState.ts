@@ -19,6 +19,7 @@ class LoadingState extends Phaser.State {
         this.load.image("BlokPrty-Fixed", "assets/sprites/blokprty-fixed.png?v=2");
         this.load.image("PlayButton", "assets/sprites/playbutton.png?v=2"); 
         this.load.image("LoginButton", "assets/sprites/loginbutton.png?v=2");
+        this.load.image("BlokPrtyLLCLogoCropped", "assets/sprites/blokprtyllclogocropped.png?v=2");
         this.load.image("FacebookLogo", "assets/sprites/facebooklogo.png?v=2");
         this.load.image("TwitterLogo", "assets/sprites/twitterlogo.png?v=2");
         this.load.image("InstagramLogo", "assets/sprites/instagramlogo.png?v=2");

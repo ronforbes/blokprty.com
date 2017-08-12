@@ -855,6 +855,7 @@ var LoadingState = (function (_super) {
         this.load.image("BlokPrty-Fixed", "assets/sprites/blokprty-fixed.png?v=2");
         this.load.image("PlayButton", "assets/sprites/playbutton.png?v=2");
         this.load.image("LoginButton", "assets/sprites/loginbutton.png?v=2");
+        this.load.image("BlokPrtyLLCLogoCropped", "assets/sprites/blokprtyllclogocropped.png?v=2");
         this.load.image("FacebookLogo", "assets/sprites/facebooklogo.png?v=2");
         this.load.image("TwitterLogo", "assets/sprites/twitterlogo.png?v=2");
         this.load.image("InstagramLogo", "assets/sprites/instagramlogo.png?v=2");
@@ -1009,6 +1010,10 @@ var MenuState = (function (_super) {
         this.nameText.anchor.setTo(0.5, 0);
         this.nameText.visible = false;
         var textStyle = { font: "20px Arial", fill: "#ffffff", align: "right" };
+        this.websiteLabel = this.add.text(0, 0, "Website", textStyle);
+        this.websiteLabel.anchor.setTo(1, 1);
+        this.websiteButton = this.add.button(0, 0, "BlokPrtyLLCLogoCropped", this.OnWebsiteButton_Click, this);
+        this.websiteButton.anchor.setTo(1, 1);
         this.facebookLabel = this.add.text(0, 0, "Facebook", textStyle);
         this.facebookLabel.anchor.setTo(1, 1);
         this.facebookButton = this.add.button(0, 0, "FacebookLogo", this.OnFacebookButton_Click, this);
@@ -1072,6 +1077,9 @@ var MenuState = (function (_super) {
         });
         ga('send', 'event', 'Menu', 'Logged In');
     };
+    MenuState.prototype.OnWebsiteButton_Click = function () {
+        window.open("http://www.blokprty.com");
+    };
     MenuState.prototype.OnFacebookButton_Click = function () {
         window.open("https://www.facebook.com/Blok-Prty-206750359857091/");
     };
@@ -1129,6 +1137,11 @@ var MenuState = (function (_super) {
         this.facebookButton.width = this.facebookButton.height = this.facebookLabel.height;
         this.facebookButton.x = this.facebookLabel.x - this.facebookLabel.width;
         this.facebookButton.y = this.facebookLabel.y;
+        this.websiteLabel.x = this.game.width;
+        this.websiteLabel.y = this.facebookLabel.y - this.facebookLabel.height;
+        this.websiteButton.width = this.websiteButton.height = this.websiteLabel.height;
+        this.websiteButton.x = this.websiteLabel.x - this.websiteLabel.width;
+        this.websiteButton.y = this.websiteLabel.y;
     };
     MenuState.prototype.update = function () {
         this.backgroundImage.tilePosition.x += 1;
