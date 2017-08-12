@@ -35,7 +35,8 @@ class GameplayState extends Phaser.State {
             this.name = "Guest";
         }
 
-        this.backgroundImage = this.add.image(0, 0, "Background");
+        this.stage.backgroundColor = 0x222222;
+        //this.backgroundImage = this.add.image(0, 0, "Background");
 
         this.board = new Board(this.game, this.scoreboard);
 
@@ -59,8 +60,8 @@ class GameplayState extends Phaser.State {
     }
 
     resize() {
-        this.backgroundImage.width = this.game.width;
-        this.backgroundImage.height = this.game.height;
+        //this.backgroundImage.width = this.game.width;
+        //this.backgroundImage.height = this.game.height;
 
         let shortDimension: number = Math.min(this.game.width, this.game.height);
         BlockRenderer.Size = shortDimension * 0.8 / (Board.Rows - 1);

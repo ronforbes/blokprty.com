@@ -18,7 +18,7 @@ class BoardRenderer {
     }
 
     Resize() {
-        this.background.beginFill(0x333333);
+        this.background.beginFill(0x3c3c3c);
         this.background.drawRect(0, BlockRenderer.Size, Board.Columns * BlockRenderer.Size, (Board.Rows - 1) * BlockRenderer.Size);
 
         this.mask.beginFill(0xffffff);

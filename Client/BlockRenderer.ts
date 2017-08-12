@@ -19,12 +19,12 @@ class BlockRenderer {
         if(BlockRenderer.StarEmitter == undefined) {
             BlockRenderer.StarEmitter = this.block.Sprite.game.add.emitter(-100, -100, 10 * Board.Columns * Board.Rows);
             BlockRenderer.StarEmitter.makeParticles("StarParticle");
-            BlockRenderer.StarEmitter.gravity = 0;
+            BlockRenderer.StarEmitter.gravity = 10;
             BlockRenderer.StarEmitter.minParticleScale = BlockRenderer.StarEmitter.maxParticleScale = 0.25;
-            BlockRenderer.StarEmitter.setAlpha(1, 0, 2000);
-            BlockRenderer.StarEmitter.setScale(0.25, 0, 0.25, 0, 2000);
-            BlockRenderer.StarEmitter.setXSpeed(-50, 50);
-            BlockRenderer.StarEmitter.setYSpeed(-50, 50);
+            BlockRenderer.StarEmitter.setAlpha(1, 0, 3000);
+            BlockRenderer.StarEmitter.setScale(0.25, 0, 0.25, 0, 3000);
+            BlockRenderer.StarEmitter.setXSpeed(-200, 200);
+            BlockRenderer.StarEmitter.setYSpeed(-200, 200);
         } 
         
         if(BlockRenderer.CircleEmitter == undefined) {
@@ -32,8 +32,8 @@ class BlockRenderer {
             BlockRenderer.CircleEmitter.makeParticles("CircleParticle");
             BlockRenderer.CircleEmitter.gravity = 0;
             BlockRenderer.CircleEmitter.minParticleScale = BlockRenderer.StarEmitter.maxParticleScale = 0.5;
-            BlockRenderer.CircleEmitter.setAlpha(1, 0, 1500);
-            BlockRenderer.CircleEmitter.setScale(0, 1, 0, 1, 2000);
+            BlockRenderer.CircleEmitter.setAlpha(1, 0, 3000);
+            BlockRenderer.CircleEmitter.setScale(0, 1, 0, 1, 3000);
             BlockRenderer.CircleEmitter.setXSpeed(0, 0);
             BlockRenderer.CircleEmitter.setYSpeed(0, 0);
         }
@@ -122,7 +122,7 @@ class BlockRenderer {
                 if(this.block.Clearer.Elapsed < BlockClearer.Duration * 0.1) {
                     BlockRenderer.StarEmitter.x = this.block.Sprite.worldPosition.x;
                     BlockRenderer.StarEmitter.y = this.block.Sprite.worldPosition.y;
-                    BlockRenderer.StarEmitter.start(true, 2000, null, 10);
+                    BlockRenderer.StarEmitter.start(true, 3000, null, 10);
 
                     BlockRenderer.CircleEmitter.x = this.block.Sprite.worldPosition.x;
                     BlockRenderer.CircleEmitter.y = this.block.Sprite.worldPosition.y;

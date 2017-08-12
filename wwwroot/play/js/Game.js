@@ -168,20 +168,20 @@ var BlockRenderer = (function () {
         if (BlockRenderer.StarEmitter == undefined) {
             BlockRenderer.StarEmitter = this.block.Sprite.game.add.emitter(-100, -100, 10 * Board.Columns * Board.Rows);
             BlockRenderer.StarEmitter.makeParticles("StarParticle");
-            BlockRenderer.StarEmitter.gravity = 0;
+            BlockRenderer.StarEmitter.gravity = 10;
             BlockRenderer.StarEmitter.minParticleScale = BlockRenderer.StarEmitter.maxParticleScale = 0.25;
-            BlockRenderer.StarEmitter.setAlpha(1, 0, 2000);
-            BlockRenderer.StarEmitter.setScale(0.25, 0, 0.25, 0, 2000);
-            BlockRenderer.StarEmitter.setXSpeed(-50, 50);
-            BlockRenderer.StarEmitter.setYSpeed(-50, 50);
+            BlockRenderer.StarEmitter.setAlpha(1, 0, 3000);
+            BlockRenderer.StarEmitter.setScale(0.25, 0, 0.25, 0, 3000);
+            BlockRenderer.StarEmitter.setXSpeed(-200, 200);
+            BlockRenderer.StarEmitter.setYSpeed(-200, 200);
         }
         if (BlockRenderer.CircleEmitter == undefined) {
             BlockRenderer.CircleEmitter = this.block.Sprite.game.add.emitter(0, 0, Board.Columns * Board.Rows);
             BlockRenderer.CircleEmitter.makeParticles("CircleParticle");
             BlockRenderer.CircleEmitter.gravity = 0;
             BlockRenderer.CircleEmitter.minParticleScale = BlockRenderer.StarEmitter.maxParticleScale = 0.5;
-            BlockRenderer.CircleEmitter.setAlpha(1, 0, 1500);
-            BlockRenderer.CircleEmitter.setScale(0, 1, 0, 1, 2000);
+            BlockRenderer.CircleEmitter.setAlpha(1, 0, 3000);
+            BlockRenderer.CircleEmitter.setScale(0, 1, 0, 1, 3000);
             BlockRenderer.CircleEmitter.setXSpeed(0, 0);
             BlockRenderer.CircleEmitter.setYSpeed(0, 0);
         }
@@ -255,7 +255,7 @@ var BlockRenderer = (function () {
                 if (this.block.Clearer.Elapsed < BlockClearer.Duration * 0.1) {
                     BlockRenderer.StarEmitter.x = this.block.Sprite.worldPosition.x;
                     BlockRenderer.StarEmitter.y = this.block.Sprite.worldPosition.y;
-                    BlockRenderer.StarEmitter.start(true, 2000, null, 10);
+                    BlockRenderer.StarEmitter.start(true, 3000, null, 10);
                     BlockRenderer.CircleEmitter.x = this.block.Sprite.worldPosition.x;
                     BlockRenderer.CircleEmitter.y = this.block.Sprite.worldPosition.y;
                     BlockRenderer.CircleEmitter.start(true, 2000, null, 1);
@@ -486,7 +486,7 @@ var BoardRenderer = (function () {
         this.Resize();
     }
     BoardRenderer.prototype.Resize = function () {
-        this.background.beginFill(0x333333);
+        this.background.beginFill(0x3c3c3c);
         this.background.drawRect(0, BlockRenderer.Size, Board.Columns * BlockRenderer.Size, (Board.Rows - 1) * BlockRenderer.Size);
         this.mask.beginFill(0xffffff);
         this.mask.drawRect(0, BlockRenderer.Size, Board.Columns * BlockRenderer.Size, (Board.Rows - 1) * BlockRenderer.Size);
@@ -500,6 +500,7 @@ var BootState = (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     BootState.prototype.preload = function () {
+        this.load.image("BlokPrtyLLCLogo", "assets/sprites/blokprtyllclogo.jpeg");
         this.load.image("LoadingBar", "assets/sprites/loadingbar.png");
     };
     BootState.prototype.create = function () {
@@ -661,7 +662,8 @@ var GameplayState = (function (_super) {
         if (this.name == undefined) {
             this.name = "Guest";
         }
-        this.backgroundImage = this.add.image(0, 0, "Background");
+        this.stage.backgroundColor = 0x222222;
+        //this.backgroundImage = this.add.image(0, 0, "Background");
         this.board = new Board(this.game, this.scoreboard);
         this.scoreboard.Reset();
         this.scoreText = this.add.text(0, 0, "0", { font: "70px Arial", fill: "#ffffff", align: "center" });
@@ -676,8 +678,8 @@ var GameplayState = (function (_super) {
         this.game.state.start("Menu", true, false, this.clock, this.scoreboard, this.name);
     };
     GameplayState.prototype.resize = function () {
-        this.backgroundImage.width = this.game.width;
-        this.backgroundImage.height = this.game.height;
+        //this.backgroundImage.width = this.game.width;
+        //this.backgroundImage.height = this.game.height;
         var shortDimension = Math.min(this.game.width, this.game.height);
         BlockRenderer.Size = shortDimension * 0.8 / (Board.Rows - 1);
         this.board.Renderer.Group.x = this.world.centerX - BlockRenderer.Size * Board.Columns / 2;
@@ -839,20 +841,13 @@ var LoadingState = (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     LoadingState.prototype.preload = function () {
-        // Setup the Blok Prty logo
-        this.logoText = this.add.text(0, 0, "Blok Prty LLC", { font: "40px Arial", fill: "#ffffff" });
-        this.logoText.anchor.setTo(0.5);
-        this.logoText.x = this.world.centerX;
-        this.logoText.y = this.game.height / 3;
-        // Set the "Presents" text
-        this.presentsText = this.add.text(0, 0, "Presents...", { font: "20px Arial", fill: "#ffffff" });
-        this.presentsText.anchor.setTo(0.5);
-        this.presentsText.x = this.world.centerX;
-        this.presentsText.y = this.game.height / 3 + this.logoText.height;
+        this.logo = this.add.image(0, 0, "BlokPrtyLLCLogo");
+        this.logo.width = this.game.width;
+        this.logo.height = this.game.height;
         // Setup the preload bar
         this.loadingBar = this.add.sprite(0, 0, "LoadingBar");
         this.loadingBar.anchor.setTo(0.5);
-        this.loadingBar.position.setTo(this.world.centerX, this.world.centerY);
+        this.loadingBar.position.setTo(this.world.centerX, this.game.height * 3 / 4);
         this.load.setPreloadSprite(this.loadingBar);
         // Load game assets
         this.load.image("Background", "assets/sprites/background.png?v=2");

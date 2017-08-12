@@ -1,5 +1,6 @@
 class BootState extends Phaser.State {
     preload() {
+        this.load.image("BlokPrtyLLCLogo", "assets/sprites/blokprtyllclogo.jpeg");
         this.load.image("LoadingBar", "assets/sprites/loadingbar.png");
     }
 
